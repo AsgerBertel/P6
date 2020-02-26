@@ -21,7 +21,7 @@ public class main {
 
         tokenStream = tokenizer("Mads Bau is a beautiful human being. He deserves to die.");
         System.out.println(tokenStream);
-        Sentence sent = new Sentence("Mads Bau elsker Mc Donalds");
+        Sentence sent = new Sentence("Mads Bau loves McDonalds");
         nerTag(sent);
     }
 
