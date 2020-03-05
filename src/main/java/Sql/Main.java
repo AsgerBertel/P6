@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
         Atlas atlas = new Atlas();
-        City city= atlas.find(40.5644630645709, -74.0703918547116);
+        City city= atlas.find(40.6133097955683, -73.8921348171745);
         System.out.println(city);
        /* try {
             main.insertDates();
@@ -32,4 +32,5 @@ public class Main {
               ConnectionManager.updateSql(QueryManager.insertIntoWareHouse(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())));
         }
     }
+
 }
