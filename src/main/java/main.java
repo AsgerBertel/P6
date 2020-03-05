@@ -1,3 +1,4 @@
+import TweetCleaner.JsonCleaner;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -11,12 +12,17 @@ import edu.stanford.nlp.simple.Sentence;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 
+import javax.json.Json;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class main {
     public static void main(String[] args) {
+
+        JsonCleaner cleaner = new JsonCleaner();
+        cleaner.cleanTweets("assets/61.json");
         /*
         ArrayList<CoreLabel> tokenStream = new ArrayList<>();
 
@@ -27,9 +33,11 @@ public class main {
 
 
 
-         */
+
         SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
         sentimentAnalyzer.findSentiment("Mads Bau loves McDonalds");
+
+         */
     }
 
 
