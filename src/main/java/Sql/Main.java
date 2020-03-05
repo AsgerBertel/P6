@@ -32,4 +32,5 @@ public class Main {
               ConnectionManager.updateSql(QueryManager.insertIntoWareHouse(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())));
         }
     }
+    
 }
