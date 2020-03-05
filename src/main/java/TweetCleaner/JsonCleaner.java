@@ -32,13 +32,13 @@ public class JsonCleaner {
 
             // read customer details
             BigDecimal id = (BigDecimal) parser.get("id");
-            String name = (String) parser.get("cr");
-            String email = (String) parser.get("email");
+          //  String name = (String) parser.get("cr");
+         //   String email = (String) parser.get("email");
             BigDecimal age = (BigDecimal) parser.get("age");
 
             System.out.println(id);
-            System.out.println(name);
-            System.out.println(email);
+        //    System.out.println(name);
+        //    System.out.println(email);
             System.out.println(age);
 
             // read address
