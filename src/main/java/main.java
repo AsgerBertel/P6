@@ -17,12 +17,19 @@ import java.util.Properties;
 
 public class main {
     public static void main(String[] args) {
+        /*
         ArrayList<CoreLabel> tokenStream = new ArrayList<>();
 
         tokenStream = tokenizer("Mads Bau is a beautiful human being. He deserves to die.");
         System.out.println(tokenStream);
-        Sentence sent = new Sentence("Mads Bau loves McDonalds");
+        Sentence sent = new Sentence("Mads ");
         nerTag(sent);
+
+
+
+         */
+        SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
+        sentimentAnalyzer.findSentiment("Mads Bau loves McDonalds");
     }
 
 
@@ -56,4 +63,5 @@ public class main {
         }
         return nerTags;
     }
+
 }
