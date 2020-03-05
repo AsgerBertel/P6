@@ -1,11 +1,12 @@
 package Sql;
 
 public class QueryManager {
-    public static String connectionString = "jdbc:sqlserver://127.0.0.1;databaseName=WareHousedb;integratedSecurity=true";
+    public static String connectionString = "jdbc:postgresql://localhost:5432/cubefrequency?user=postgres&password=Password";
+    public static String selectDateFromTweet = "SELECT date FROM cube.tweets ";
 
 
+    public static String insertIntoWareHouse(int day, int month, int year) {
+        return "INSERT INTO cube.datedimenson (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
+    }//INSERT INTO cube.datedimenson (year,month,day)  VALUES (2020, 10, 30)
 
-    public static String insertIntoWareHouse(String wareHouseMapName, String width, String length) {
-        return "INSERT INTO WareHouse VALUES ('" + wareHouseMapName + "', '" + width + "', '" + length + "')";
-    }
 }
