@@ -22,7 +22,9 @@ public class main {
     public static void main(String[] args) {
 
         JsonCleaner cleaner = new JsonCleaner();
-        cleaner.cleanTweets("assets/61.json");
+
+        System.out.println(cleaner.cleanAllFilesInDirectory("assets/jsonfiles/").size());
+
         /*
         ArrayList<CoreLabel> tokenStream = new ArrayList<>();
 
