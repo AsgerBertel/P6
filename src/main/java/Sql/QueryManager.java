@@ -1,7 +1,7 @@
 package Sql;
 
 public class QueryManager {
-    public static String connectionString = "jdbc:postgresql://localhost:5432/cubefrequency?user=postgres&password=Password";
+    public static String connectionString = "jdbc:postgresql://62.107.118.55:5432/cubefrequency?user=postgres&password=Password";
     public static String selectDateFromTweet = "SELECT date FROM cube.tweets ";
         public static String selectCoordinatesFromTweet = "SELECT lat,long FROM cube.tweets ";
     public static String selectProductsFromTweet = "SELECT lat,long FROM cube.tweets ";
