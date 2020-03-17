@@ -8,13 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import DataGeneration.DataGeneration;
 import org.json.JSONObject;
 
 public class JsonCleaner {
+    DataGeneration datagenerator = new DataGeneration();
     String line;
 
-    public ArrayList<Tweet> cleanAllFilesInDirectory(String pathToDirectory){
-        ArrayList<Tweet> usableTweets = new ArrayList<>();
+    public ArrayList<JsonTweet> cleanAllFilesInDirectory(String pathToDirectory){
+        ArrayList<JsonTweet> usableTweets = new ArrayList<>();
         File folder = new File(pathToDirectory);
         List<File> files = Arrays.asList(folder.listFiles());
         for (File f : files) {
@@ -22,8 +24,8 @@ public class JsonCleaner {
         }
         return usableTweets;
     }
-    private ArrayList<Tweet> cleanTweets(String path) {
-        ArrayList<Tweet> usableTweets = new ArrayList<>();
+    private ArrayList<JsonTweet> cleanTweets(String path) {
+        ArrayList<JsonTweet> usableTweets = new ArrayList<>();
 
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
@@ -46,13 +48,14 @@ public class JsonCleaner {
                         text = (String) json.get("text");
                     }
                     double[] latlong = genLatLong();
-                    Tweet tweet = new Tweet(
+                    JsonTweet jsonTweet = new JsonTweet(
                             String.valueOf(json.get("id")),
                             text,
                             (String) json.get("created_at"),
-                            latlong[0], latlong[1]
+                            latlong[0], latlong[1],
+                            null
                     );
-                    usableTweets.add(tweet);
+                    usableTweets.add(jsonTweet);
                 } catch (Exception e) {
                     System.out.println(e);
                 }
@@ -65,7 +68,7 @@ public class JsonCleaner {
     }
 
     public double[] genLatLong() {
-        double[] longLatArray = new double[]{-1.0, -1.0};
+        double[] longLatArray = new double[]{DataGeneration.generateLat(20, 100), DataGeneration.generateLong(20, 100)};
         // TODO: 06/03/2020  Make it take bundary for future use
         return longLatArray;
     }

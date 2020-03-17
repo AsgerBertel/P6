@@ -25,6 +25,7 @@ public class main {
 
         System.out.println(cleaner.cleanAllFilesInDirectory("assets/jsonfiles/").size());
 
+
         /*
         ArrayList<CoreLabel> tokenStream = new ArrayList<>();
 
