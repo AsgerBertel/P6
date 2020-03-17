@@ -82,7 +82,7 @@ public class UnZipManager {
                 try {
                     File currDir = new File(tempTarDir.getPath() + "/" + j++);
                     currDir.mkdir();
-                    UnZipper.unTar(new File(file.getAbsolutePath()), tempTarDir);
+                    UnZipper.unTar(new File(file.getAbsolutePath()), currDir);
                     System.out.println("unTar Fnished");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -155,8 +155,8 @@ class BzUnzipRunnable implements Runnable{
 
     private void showFiles(File[] files) {
         for (File file : files) {
-            //if(file.getName().contains("finished"))
-            //    continue;
+            if(file.getName().contains("finished"))
+                continue;
             if (file.isDirectory()) {
                 showFiles(file.listFiles()); // Calls same method again.
             } else {
@@ -171,7 +171,7 @@ class BzUnzipRunnable implements Runnable{
                     System.out.println(e);
                 }
             }
-            //file.renameTo(new File(file.getAbsolutePath() + "finished"));
+            file.renameTo(new File(file.getAbsolutePath() + "finished"));
         }
     }
 }
