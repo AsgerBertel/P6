@@ -61,7 +61,7 @@ public class JsonCleaner {
                     double[] latlong = genLatLong();
                     JsonTweet jsonTweet = new JsonTweet(
                             String.valueOf(json.get("id")),
-                            text,
+                            text.replace("\n",""),
                             (String) json.get("created_at"),
                             latlong[0], latlong[1],
                             null
