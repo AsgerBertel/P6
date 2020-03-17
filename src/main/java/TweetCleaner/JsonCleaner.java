@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,12 +15,21 @@ import org.json.JSONObject;
 public class JsonCleaner {
     DataGeneration datagenerator = new DataGeneration();
     String line;
-
+    double p =0;
+    DecimalFormat df2 = new DecimalFormat("#.#");
     public ArrayList<JsonTweet> cleanAllFilesInDirectory(String pathToDirectory){
         ArrayList<JsonTweet> usableTweets = new ArrayList<>();
         File folder = new File(pathToDirectory);
         List<File> files = Arrays.asList(folder.listFiles());
+        int i=0;
         for (File f : files) {
+            if(i % (files.size()/1000) == 0){
+                System.out.print("\r " + df2.format(p) + "%");
+                p = p + 0.1;
+                if (p >= 99.9)
+                    System.out.print("\r " + 100 + "%");
+            }
+            i++;
             usableTweets.addAll(cleanTweets(f.getPath()));
         }
         return usableTweets;
@@ -35,11 +45,12 @@ public class JsonCleaner {
                 String text = "";
                 try {
                     json = new JSONObject(this.line);
-                    if (!line.contains("lang\":\"en")) {
+                    if(!(json.get("lang").equals("en")))
                         continue;
-                    }
                     if (line.contains("extended_tweet")) {
                         if (handleRetweet(json)) {
+                            if(!(json.getJSONObject("retweeted_status").get("lang").equals("en")))
+                                continue;
                             text = (String) json.getJSONObject("retweeted_status").getJSONObject("extended_tweet").get("full_text");
                         } else {
                             continue;
@@ -57,7 +68,7 @@ public class JsonCleaner {
                     );
                     usableTweets.add(jsonTweet);
                 } catch (Exception e) {
-                    System.out.println(e);
+                    //System.out.println(e);
                 }
             }
         } catch (IOException e) {
@@ -78,7 +89,7 @@ public class JsonCleaner {
             String text = (String) json.getJSONObject("retweeted_status").getJSONObject("extended_tweet").get("full_text");
             return true;
         } catch (Exception e) {
-            System.out.println(e);
+            //System.out.println(e);
         }
         return false;
     }
