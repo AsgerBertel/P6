@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -14,15 +15,12 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-
         try {
             //main.insertIntoProduct();
             main.insertIntoDates();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
     private void insertIntoDates() throws SQLException {
         resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
@@ -32,16 +30,11 @@ public class Main {
             ConnectionManager.updateSql(QueryManager.insertIntoDate(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())));
         }
     }
-
-    private void insertIntoLocation() throws SQLException {
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectCoordinatesFromTweet);
-        while (resultSet.next()) {
-            Atlas atlas = new Atlas();
-            City city = atlas.find(resultSet.getDouble(1), resultSet.getDouble(2));
-
-            ConnectionManager.updateSql(QueryManager.insertIntoLocation(city.name, city.admin2, city.admin1, city.countryCode));
-        }
-
+    private void multithreadedInsertIntoLocation() throws SQLException {
+        InsertThread t1 = new InsertThread(true);
+        InsertThread t2 = new InsertThread(false);
+        t1.start();
+        t2.start();
     }
 
     private void insertIntoProduct() throws SQLException, FileNotFoundException {
