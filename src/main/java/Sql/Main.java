@@ -15,19 +15,33 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
+
         try {
             //main.insertIntoProduct();
-            main.insertIntoDates();
+            // main.insertIntoDates();
+            main.insertIntoLocation();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
     }
     private void insertIntoDates() throws SQLException {
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
+      /*  resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
         while (resultSet.next()) {
             String result = resultSet.getString(1);
             String[] arrOfStr = result.split("/");
             ConnectionManager.updateSql(QueryManager.insertIntoDate(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())));
+        }*/
+
+
+        for (int year = 2018; year <= 2020; year++) {
+            for (int month = 1; month <= 12; month++) {
+                for (int day = 1; day <= 31; day++) {
+                    ConnectionManager.updateSql(QueryManager.insertIntoDate(day, month, year));
+
+                }
+            }
         }
     }
     private void multithreadedInsertIntoLocation() throws SQLException {
@@ -44,8 +58,8 @@ public class Main {
 
         String[] values;
         while (sc.hasNextLine()) {
-           // String[] arrSplit = strMain.split(", ");
-             values = sc.nextLine().split(",");
+            // String[] arrSplit = strMain.split(", ");
+            values = sc.nextLine().split(",");
             ConnectionManager.updateSql(QueryManager.insertIntoProduct(values[1], values[0]));
         }
 
