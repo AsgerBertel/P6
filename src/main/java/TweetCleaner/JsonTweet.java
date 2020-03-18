@@ -24,4 +24,9 @@ public class JsonTweet {
     public String getText() {
         return text;
     }
+
+    @Override
+    public String toString() {
+        return id + '|' + text + '|' + date + '|' + latitude + '|'+ longitude;
+    }
 }
