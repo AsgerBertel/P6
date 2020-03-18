@@ -24,7 +24,6 @@ public class Main {
 
 
     }
-
     private void insertIntoDates() throws SQLException {
         resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
         while (resultSet.next()) {
