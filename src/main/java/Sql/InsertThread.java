@@ -1,44 +1,38 @@
 package Sql;
 
 import atlas.Atlas;
-import atlas.City;
-
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InsertThread extends Thread {
-    Atlas atlas = new Atlas();
-    ResultSet resultSet;
-    boolean isEven;
+    Atlas atlas;
+    SynchronizedLocationManager resultSet;
 
-    public InsertThread(boolean isEven) {
-        this.isEven = isEven;
+    public InsertThread(SynchronizedLocationManager resultSet, Atlas atlas) {
+        this.resultSet = resultSet;
+        this.atlas = atlas;
     }
 
     @Override
     public void run() {
-        try {
-            insertIntoLocation();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        insertIntoLocation();
     }
 
-    private void insertIntoLocation() throws SQLException {
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectCoordinatesFromTweet);
-        while (resultSet.next()) {
-            if(isEven){
-                if(resultSet.getInt(1) % 2 == 0){
-                    City city = this.atlas.find(resultSet.getDouble(1), resultSet.getDouble(2));
-                    ConnectionManager.updateSql(QueryManager.insertIntoLocation(city.name, city.admin2, city.admin1, city.countryCode));
+    private void insertIntoLocation() {
+        int count=0;
+        while(true){
+            try{
+                DatabaseLocation databaseLocation = resultSet.syncedGetNext(this.atlas);
+                ConnectionManager.updateSql(QueryManager.insertIntoLocation(
+                        databaseLocation.city.name, databaseLocation.city.admin2, databaseLocation.city.admin1, databaseLocation.city.countryCode,databaseLocation.latitude ,databaseLocation.longitude));
+                count++;
+                if(count % 100 == 0){
+                    System.out.println(this.getName() + "has done " + count);
                 }
-            }
-            else{
-                if (resultSet.getInt(1) % 2 !=0){
-                    City city = this.atlas.find(resultSet.getDouble(1), resultSet.getDouble(2));
-                    ConnectionManager.updateSql(QueryManager.insertIntoLocation(city.name, city.admin2, city.admin1, city.countryCode));
-                }
+            }catch (LastRowReachedException | NullPointerException | SQLException e){
+                System.out.println(e.getMessage());
+                break;
             }
         }
     }
 }
+
