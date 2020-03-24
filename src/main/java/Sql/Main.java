@@ -22,8 +22,8 @@ public class Main {
             //main.insertIntoProduct();
             //  main.insertIntoDates();
             //  main.multithreadedInsertIntoLocation();
+            //  main.insertIntoFactTable();
             main.insertIntoFactTable();
-
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -38,30 +38,37 @@ public class Main {
             TweetElement tweetElement = new TweetElement(resultSets.getString(1), resultSets.getDouble(2), resultSets.getDouble(3), resultSets.getString(4), resultSets.getString(5));
 
             listOfFactTableElements.add(tweetElement);
+
+        }
+        for (TweetElement tweetelement : listOfFactTableElements) {
+            String[] arrOfStr = tweetelement.getDate().split("/", 4);
+            //  ConnectionManager.updateSql(getProductID(tweetelement.getProduct()),getOpinionID(tweetelement.getOpinion()),getDateID(Integer.parseInt(arrOfStr[1]),Integer.parseInt(arrOfStr[2]),Integer.parseInt(arrOfStr[3])),getLocationID(tweetelement.getLat(),tweetelement.getLongitude()));
+            ConnectionManager.updateSql(QueryManager.insertFactTable(getProductID(tweetelement.getProduct()), getOpinionID(tweetelement.getOpinion()), getDateID(Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2]), Integer.parseInt(arrOfStr[3])), getLocationID(tweetelement.getLat(), tweetelement.getLongitude())));
         }
 
-
     }
-    private int getProductID(String product) throws SQLException{
+
+    private int getProductID(String product) throws SQLException {
 
         resultSet = ConnectionManager.selectSQL(QueryManager.selectProductIDFromProduct(product));
         return resultSet.getInt(1);
     }
-    private int getOpinionID(String opinion) throws SQLException{
+
+    private int getOpinionID(String opinion) throws SQLException {
 
         resultSet = ConnectionManager.selectSQL(QueryManager.selectOpinionIDFromOpinion(opinion));
         return resultSet.getInt(1);
     }
 
-    private int getLocationID(double lat, double longi) throws SQLException{
+    private int getLocationID(double lat, double longi) throws SQLException {
 
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectLocationIDFromCoordinates(lat,longi));
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectLocationIDFromCoordinates(lat, longi));
         return resultSet.getInt(1);
     }
 
-    private int getDateID(String product) throws SQLException{
+    private int getDateID(int day, int month, int year) throws SQLException {
 
-     //   resultSet = ConnectionManager.selectSQL(QueryManager.selectProductsFromTweet(product));
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectDayIDFromDay(day, month, year));
         return resultSet.getInt(1);
     }
 
@@ -73,11 +80,10 @@ public class Main {
             String[] arrOfStr = result.split("/");
             ConnectionManager.updateSql(QueryManager.insertIntoDate(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())));
         }*/
-        for (int year = 2018; year <= 2020; year++) {
-            for (int month = 1; month <= 12; month++) {
-                for (int day = 1; day <= 31; day++) {
-                    ConnectionManager.updateSql(QueryManager.insertIntoDate(day, month, year));
-                }
+
+        for (int month = 1; month <= 36; month++) {
+            for (int day = 1; day <= 31; day++) {
+                ConnectionManager.updateSql(QueryManager.insertIntoDay(day, month));
             }
         }
     }

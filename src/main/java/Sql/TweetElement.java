@@ -14,4 +14,24 @@ public class TweetElement {
         this.opinion = opinion;
         this.date = date;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public String getOpinion() {
+        return opinion;
+    }
 }
