@@ -25,18 +25,15 @@ public class QueryManager {
     }
 
     public static String selectLocationIDFromCoordinates(double lat, double longi) {
-        return "SELECT coordinate.locationid FROM cube.coordinate WHERE lat = " + lat + "' AND long =" + longi + "";
+        return "SELECT coordinate.locationid FROM cube.coordinate WHERE lat = " + lat + " AND long =" + longi + "";
     }
 
     public static String selectDayIDFromDay(int day, int month, int year) {
-        return "SELECT dayid FROM cube.day d" +
-                "    INNER JOIN cube.month ON d.monthid = month.monthid" +
-                "    INNER JOIN cube.year ON month.yearid = year.yearid" +
-                "    WHERE day = " + day + "' AND long =" + month + "' AND long =" + year + "";
+        return "SELECT dayid FROM cube.day d INNER JOIN cube.month ON d.monthid = month.monthid INNER JOIN cube.year ON month.yearid = year.yearid WHERE day = " + day + " AND month.month = " + month + " AND year.year =" + year + "";
     }
     public static String insertFactTable(int productid, int opinionid, int dateid, int coordinateid) {
         return "INSERT INTO cube.facttable ( productid, opinionid, dateid, coordinateid)\n" +
-                "VALUES( '" + productid + "', '" + opinionid + "','" + dateid + "','" + coordinateid + "')";
+                "VALUES( " + productid + ", " + opinionid + "," + dateid + "," + coordinateid + ")";
     }
     public static String insertIntoLocation(String district, String county, String City, String country, double lat, double longtitude) {
         return "INSERT INTO cube.locationdimension (district,county,City,country,lat,long)  VALUES ( '" + district + "', '" + county + "','" + City + "','" + country + "','" + lat + "','" + longtitude + "')";

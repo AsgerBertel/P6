@@ -45,7 +45,8 @@ public class Main {
         for (TweetElement tweetelement : listOfFactTableElements) {
 
             String[] arrOfStr = tweetelement.getDate().split("/", 4);
-            ConnectionManager.updateSql(QueryManager.insertFactTable(getProductID(tweetelement.getProduct().trim()), getOpinionID(tweetelement.getOpinion().trim()), getDateID(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())), getLocationID(tweetelement.getLat(), tweetelement.getLongitude())));
+            arrOfStr[0] = arrOfStr[0].trim();
+            ConnectionManager.updateSql(QueryManager.insertFactTable(getProductID(tweetelement.getProduct().trim()), getOpinionID(tweetelement.getOpinion().trim()), getDateID(Integer.parseInt(arrOfStr[0]), Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2])), getLocationID(tweetelement.getLat(), tweetelement.getLongitude())));
         }
 
     }
