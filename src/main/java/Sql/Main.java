@@ -36,7 +36,7 @@ public class Main {
         resultSets = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
         while (resultSets.next()) {
             TweetElement tweetElement = new TweetElement(resultSets.getString(1), resultSets.getDouble(2), resultSets.getDouble(3), resultSets.getString(4), resultSets.getString(5));
-            if(tweetElement != null)
+       
             listOfFactTableElements.add(tweetElement);
 
         }
