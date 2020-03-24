@@ -1,6 +1,7 @@
 package Sql;
 
 import atlas.Atlas;
+import org.json4s.JsonAST;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +13,7 @@ import java.util.Scanner;
 
 public class Main {
     ResultSet resultSet;
+    ArrayList<TweetElement> listOfFactTableElements;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -20,49 +22,49 @@ public class Main {
             //main.insertIntoProduct();
             //  main.insertIntoDates();
             //  main.multithreadedInsertIntoLocation();
-            // main.insertIntoFactTable();
-            main.test();
+            main.insertIntoFactTable();
+
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
-    }
-
-    private void test() throws SQLException {
-        String product = "fish";
-        double lat;
-        double longitude;
-        String opinion;
-        String date;
-        System.out.println(product);
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
-        while (resultSet.next()) {
-
-            System.out.println(resultSet.getInt(1));
-        }
-
     }
 
     private void insertIntoFactTable() throws SQLException {
-        String product;
-        double lat;
-        double longitude;
-        String opinion;
-        String date;
+        ResultSet resultSets;
 
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
+        resultSets = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
+        while (resultSets.next()) {
+            TweetElement tweetElement = new TweetElement(resultSets.getString(1), resultSets.getDouble(2), resultSets.getDouble(3), resultSets.getString(4), resultSets.getString(5));
 
-        product = resultSet.getString(2);
-        lat = resultSet.getDouble(3);
-        longitude = resultSet.getDouble(4);
-        opinion = resultSet.getString(5);
-        date = resultSet.getString(6);
-        System.out.println(product);
+            listOfFactTableElements.add(tweetElement);
+        }
 
 
     }
+    private int getProductID(String product) throws SQLException{
+
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectProductIDFromProduct(product));
+        return resultSet.getInt(1);
+    }
+    private int getOpinionID(String opinion) throws SQLException{
+
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectOpinionIDFromOpinion(opinion));
+        return resultSet.getInt(1);
+    }
+
+    private int getLocationID(double lat, double longi) throws SQLException{
+
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectLocationIDFromCoordinates(lat,longi));
+        return resultSet.getInt(1);
+    }
+
+    private int getDateID(String product) throws SQLException{
+
+     //   resultSet = ConnectionManager.selectSQL(QueryManager.selectProductsFromTweet(product));
+        return resultSet.getInt(1);
+    }
+
 
     private void insertIntoDates() throws SQLException {
       /*  resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
@@ -75,7 +77,6 @@ public class Main {
             for (int month = 1; month <= 12; month++) {
                 for (int day = 1; day <= 31; day++) {
                     ConnectionManager.updateSql(QueryManager.insertIntoDate(day, month, year));
-
                 }
             }
         }
@@ -109,8 +110,6 @@ public class Main {
             values = sc.nextLine().split(",");
             ConnectionManager.updateSql(QueryManager.insertIntoProduct(values[1], values[0]));
         }
-
     }
-
 }
 
