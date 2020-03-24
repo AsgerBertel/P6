@@ -1,9 +1,16 @@
 package Sql;
 
 public class FactTable {
-    int dateID;
-    int locationID;
-    int opinionID;
-    int productID;
+    private int dayID;
+    private int locationID;
+    private int opinionID;
+    private int productID;
+
+    public FactTable(int dayID, int locationID, int opinionID, int productID) {
+        this.dayID = dayID;
+        this.locationID = locationID;
+        this.opinionID = opinionID;
+        this.productID = productID;
+    }
 
 }

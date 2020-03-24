@@ -1,9 +1,6 @@
 package Sql;
 
-
-
 import atlas.Atlas;
-import org.apache.avro.generic.GenericData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -22,15 +18,52 @@ public class Main {
 
         try {
             //main.insertIntoProduct();
-            // main.insertIntoDates();
-            main.multithreadedInsertIntoLocation();
+            //  main.insertIntoDates();
+            //  main.multithreadedInsertIntoLocation();
+            // main.insertIntoFactTable();
+            main.test();
 
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
 
     }
+
+    private void test() throws SQLException {
+        String product = "fish";
+        double lat;
+        double longitude;
+        String opinion;
+        String date;
+        System.out.println(product);
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
+        while (resultSet.next()) {
+
+            System.out.println(resultSet.getInt(1));
+        }
+
+    }
+
+    private void insertIntoFactTable() throws SQLException {
+        String product;
+        double lat;
+        double longitude;
+        String opinion;
+        String date;
+
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
+
+        product = resultSet.getString(2);
+        lat = resultSet.getDouble(3);
+        longitude = resultSet.getDouble(4);
+        opinion = resultSet.getString(5);
+        date = resultSet.getString(6);
+        System.out.println(product);
+
+
+    }
+
     private void insertIntoDates() throws SQLException {
       /*  resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
         while (resultSet.next()) {
@@ -47,6 +80,7 @@ public class Main {
             }
         }
     }
+
     private void multithreadedInsertIntoLocation() throws SQLException, InterruptedException {
         Atlas atlas = new Atlas();
         resultSet = ConnectionManager.selectSQL(QueryManager.selectCoordinatesFromTweet);
@@ -54,12 +88,12 @@ public class Main {
         SynchronizedLocationManager syncSet = new SynchronizedLocationManager(resultSet);
 
         ArrayList<InsertThread> threads = new ArrayList<>();
-        for(int i =0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             InsertThread t1 = new InsertThread(syncSet, atlas);
             threads.add(t1);
             t1.start();
         }
-        for(InsertThread it : threads){
+        for (InsertThread it : threads) {
             it.join();
         }
     }
@@ -79,23 +113,4 @@ public class Main {
     }
 
 }
-class SynchronizedLocationManager {
-    final Object lock = new Object();
-    ResultSet resultSet;
 
-    public SynchronizedLocationManager(ResultSet resultSet) {
-        this.resultSet = resultSet;
-    }
-    public DatabaseLocation syncedGetNext(Atlas atlas) throws SQLException {
-        synchronized (lock){
-                if(resultSet.next()){
-                    double latitude = this.resultSet.getDouble(1);
-                    double longitude = this.resultSet.getDouble(2);
-                    return new DatabaseLocation(atlas.find(latitude,longitude),latitude,longitude);
-                }
-                else{
-                    throw new LastRowReachedException("Last row of results set has been reached");
-                }
-        }
-    }
-}
