@@ -14,7 +14,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
         TweetLoader tl = new TweetLoader();
-        ArrayList<TopicModelTweet> tweets = tl.getTopicTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/2.txt");
+        ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/2.txt");
         Lda lda = new Lda();
         lda.setTopicCount(7);
         lda.setMaxVocabularySize(2000);

@@ -1,11 +1,10 @@
 
-
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
+import TopicModelling.TopicModelTweet;
+import TopicModelling.TweetLoader;
 import TweetCleaner.JsonTweet;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -14,15 +13,14 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
-import org.json.JSONObject;
 
 public class SentimentAnalyzer {
 
-    public void findSentiment(ArrayList<JsonTweet> tweets) {
+    public void findSentiment(ArrayList<TopicModelTweet> tweets) {
                 Properties props = new Properties();
                 props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
                 StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-                for (JsonTweet tweet : tweets) {
+                for (TopicModelTweet tweet : tweets) {
 
                     int mainSentiment = 0;
                     String line = tweet.getText();
@@ -73,21 +71,15 @@ public class SentimentAnalyzer {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        TweetLoader tweetLoader = new TweetLoader();
         SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
-        ArrayList<JsonTweet> tweets = new ArrayList<>();
-        JsonTweet tweet1 = new JsonTweet("1", "Mads loves mcDonalds", "2020", 20.0, 10.0, null);
-        JsonTweet tweet2 = new JsonTweet("2", "Mads hates mcDonalds", "2020", 20.0, 10.0, null);
-        JsonTweet tweet3 = new JsonTweet("3", "Mads do not like mcDonalds", "2020", 20.0, 10.0, null);
-        JsonTweet tweet4 = new JsonTweet("4", "Mads thinks mcDonalds is distasteful. The food industry is filled with nasty ", "2020", 20.0, 10.0, null);
-        tweets.add(tweet1);
-        tweets.add(tweet2);
-        tweets.add(tweet3);
-        tweets.add(tweet4);
+        ArrayList<TopicModelTweet> tweets = tweetLoader.getTweetsFromFile("D:\\Programming\\P6\\assets\\CleanedData\\2.txt");
+
         sentimentAnalyzer.findSentiment(tweets);
-        for (JsonTweet t:tweets) {
+
+        for (TopicModelTweet t: tweets) {
             System.out.println(t.getSentiment());
         }
-        System.out.println();
     }
 }

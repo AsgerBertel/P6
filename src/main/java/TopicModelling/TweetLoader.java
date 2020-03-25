@@ -5,17 +5,14 @@ import java.util.ArrayList;
 
 public class TweetLoader {
 
-    public ArrayList getSentimentTweetsFromFile(String path){
-        return null;
-    }
-    public ArrayList<TopicModelTweet> getTopicTweetsFromFile(String path) throws IOException {
+    public ArrayList<TopicModelTweet> getTweetsFromFile(String path) throws IOException {
         ArrayList<TopicModelTweet> tweets = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(path));
         String line;
         while((line = br.readLine())!=null){
             String[] lines = line.split("\\|");
             try{
-                tweets.add(new TopicModelTweet(lines[0],cleanTweet(lines[1])));
+                tweets.add(new TopicModelTweet(lines[0],cleanTweet(lines[1]), null));
             }catch (IndexOutOfBoundsException e){
                 System.out.println(e + " :: " + line);
             }
