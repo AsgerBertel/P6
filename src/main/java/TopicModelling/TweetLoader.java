@@ -12,11 +12,11 @@ public class TweetLoader {
         while((line = br.readLine())!=null){
             String[] lines = line.split("\\|");
             try{
-                tweets.add(new TopicModelTweet(lines[0],cleanTweet(lines[1]), null));
+                tweets.add(new TopicModelTweet(lines[0],cleanTweet(lines[1]),line));
             }catch (IndexOutOfBoundsException e){
                 System.out.println(e + " :: " + line);
             }
-            if(tweets.size() > 100){
+            if(tweets.size() > 50000){
                 break;
             }
         }
@@ -31,6 +31,7 @@ public class TweetLoader {
         if(text.contains("RT @")){
             text = text.replaceAll("RT @\\S*", "");
         }
+        //remove
         return text;
     }
 }

@@ -3,9 +3,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import TopicModelling.Sentiment;
 import TopicModelling.TopicModelTweet;
 import TopicModelling.TweetLoader;
-import TweetCleaner.JsonTweet;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -23,7 +23,7 @@ public class SentimentAnalyzer {
                 for (TopicModelTweet tweet : tweets) {
 
                     int mainSentiment = 0;
-                    String line = tweet.getText();
+                    String line = tweet.getModified_text();
                     if (line != null && line.length() > 0) {
                         int longest = 0;
                         Annotation annotation = pipeline.process(line);
@@ -41,12 +41,12 @@ public class SentimentAnalyzer {
                     //add sentiment to tweet
                     //CoreNLP returns 0 or 1 for negative, 2 for neutral and 3 or 4 for positive sentiment
                     if(mainSentiment < 2 && mainSentiment >= 0){
-                        tweet.setSentiment("Negative");
+                        tweet.setSentiment(Sentiment.NEGATIVE);
                     } else if(mainSentiment > 2 && mainSentiment <= 4){
-                        tweet.setSentiment("Positive");
+                        tweet.setSentiment(Sentiment.POSITIVE);
                     }
                     if (mainSentiment == 2 || mainSentiment > 4 || mainSentiment < 0) {
-                        tweet.setSentiment("Neutral");
+                        tweet.setSentiment(Sentiment.NEUTRAL);
                     }
                     System.out.println(mainSentiment);
                 }

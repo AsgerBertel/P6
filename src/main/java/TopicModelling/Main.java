@@ -17,7 +17,7 @@ public class Main {
         ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/2.txt");
         Lda lda = new Lda();
         lda.setTopicCount(7);
-        lda.setMaxVocabularySize(2000);
+        lda.setMaxVocabularySize(100000);
         LdaResult res = lda.fit(getTweets(tweets));
         System.out.println("Topics: " + res.topicCount());
 
@@ -43,7 +43,7 @@ public class Main {
     private static ArrayList<String> getTweets(ArrayList<TopicModelTweet> tweets){
         ArrayList<String> text = new ArrayList();
         for(TopicModelTweet t : tweets){
-            text.add(t.text);
+            text.add(t.modified_text);
         }
         return text;
     }
