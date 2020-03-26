@@ -16,15 +16,17 @@ public class Main {
         TweetLoader tl = new TweetLoader();
         ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/2.txt");
         Lda lda = new Lda();
-        lda.setTopicCount(7);
-        lda.setMaxVocabularySize(100000);
+        lda.setTopicCount(10);
+        lda.setMaxVocabularySize(20000);
         LdaResult res = lda.fit(getTweets(tweets));
         System.out.println("Topics: " + res.topicCount());
+        TopicLabelCalculator topicCalc = new TopicLabelCalculator(res,tl);
+        topicCalc.simpleCalcTopicLabels();
 
         for(int topicIndex = 0; topicIndex < res.topicCount(); ++topicIndex){
             String topicSum = res.topicSummary(topicIndex);
-            List<TupleTwo<String,Integer>> topKeyWords = res.topKeyWords(topicIndex,10);
-            List<TupleTwo<Doc,Double>> topStrings = res.topDocuments(topicIndex,5);
+            //List<TupleTwo<String,Integer>> topKeyWords = res.topKeyWords(topicIndex,10);
+            //List<TupleTwo<Doc,Double>> topStrings = res.topDocuments(topicIndex,5);
             System.out.println("Topic " + (topicIndex+1) + ": " + topicSum);
             /*for(TupleTwo<String, Integer> entry : topKeyWords){
                 String keyword = entry._1();
@@ -36,8 +38,7 @@ public class Main {
                 int docIndex = entry._1().getDocIndex();
                 String docContent = entry._1().getContent();
                 System.out.println("Doc (" + docIndex + ", " + score + ")): " + docContent);
-            }
-             */
+            }*/
         }
     }
     private static ArrayList<String> getTweets(ArrayList<TopicModelTweet> tweets){
