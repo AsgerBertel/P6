@@ -18,7 +18,8 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
 
-        try {
+
+       try {
             //main.insertIntoProduct();
             //  main.insertIntoDates();
             //  main.multithreadedInsertIntoLocation();
@@ -40,13 +41,21 @@ public class Main {
             listOfFactTableElements.add(tweetElement);
 
         }
+        System.out.println(listOfFactTableElements.size());
         System.out.println("done loading data");
         System.out.println("inserting data");
         for (TweetElement tweetelement : listOfFactTableElements) {
 
             String[] arrOfStr = tweetelement.getDate().split("/", 4);
             arrOfStr[0] = arrOfStr[0].trim();
-            ConnectionManager.updateSql(QueryManager.insertFactTable(getProductID(tweetelement.getProduct().trim()), getOpinionID(tweetelement.getOpinion().trim()), getDateID(Integer.parseInt(arrOfStr[0]), Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2])), getLocationID(tweetelement.getLat(), tweetelement.getLongitude())));
+         //   System.out.println(tweetelement.getProduct());
+                int productID = getProductID(tweetelement.getProduct().trim());
+                int opinionID = getOpinionID(tweetelement.getOpinion().trim());
+                int dateID = getDateID(Integer.parseInt(arrOfStr[0]), Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2]));
+                int locationID = getLocationID(tweetelement.getLat(), tweetelement.getLongitude());
+            if(productID != 0 || opinionID != 0 || dateID != 0 || locationID != 0)
+            ConnectionManager.updateSql(QueryManager.insertFactTable(productID,opinionID,dateID , locationID));
+
         }
 
     }
@@ -57,7 +66,7 @@ public class Main {
 
         while (resultSet.next())
             return resultSet.getInt(1);
-        return resultSet.getInt(1);
+        return 0;
 
     }
 
@@ -66,7 +75,7 @@ public class Main {
         resultSet = ConnectionManager.selectSQL(QueryManager.selectOpinionIDFromOpinion(opinion));
         while (resultSet.next())
             return resultSet.getInt(1);
-        return resultSet.getInt(1);
+        return 0;
     }
 
     private int getLocationID(double lat, double longi) throws SQLException {
@@ -74,7 +83,7 @@ public class Main {
         resultSet = ConnectionManager.selectSQL(QueryManager.selectLocationIDFromCoordinates(lat, longi));
         while (resultSet.next())
             return resultSet.getInt(1);
-        return resultSet.getInt(1);
+        return 0;
     }
 
     private int getDateID(int day, int month, int year) throws SQLException {
@@ -82,7 +91,7 @@ public class Main {
         resultSet = ConnectionManager.selectSQL(QueryManager.selectDayIDFromDay(day, month, year));
         while (resultSet.next())
             return resultSet.getInt(1);
-        return resultSet.getInt(1);
+        return 0;
     }
 
 

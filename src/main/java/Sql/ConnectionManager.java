@@ -13,10 +13,11 @@ public class ConnectionManager {
     }
 
     public static ResultSet selectSQL(String query) throws SQLException {
-        Connection conn = DriverManager.getConnection(QueryManager.connectionString);
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(query);
-        return rs;
+        try (Connection conn = DriverManager.getConnection(QueryManager.connectionString)) {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            return rs;
+        }
     }
 
     public static int updateSqlWithGeneratedKey(String query, String primaryKeyName) {
