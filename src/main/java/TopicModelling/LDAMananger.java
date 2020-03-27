@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 public class LDAMananger {
     ArrayList<String> tweets = new ArrayList<>();
-    LdaResult result;
 
-    public void calculateTopics(int topics, int vocabSize){
+
+    public LdaResult calculateTopics(int topics, int vocabSize){
         Lda lda = new Lda();
         lda.setTopicCount(topics);
         lda.setMaxVocabularySize(vocabSize);
-        result = lda.fit(tweets);
+        return lda.fit(tweets);
     }
     public void extractTweetText(ArrayList<TopicModelTweet> topicModelTweets){
         for(TopicModelTweet t : topicModelTweets){
