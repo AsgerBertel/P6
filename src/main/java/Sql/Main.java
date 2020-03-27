@@ -17,14 +17,16 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
+        FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();
 
-
-       try {
+        try {
+            factTableIdGenerator.generateFactTableElement();
             //main.insertIntoProduct();
             //  main.insertIntoDates();
             //  main.multithreadedInsertIntoLocation();
             //  main.insertIntoFactTable();
-            main.insertIntoFactTable();
+            //main.insertIntoFactTable();
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,13 +50,13 @@ public class Main {
 
             String[] arrOfStr = tweetelement.getDate().split("/", 4);
             arrOfStr[0] = arrOfStr[0].trim();
-         //   System.out.println(tweetelement.getProduct());
-                int productID = getProductID(tweetelement.getProduct().trim());
-                int opinionID = getOpinionID(tweetelement.getOpinion().trim());
-                int dateID = getDateID(Integer.parseInt(arrOfStr[0]), Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2]));
-                int locationID = getLocationID(tweetelement.getLat(), tweetelement.getLongitude());
-            if(productID != 0 || opinionID != 0 || dateID != 0 || locationID != 0)
-            ConnectionManager.updateSql(QueryManager.insertFactTable(productID,opinionID,dateID , locationID));
+            //   System.out.println(tweetelement.getProduct());
+            int productID = getProductID(tweetelement.getProduct().trim());
+            int opinionID = getOpinionID(tweetelement.getOpinion().trim());
+            int dateID = getDateID(Integer.parseInt(arrOfStr[0]), Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2]));
+            int locationID = getLocationID(tweetelement.getLat(), tweetelement.getLongitude());
+            if (productID != 0 || opinionID != 0 || dateID != 0 || locationID != 0)
+                ConnectionManager.updateSql(QueryManager.insertFactTable(productID, opinionID, dateID, locationID));
 
         }
 

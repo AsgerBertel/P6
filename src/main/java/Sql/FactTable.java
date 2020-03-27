@@ -13,4 +13,14 @@ public class FactTable {
         this.productID = productID;
     }
 
+    @Override
+    public String toString() {
+        return
+
+                productID +
+                        ", " + opinionID +
+                        ", " + dayID +
+                        ", " + locationID +
+                        ';';
+    }
 }
