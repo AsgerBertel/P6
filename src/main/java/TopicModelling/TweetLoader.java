@@ -21,9 +21,9 @@ public class TweetLoader {
             }catch (IndexOutOfBoundsException e){
                 System.out.println(e + " :: " + line);
             }
-            if(tweets.size() > 20000){
+            /*if(tweets.size() > 20000){
                 break;
-            }
+            }*/
         }
         return tweets;
     }

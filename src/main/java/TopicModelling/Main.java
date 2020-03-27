@@ -10,12 +10,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
         LDAMananger ldaMananger = new LDAMananger();
         TweetLoader tl = new TweetLoader();
-        ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/2.txt");
+        ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("D:\\Programming\\P6\\assets\\CleanedData\\2.txt");
         ldaMananger.extractTweetText(tweets);
-        ldaMananger.calculateTopics(10,20000);
-        TopicLabelCalculator topicCalc = new TopicLabelCalculator(ldaMananger.result,tl);
+        TopicLabelCalculator topicCalc = new TopicLabelCalculator( ldaMananger.calculateTopics(10,20000),tl);
         topicCalc.simpleCalcTopicLabelScore();
+
         HashMap<Integer, ArrayList<String>> orderedDescriptors = topicCalc.getOrderedTopicDescriptors();
+        TopicAmountCalculator topicAmountCalculator = new TopicAmountCalculator();
+        topicAmountCalculator.jaccardAverage(10, orderedDescriptors);
         int x = 0;
         /*for(int topicIndex = 0; topicIndex < res.topicCount(); ++topicIndex){
             String topicSum = res.topicSummary(topicIndex);

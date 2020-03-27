@@ -9,16 +9,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class LDAMananger {
     ArrayList<String> tweets = new ArrayList<>();
     int curr_doc=0;
+    LdaResult tempLdaResult;
 
     public LdaResult calculateTopics(int topics, int vocabSize){
         Lda lda = new Lda();
         lda.setTopicCount(topics);
         lda.setMaxVocabularySize(vocabSize);
-        return lda.fit(tweets);
+        tempLdaResult = lda.fit(tweets);
+        return tempLdaResult;
     }
     public void extractTweetText(ArrayList<TopicModelTweet> topicModelTweets){
         for(TopicModelTweet t : topicModelTweets){

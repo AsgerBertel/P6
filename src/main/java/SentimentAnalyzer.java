@@ -35,7 +35,6 @@ public class SentimentAnalyzer {
                                 mainSentiment = sentiment;
                                 longest = partText.length();
                             }
-
                         }
                     }
                     //add sentiment to tweet
@@ -75,10 +74,14 @@ public class SentimentAnalyzer {
         TweetLoader tweetLoader = new TweetLoader();
         SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
         ArrayList<TopicModelTweet> tweets = tweetLoader.getTweetsFromFile("D:\\Programming\\P6\\assets\\CleanedData\\2.txt");
+        ArrayList<TopicModelTweet> tweetsTest = new ArrayList<>();
+        TopicModelTweet tweet1 = new TopicModelTweet("1", "i do not like mcDonalds", Sentiment.NEUTRAL);
+        TopicModelTweet tweet2 = new TopicModelTweet("2", "i hate McDonalds", Sentiment.NEUTRAL);
 
-        sentimentAnalyzer.findSentiment(tweets);
-
-        for (TopicModelTweet t: tweets) {
+        tweetsTest.add(tweet1);
+        tweetsTest.add(tweet2);
+        sentimentAnalyzer.findSentiment(tweetsTest);
+        for (TopicModelTweet t: tweetsTest) {
             System.out.println(t.getSentiment());
         }
     }
