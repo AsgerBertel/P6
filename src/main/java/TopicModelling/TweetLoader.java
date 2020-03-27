@@ -13,13 +13,17 @@ public class TweetLoader {
         while((line = br.readLine())!=null){
             String[] lines = line.split("\\|");
             try{
-                tweets.add(new TopicModelTweet(lines[0],cleanTweet(lines[1]),line));
+                String cleaned_tweet = cleanTweet(lines[1]);
+                if(cleaned_tweet.isEmpty() || cleaned_tweet.isBlank() || cleaned_tweet.split("\\s+").length == 1){
+                    continue;
+                }
+                tweets.add(new TopicModelTweet(lines[0],cleaned_tweet,line));
             }catch (IndexOutOfBoundsException e){
                 System.out.println(e + " :: " + line);
             }
-            /*if(tweets.size() > 20000){
+            if(tweets.size() > 20000){
                 break;
-            }*/
+            }
         }
         return tweets;
     }
@@ -36,21 +40,16 @@ public class TweetLoader {
         //remove symbols
         if(text.contains("&amp") || text.contains("&gt"))
             text=text.replaceAll("&\\S*","");
-        if(text.contains("."))
-            text=text.replaceAll("\\.","");
-        //remove useless words
         text = removeApostropheWords(text);
         text = removeStopWords(text);
-        text = removeSymbols(text);
-        return text.trim();
+        text = removeDigitsAndSymbols(text);
+        return text.trim().replaceAll(" +", " ");
     }
 
-    private String removeSymbols(String text) {
-        Matcher matcher = SymbolAndWordRemovePatterns.symbolsPattern.matcher(text);
-        text = matcher.replaceAll(" ");
+    private String removeDigitsAndSymbols(String text) {
+        text = text.replaceAll("[^a-zA-Z\\s]","");
         return text;
     }
-
     private String removeApostropheWords(String text) {
         Matcher matcher = SymbolAndWordRemovePatterns.apostropheWordPattern.matcher(text);
         text = matcher.replaceAll("");
