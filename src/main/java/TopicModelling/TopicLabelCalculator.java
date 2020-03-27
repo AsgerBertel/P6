@@ -2,9 +2,9 @@ package TopicModelling;
 
 import com.github.chen0040.lda.LdaResult;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TopicLabelCalculator {
     LdaResult result;
@@ -15,8 +15,27 @@ public class TopicLabelCalculator {
         this.result = result;
         this.tweetLoader = tweetLoader;
     }
+    public HashMap<Integer, ArrayList<String>> getOrderedTopicDescriptors(){
+        HashMap<Integer, ArrayList<String>> orderedDescriptors = new HashMap<>();
+        Comparator<Entry<String,Integer>> valueComparator = (o1, o2) -> {
+            int v1 = o1.getValue();
+            int v2 = o2.getValue();
+            return Integer.compare(v2,v1);
+        };
 
-    public HashMap<Integer, HashMap<String, Integer>> simpleCalcTopicLabels(){
+        for(int i = 0; i < topicLabels.keySet().size(); i++){
+            ArrayList<Entry<String, Integer>> entries = new ArrayList<>(topicLabels.get(i).entrySet());
+            Collections.sort(entries,valueComparator);
+            ArrayList<String> sortedList = new ArrayList<>();
+            for(Entry<String,Integer> e : entries){
+                sortedList.add(e.getKey());
+            }
+            orderedDescriptors.put(i,sortedList);
+        }
+        return orderedDescriptors;
+    }
+
+    public HashMap<Integer, HashMap<String, Integer>> simpleCalcTopicLabelScore(){
         for(int index = 0; index < result.topicCount(); index++){
             findLabelValsForTopic(result.topicSummary(index),index);
         }
