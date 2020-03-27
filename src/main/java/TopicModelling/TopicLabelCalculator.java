@@ -2,7 +2,6 @@ package TopicModelling;
 
 import com.github.chen0040.lda.LdaResult;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -48,7 +47,7 @@ public class TopicLabelCalculator {
         String[] topics = topicSum.trim().split("\\s+");
         populateLabelVals(labelVals,topics);
         for(TopicModelTweet t : tweetLoader.getTweets()){
-            getScoreForLine(t.modified_text, topics, labelVals);
+            getScoreForLine(t.topic_text, topics, labelVals);
         }
         topicLabels.put(index,labelVals);
     }

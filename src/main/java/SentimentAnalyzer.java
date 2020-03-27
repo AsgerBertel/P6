@@ -23,7 +23,7 @@ public class SentimentAnalyzer {
                 for (TopicModelTweet tweet : tweets) {
 
                     int mainSentiment = 0;
-                    String line = tweet.getModified_text();
+                    String line = tweet.getTopic_text();
                     if (line != null && line.length() > 0) {
                         int longest = 0;
                         Annotation annotation = pipeline.process(line);

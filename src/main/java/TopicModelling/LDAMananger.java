@@ -7,10 +7,6 @@ import com.github.chen0040.lda.LdaResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class LDAMananger {
@@ -27,7 +23,7 @@ public class LDAMananger {
     }
     public void extractTweetText(ArrayList<TopicModelTweet> topicModelTweets){
         for(TopicModelTweet t : topicModelTweets){
-            tweets.add(t.modified_text);
+            tweets.add(t.topic_text);
         }
     }
     public void assignTopics(ArrayList<TopicModelTweet> tweets, LdaResult results, HashMap<Integer, ArrayList<String>> descriptors){
@@ -52,12 +48,12 @@ public class LDAMananger {
         }
     }
     private Doc getCorrespondingDocument(TopicModelTweet tweet, List<Doc> docs){
-        if(docs.get(curr_doc).getContent().equals(tweet.modified_text)){
+        if(docs.get(curr_doc).getContent().equals(tweet.topic_text)){
             Doc d = docs.get(curr_doc);
             curr_doc++;
             return d;
         }
-        System.out.println("its fucked, method on line 54 LDAManager" + tweet.modified_text);
+        System.out.println("its fucked, method on line 54 LDAManager" + tweet.topic_text);
         return null;
     }
 }
