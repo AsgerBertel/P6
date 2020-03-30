@@ -1,16 +1,22 @@
+package SentimentAnalysis_CoreNLP;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import TopicModelling.Sentiment;
 import TopicModelling.TopicModelTweet;
 import TopicModelling.TweetLoader;
 import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.CoreDocument;
+import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
+import edu.stanford.nlp.simple.Sentence;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 
@@ -50,7 +56,6 @@ public class SentimentAnalyzer {
                     System.out.println(mainSentiment);
                 }
     }
-        //add sentiment to tweet
 
 
     private String toCss(int sentiment) {
@@ -70,19 +75,36 @@ public class SentimentAnalyzer {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        TweetLoader tweetLoader = new TweetLoader();
-        SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
-        ArrayList<TopicModelTweet> tweets = tweetLoader.getTweetsFromFile("D:\\Programming\\P6\\assets\\CleanedData\\2.txt");
-        ArrayList<TopicModelTweet> tweetsTest = new ArrayList<>();
-        TopicModelTweet tweet1 = new TopicModelTweet("1", "i do not like mcDonalds", Sentiment.NEUTRAL);
-        TopicModelTweet tweet2 = new TopicModelTweet("2", "i hate McDonalds", Sentiment.NEUTRAL);
-
-        tweetsTest.add(tweet1);
-        tweetsTest.add(tweet2);
-        sentimentAnalyzer.findSentiment(tweetsTest);
-        for (TopicModelTweet t: tweetsTest) {
-            System.out.println(t.getSentiment());
+    /* Might not be useful*/
+    public static ArrayList<CoreLabel> tokenizer(String tweet){
+        Properties props = new Properties();
+        props.setProperty("annotators", "tokenize, ssplit");
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        Annotation annotation = pipeline.process(tweet);
+        CoreDocument exampleDocument = new CoreDocument(tweet);
+        // annotate document
+        pipeline.annotate(exampleDocument);
+        // access tokens from a CoreDocument
+        // a token is represented by a CoreLabel
+        ArrayList<CoreLabel> allSentenceTokens = new ArrayList<>();
+        List<CoreSentence> allSentences = exampleDocument.sentences();
+        for(CoreSentence sentence: allSentences){
+            allSentenceTokens.addAll(sentence.tokens());
         }
+        List<CoreLabel> firstSentenceTokens = exampleDocument.sentences().get(0).tokens();
+        // this for loop will print out all of the tokens and the character offset info
+        for (CoreLabel token : firstSentenceTokens) {
+            System.out.println(token.word() + "\t" + token.beginPosition() + "\t" + token.endPosition());
+        }
+        return allSentenceTokens;
     }
+    public static List<String> nerTag(Sentence tweetText){
+        List<String> nerTags = tweetText.nerTags();
+        String FirstPOSTag = tweetText.posTag(0);
+        for(String nerTag: nerTags){
+            System.out.println(nerTag + "\t");
+        }
+        return nerTags;
+    }
+
 }

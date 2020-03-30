@@ -1,6 +1,8 @@
 package TopicModelling;
 
 
+import SentimentAnalysis_CoreNLP.SentimentAnalyzer;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +13,10 @@ public class Main {
         LDAMananger ldaMananger = new LDAMananger();
         TweetLoader tl = new TweetLoader();
         ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("D:\\Programming\\P6\\assets\\CleanedData\\2.txt");
+        //find sentiments
+        SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
+        sentimentAnalyzer.findSentiment(tweets);
+
         ldaMananger.extractTweetText(tweets);
         TopicLabelCalculator topicCalc = new TopicLabelCalculator( ldaMananger.calculateTopics(10,20000),tl);
         topicCalc.simpleCalcTopicLabelScore();
@@ -39,7 +45,7 @@ public class Main {
     public static ArrayList<String> getTweets(ArrayList<TopicModelTweet> tweets){
         ArrayList<String> text = new ArrayList();
         for(TopicModelTweet t : tweets){
-            text.add(t.modified_text);
+            text.add(t.topic_text);
         }
         return text;
     }
