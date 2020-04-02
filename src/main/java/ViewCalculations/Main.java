@@ -8,7 +8,7 @@ public class Main {
     HashMap<String, Integer> listOfLocationRows = new HashMap<>();
     HashMap<String, Integer> listOfDateRows = new HashMap<>();
     HashMap<String, Integer> listOfOpinionRows = new HashMap<>();
-     HashMap<String, Integer> listOfAllRowCombinations;
+    HashMap<String, Integer> listOfAllRowCombinations;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -17,12 +17,14 @@ public class Main {
 
     }
 
-    public void run(){
+    public void run() {
         listOfLocationRows = calculateRowCombinations();
         for (String q : listOfLocationRows.keySet()) {
             System.out.println(q + " " + listOfAllRowCombinations.get(q));
         }
+        System.out.println(listOfAllRowCombinations.size());
     }
+
     public HashMap calculateRowCombinations() {
         listOfAllRowCombinations = new HashMap<>();
         listOfProductRows.put("products", 41);
@@ -40,6 +42,17 @@ public class Main {
         listOfDateRows.put("month", 36);
         listOfDateRows.put("year", 3);
         //combine product and location
+
+
+        for (String s : listOfProductRows.keySet())
+            listOfAllRowCombinations.put(s, listOfProductRows.get(s));
+        for (String s : listOfLocationRows.keySet())
+            listOfAllRowCombinations.put(s, listOfLocationRows.get(s));
+        for (String s : listOfOpinionRows.keySet())
+            listOfAllRowCombinations.put(s, listOfOpinionRows.get(s));
+        for (String s : listOfDateRows.keySet())
+            listOfAllRowCombinations.put(s, listOfDateRows.get(s));
+
         for (String q : listOfProductRows.keySet()) {
             for (String s : listOfLocationRows.keySet()) {
                 listOfAllRowCombinations.put(s + "-" + q, listOfProductRows.get(q) * listOfLocationRows.get(s));
