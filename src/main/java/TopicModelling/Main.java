@@ -3,6 +3,10 @@ package TopicModelling;
 
 import SentimentAnalysis_CoreNLP.SentimentAnalyzer;
 
+import com.github.chen0040.data.utils.TupleTwo;
+import com.github.chen0040.lda.Doc;
+import com.github.chen0040.lda.LdaResult;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,21 +14,15 @@ import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        LDAMananger ldaMananger = new LDAMananger();
         TweetLoader tl = new TweetLoader();
-        ArrayList<TopicModelTweet> tweets = tl.getTweetsFromFile("D:\\Programming\\P6\\assets\\CleanedData\\2.txt");
-        //find sentiments
-        SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
-        sentimentAnalyzer.findSentiment(tweets);
+        //tl.getTweetsFromFile("C:/Users/mk96/Desktop/CleanedData/2.txt");
+        tl.getTweetsFromFile("C:/Users/mk96/Desktop/CleanedData/1.txt");
 
-        ldaMananger.extractTweetText(tweets);
-        TopicLabelCalculator topicCalc = new TopicLabelCalculator( ldaMananger.calculateTopics(10,20000),tl);
-        topicCalc.simpleCalcTopicLabelScore();
+        //sentiment(tl.getTweets());
+        topicModel(tl.getTweets(),tl);
+        //TopicAmountCalculator topicAmountCalculator = new TopicAmountCalculator();
+        //topicAmountCalculator.jaccardAverage(10, orderedDescriptors);
 
-        HashMap<Integer, ArrayList<String>> orderedDescriptors = topicCalc.getOrderedTopicDescriptors();
-        TopicAmountCalculator topicAmountCalculator = new TopicAmountCalculator();
-        topicAmountCalculator.jaccardAverage(10, orderedDescriptors);
-        int x = 0;
         /*for(int topicIndex = 0; topicIndex < res.topicCount(); ++topicIndex){
             String topicSum = res.topicSummary(topicIndex);
             //List<TupleTwo<String,Integer>> topKeyWords = res.topKeyWords(topicIndex,10);
@@ -41,6 +39,41 @@ public class Main {
                 String docContent = entry._1().getContent();
                 System.out.println("Doc (" + docIndex + ", " + score + ")): " + docContent);
             }}*/
+    }
+    private static void sentiment(ArrayList<TopicModelTweet> tweets){
+        SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
+        sentimentAnalyzer.findSentiment(tweets);
+    }
+    private static void topicModel(ArrayList<TopicModelTweet> tweets,TweetLoader tl){
+        LDAMananger ldaMananger = new LDAMananger();
+        ldaMananger.extractTweetText(tweets);
+        LdaResult result = ldaMananger.calculateTopics(80,30000);
+
+        TopicLabelCalculator topicCalc = new TopicLabelCalculator(result,tl);
+        topicCalc.simpleCalcTopicLabelScore();
+        HashMap<Integer, ArrayList<String>> orderedDescriptors = topicCalc.getOrderedTopicDescriptors();
+        ldaMananger.assignTopics(tweets,result,orderedDescriptors);
+        int i =0;
+        double avg = 0;
+        /*for(Doc d : result.documents()){
+            for(TupleTwo<Integer,Double> tt : d.topTopics(1)){
+                if(tt._2() < 0.6){
+                    //System.out.println(d.getContent() + " ::: " + tt._2());
+                    avg = avg + tt._2();
+                    i++;
+                }
+            }
+            //System.out.println(t.getTopics());
+        }
+        System.out.println(i + " out of " + tweets.size());
+        System.out.println("avg: " + avg/i);*/
+        for(ArrayList<String> ls : orderedDescriptors.values()){
+            System.out.println("Words to describe this category: ");
+            for(int j =0; j < 3; j++){
+                System.out.print(ls.get(j) + ", ");
+            }
+            System.out.println("\n----------------------------------------------------------------");
+        }
     }
     public static ArrayList<String> getTweets(ArrayList<TopicModelTweet> tweets){
         ArrayList<String> text = new ArrayList();

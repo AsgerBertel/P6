@@ -26,18 +26,19 @@ public class LDAMananger {
             tweets.add(t.topic_text);
         }
     }
-    public void assignTopics(ArrayList<TopicModelTweet> tweets, LdaResult results, HashMap<Integer, ArrayList<String>> descriptors){
+    public void assignTopics(ArrayList<TopicModelTweet> topicModelTweets, LdaResult results, HashMap<Integer, ArrayList<String>> descriptors){
         //for all tweets, find the document in results and determine what topic(s) it was assigned to.
         //Given the number of that topic, take the top three descriptors and add to the list in TopicModelTweet.
-        for(TopicModelTweet t : tweets){
+
+        for(TopicModelTweet t : topicModelTweets){
             //find corresponding document
             Doc doc = getCorrespondingDocument(t,results.documents());
             if(doc == null)
                 continue;
-            //loop over top 5 topics assigned to tweet
+            //loop over top 3 topics assigned to tweet
             for(TupleTwo<Integer,Double> tuple : doc.topTopics(3)){
                 //if probability that topic is correct is less than 50% then skip
-                if(tuple._2() < 0.5){
+                if(tuple._2() < 0.6){
                     continue;
                 }
                 //add the topics that "should" describe the content of the tweet
@@ -53,7 +54,7 @@ public class LDAMananger {
             curr_doc++;
             return d;
         }
-        System.out.println("its fucked, method on line 54 LDAManager" + tweet.topic_text);
+        System.out.println("Missing document for: " + tweet.topic_text + " ||| " + tweet.original_text);
         return null;
     }
 }
