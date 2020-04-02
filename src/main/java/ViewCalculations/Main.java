@@ -27,7 +27,7 @@ public class Main {
 
     public HashMap calculateRowCombinations() {
         listOfAllRowCombinations = new HashMap<>();
-        listOfProductRows.put("products", 41);
+        listOfProductRows.put("products", 40);
         listOfProductRows.put("category", 9);
 
         listOfLocationRows.put("coordinates", 3861358);
