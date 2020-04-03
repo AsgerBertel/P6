@@ -2,6 +2,7 @@ package SentimentAnalysis_CoreNLP;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -23,38 +24,40 @@ import edu.stanford.nlp.util.CoreMap;
 public class SentimentAnalyzer {
 
     public void findSentiment(ArrayList<TopicModelTweet> tweets) {
-                Properties props = new Properties();
-                props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
-                StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-                for (TopicModelTweet tweet : tweets) {
-
-                    int mainSentiment = 0;
-                    String line = tweet.getTopic_text();
-                    if (line != null && line.length() > 0) {
-                        int longest = 0;
-                        Annotation annotation = pipeline.process(line);
-                        for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
-                            Tree tree = sentence.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-                            int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                            String partText = sentence.toString();
-                            if (partText.length() > longest) {
-                                mainSentiment = sentiment;
-                                longest = partText.length();
-                            }
-                        }
-                    }
-                    //add sentiment to tweet
-                    //CoreNLP returns 0 or 1 for negative, 2 for neutral and 3 or 4 for positive sentiment
-                    if(mainSentiment < 2 && mainSentiment >= 0){
-                        tweet.setSentiment(Sentiment.NEGATIVE);
-                    } else if(mainSentiment > 2 && mainSentiment <= 4){
-                        tweet.setSentiment(Sentiment.POSITIVE);
-                    }
-                    if (mainSentiment == 2 || mainSentiment > 4 || mainSentiment < 0) {
-                        tweet.setSentiment(Sentiment.NEUTRAL);
-                    }
-                    System.out.println(mainSentiment);
+        Properties props = new Properties();
+        props.put("annotators", "tokenize, ssplit, parse, sentiment");
+        props.put("threads", "4");
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        HashMap<String, TopicModelTweet> map = new HashMap<>();
+        List<Annotation> annotations = new ArrayList<>();
+        for (TopicModelTweet tweet : tweets) {
+            Annotation a = new Annotation(tweet.getOriginal_text());
+            annotations.add(a);
+            map.put(a.toString(), tweet);
+        }
+        pipeline.annotate(annotations);
+        for (Annotation a : annotations) {
+            int mainSentiment = 0;
+            int longest = 0;
+            for (CoreMap cm : a.get(CoreAnnotations.SentencesAnnotation.class)) {
+                int sentiment = RNNCoreAnnotations.getPredictedClass(cm.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class));
+                String partText = cm.toString();
+                if (partText.length() > longest) {
+                    mainSentiment = sentiment;
+                    longest = partText.length();
                 }
+            }
+            //add sentiment to tweet
+            //CoreNLP returns 0 or 1 for negative, 2 for neutral and 3 or 4 for positive sentiment
+            if (mainSentiment < 2 && mainSentiment >= 0) {
+                map.get(a.toString()).setSentiment(Sentiment.NEGATIVE);
+            } else if (mainSentiment > 2 && mainSentiment <= 4) {
+                map.get(a.toString()).setSentiment(Sentiment.POSITIVE);
+            }
+            if (mainSentiment == 2 || mainSentiment > 4 || mainSentiment < 0) {
+                map.get(a.toString()).setSentiment(Sentiment.NEUTRAL);
+            }
+        }
     }
 
 
@@ -76,7 +79,7 @@ public class SentimentAnalyzer {
     }
 
     /* Might not be useful*/
-    public static ArrayList<CoreLabel> tokenizer(String tweet){
+    public static ArrayList<CoreLabel> tokenizer(String tweet) {
         Properties props = new Properties();
         props.setProperty("annotators", "tokenize, ssplit");
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
@@ -88,7 +91,7 @@ public class SentimentAnalyzer {
         // a token is represented by a CoreLabel
         ArrayList<CoreLabel> allSentenceTokens = new ArrayList<>();
         List<CoreSentence> allSentences = exampleDocument.sentences();
-        for(CoreSentence sentence: allSentences){
+        for (CoreSentence sentence : allSentences) {
             allSentenceTokens.addAll(sentence.tokens());
         }
         List<CoreLabel> firstSentenceTokens = exampleDocument.sentences().get(0).tokens();
@@ -98,10 +101,11 @@ public class SentimentAnalyzer {
         }
         return allSentenceTokens;
     }
-    public static List<String> nerTag(Sentence tweetText){
+
+    public static List<String> nerTag(Sentence tweetText) {
         List<String> nerTags = tweetText.nerTags();
         String FirstPOSTag = tweetText.posTag(0);
-        for(String nerTag: nerTags){
+        for (String nerTag : nerTags) {
             System.out.println(nerTag + "\t");
         }
         return nerTags;
