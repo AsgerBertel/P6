@@ -7,19 +7,25 @@ import com.github.chen0040.data.utils.TupleTwo;
 import com.github.chen0040.lda.Doc;
 import com.github.chen0040.lda.LdaResult;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         TweetLoader tl = new TweetLoader();
         //tl.getTweetsFromFile("C:/Users/mk96/Desktop/CleanedData/2.txt");
-        tl.getTweetsFromFile("C:/Users/mk96/Desktop/CleanedData/1.txt");
+        tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/1.txt");
 
         //sentiment(tl.getTweets());
         topicModel(tl.getTweets(),tl);
+        sentiment(tl.getTweets());
+        writeToFile("C:/Users/Mads/Desktop/CleanedData/topicSenti.txt",tl.getTweets());
         //TopicAmountCalculator topicAmountCalculator = new TopicAmountCalculator();
         //topicAmountCalculator.jaccardAverage(10, orderedDescriptors);
 
@@ -40,46 +46,26 @@ public class Main {
                 System.out.println("Doc (" + docIndex + ", " + score + ")): " + docContent);
             }}*/
     }
-    private static void sentiment(ArrayList<TopicModelTweet> tweets){
+    private static void sentiment(ArrayList<TopicModelTweet> tweets) throws InterruptedException {
         SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
         sentimentAnalyzer.findSentiment(tweets);
     }
     private static void topicModel(ArrayList<TopicModelTweet> tweets,TweetLoader tl){
         LDAMananger ldaMananger = new LDAMananger();
         ldaMananger.extractTweetText(tweets);
-        LdaResult result = ldaMananger.calculateTopics(80,30000);
-
+        LdaResult result = ldaMananger.calculateTopics(50,30000);
         TopicLabelCalculator topicCalc = new TopicLabelCalculator(result,tl);
         topicCalc.simpleCalcTopicLabelScore();
         HashMap<Integer, ArrayList<String>> orderedDescriptors = topicCalc.getOrderedTopicDescriptors();
         ldaMananger.assignTopics(tweets,result,orderedDescriptors);
-        int i =0;
-        double avg = 0;
-        /*for(Doc d : result.documents()){
-            for(TupleTwo<Integer,Double> tt : d.topTopics(1)){
-                if(tt._2() < 0.6){
-                    //System.out.println(d.getContent() + " ::: " + tt._2());
-                    avg = avg + tt._2();
-                    i++;
-                }
-            }
-            //System.out.println(t.getTopics());
-        }
-        System.out.println(i + " out of " + tweets.size());
-        System.out.println("avg: " + avg/i);*/
-        for(ArrayList<String> ls : orderedDescriptors.values()){
-            System.out.println("Words to describe this category: ");
-            for(int j =0; j < 3; j++){
-                System.out.print(ls.get(j) + ", ");
-            }
-            System.out.println("\n----------------------------------------------------------------");
-        }
+        //remove any tweets that for some reason, might not have topics assigned to them.
+        tweets.removeIf(topicModelTweet -> topicModelTweet.getTopics().isEmpty());
     }
-    public static ArrayList<String> getTweets(ArrayList<TopicModelTweet> tweets){
-        ArrayList<String> text = new ArrayList();
-        for(TopicModelTweet t : tweets){
-            text.add(t.topic_text);
+    private static void writeToFile(String filePath, ArrayList<TopicModelTweet> tweets) throws IOException {
+        File topicSentiTweet = new File(filePath);
+        BufferedWriter bfw = new BufferedWriter(new FileWriter(topicSentiTweet));
+        for(TopicModelTweet t: tweets){
+            bfw.write(filePath);
         }
-        return text;
     }
 }

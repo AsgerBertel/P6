@@ -20,11 +20,11 @@ public class TweetLoader {
                 if(cleaned_tweet.isEmpty() || cleaned_tweet.isBlank() || cleaned_tweet.split("\\s+").length == 1){
                     continue;
                 }
-                tweets.add(new TopicModelTweet(lines[0],cleaned_tweet,line));
+                tweets.add(new TopicModelTweet(lines[0],cleaned_tweet,lines[1],lines[2]));
             }catch (IndexOutOfBoundsException e){
                 System.out.println(e + " :: " + line);
             }
-            if(tweets.size() > 500000){
+            if(tweets.size() > 100){
                 break;
             }
         }
