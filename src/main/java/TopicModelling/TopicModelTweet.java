@@ -55,7 +55,7 @@ public class TopicModelTweet {
         return
                 original_text + "|"
                 + getTopicsString() + "|"
-                + getSentiment() + "|"
+                //+ getSentiment() + "|"
                 + date;
     }
 }

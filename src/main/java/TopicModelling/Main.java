@@ -19,12 +19,12 @@ import java.util.Iterator;
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         TweetLoader tl = new TweetLoader();
-        //tl.getTweetsFromFile("C:/Users/mk96/Desktop/CleanedData/2.txt");
+        tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/2.txt");
         tl.getTweetsFromFile("C:/Users/Mads/Desktop/CleanedData/1.txt");
 
         //sentiment(tl.getTweets());
         topicModel(tl.getTweets(),tl);
-        sentiment(tl.getTweets());
+        //sentiment(tl.getTweets());
         writeToFile("C:/Users/Mads/Desktop/CleanedData/topicSenti.txt",tl.getTweets());
         //TopicAmountCalculator topicAmountCalculator = new TopicAmountCalculator();
         //topicAmountCalculator.jaccardAverage(10, orderedDescriptors);
@@ -53,7 +53,7 @@ public class Main {
     private static void topicModel(ArrayList<TopicModelTweet> tweets,TweetLoader tl){
         LDAMananger ldaMananger = new LDAMananger();
         ldaMananger.extractTweetText(tweets);
-        LdaResult result = ldaMananger.calculateTopics(50,30000);
+        LdaResult result = ldaMananger.calculateTopics(50,50000);
         TopicLabelCalculator topicCalc = new TopicLabelCalculator(result,tl);
         topicCalc.simpleCalcTopicLabelScore();
         HashMap<Integer, ArrayList<String>> orderedDescriptors = topicCalc.getOrderedTopicDescriptors();
@@ -65,7 +65,9 @@ public class Main {
         File topicSentiTweet = new File(filePath);
         BufferedWriter bfw = new BufferedWriter(new FileWriter(topicSentiTweet));
         for(TopicModelTweet t: tweets){
-            bfw.write(filePath);
+            bfw.write(t.toString());
+            bfw.newLine();
         }
+        bfw.close();
     }
 }

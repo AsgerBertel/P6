@@ -24,9 +24,10 @@ public class TweetLoader {
             }catch (IndexOutOfBoundsException e){
                 System.out.println(e + " :: " + line);
             }
-            if(tweets.size() > 100){
+            /*if(tweets.size() > 100){
                 break;
             }
+             */
         }
         return tweets;
     }
