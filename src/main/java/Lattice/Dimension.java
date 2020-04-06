@@ -37,6 +37,30 @@ public class Dimension {
             throw new RuntimeException("String not in hierarchy");
         }
     }
+    /**
+     * Gets all descendants of a given string, excluding the given string
+     * **/
+    public ArrayList<String> getAllDescendants(String s){
+        ArrayList<String> descendants = new ArrayList<>();
+        int i = hierarchy.indexOf(s);
+        while(true){
+            try{
+                descendants.add(getDescendant(hierarchy.get(i++)));
+            }catch (RuntimeException e){
+                System.out.println(e.toString());
+                return descendants;
+            }
+        }
+    }
+    /**
+     * Gets all descendants of a given string, including the given string
+     * **/
+    public ArrayList<String> getAllDescendantsAndPassed(String s){
+        ArrayList<String> descendants = new ArrayList<>();
+        descendants.add(s);
+        descendants.addAll(getAllDescendants(s));
+        return descendants;
+    }
 
     public Dimension(String[] array){
         this.hierarchy.addAll(Arrays.asList(array));
