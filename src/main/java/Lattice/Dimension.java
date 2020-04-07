@@ -23,6 +23,9 @@ public class Dimension {
             throw new RuntimeException("String not in hierarchy");
         }
     }
+    public int getLevel(String s){
+        return this.hierarchy.indexOf(s);
+    }
     public String getDescendant(String s){
         if(this.hierarchy.contains(s)){
             int index = this.hierarchy.indexOf(s);
@@ -64,5 +67,16 @@ public class Dimension {
 
     public Dimension(String[] array){
         this.hierarchy.addAll(Arrays.asList(array));
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Dimension cmp_d = (Dimension) obj;
+        return hierarchy.equals(cmp_d.hierarchy);
     }
 }
