@@ -92,7 +92,7 @@ public class GraphManager {
                         //check if string is already in Set. If it is not, add s to map
                         if(!hm.containsKey(ds)){
                             if(duplicateMap.containsKey(sb.toString())){
-                                if(duplicateMap.get(sb.toString()) <= previous/ls.size()){
+                                if(duplicateMap.get(sb.toString()) < previous){
                                     hm.put(ds,s);
                                     duplicateMap.put(sb.toString(),duplicateMap.get(sb.toString())+1);
                                 }
@@ -111,9 +111,6 @@ public class GraphManager {
         //Get filtered list of nodes
         ArrayList<Node> filteredNodes = filterExistingNodes(ListOfMapsToNodes(big_daddy));
         for(Node node: filteredNodes){
-            if(node.dimensions.size()==2){
-                System.out.println("thats not it chief");
-            }
             nodes.put(node,node);
         }
         //Add them to nodes map
