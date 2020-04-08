@@ -23,36 +23,36 @@ public class GraphManager {
     }
 
     private ArrayList<Node> generateChildren(Node n) {
-        HashMap<Dimension,ArrayList<String>> strings = new HashMap<>();
+        HashMap<Dimension,ArrayList<Level>> dimensionLevelMap = new HashMap<>();
         //Fill strings - With Nodes dimension and its descendant in all spots.
         for(Dimension d: n.dimensions.keySet()){
-            ArrayList<String> arrayList = new ArrayList<>();
+            ArrayList<Level> arrayList = new ArrayList<>();
             arrayList.add(n.dimensions.get(d));
             try{
-                String descendant = d.getDescendant(n.dimensions.get(d));
+                Level descendant = d.getDescendant(n.dimensions.get(d));
                 arrayList.add(descendant);
-                strings.put(d,arrayList);
+                dimensionLevelMap.put(d,arrayList);
             }catch (RuntimeException e){
                 //get here if s is lowest level in the hierarchy. Just add s and nothing else.
-                strings.put(d,arrayList);
+                dimensionLevelMap.put(d,arrayList);
                 //todo fix exception here when a custom has been made
             }
         }
         //calculate total number of rows needed to represent all strings
         int num_rows = 1;
-        for(ArrayList<String> l : strings.values()){
+        for(ArrayList<Level> l : dimensionLevelMap.values()){
             num_rows = num_rows*l.size();
         }
-        ArrayList<LinkedHashMap<Dimension,String>> big_daddy = new ArrayList<>();
+        ArrayList<LinkedHashMap<Dimension,Level>> big_daddy = new ArrayList<>();
         boolean isFirst = true;
         int previous = 0;
-        for(Dimension ds : strings.keySet()){
-            ArrayList<String> ls = strings.get(ds);
+        for(Dimension ds : dimensionLevelMap.keySet()){
+            ArrayList<Level> ls = dimensionLevelMap.get(ds);
             if(isFirst){
                 previous = num_rows/ls.size();
-                for(String s : ls){
+                for(Level s : ls){
                     for(int i = 0; i < num_rows/ls.size();i++){
-                        LinkedHashMap<Dimension,String> map = new LinkedHashMap<>();
+                        LinkedHashMap<Dimension,Level> map = new LinkedHashMap<>();
                         map.put(ds,s);
                         big_daddy.add(map);
                     }
@@ -61,13 +61,13 @@ public class GraphManager {
             }
             else{
                 previous = previous/ls.size();
-                for(String s : ls){
+                for(Level s : ls){
                     HashMap<String,Integer> duplicateMap = new HashMap<>();
-                    for(LinkedHashMap<Dimension, String> hm : big_daddy){
+                    for(LinkedHashMap<Dimension, Level> hm : big_daddy){
                         StringBuilder sb = new StringBuilder();
                         //combine all strings into one
-                        for(String keyString : hm.values()){
-                            sb.append(keyString);
+                        for(Level keyString : hm.values()){
+                            sb.append(keyString.getName());
                         }
                         //check if string is already in Set. If it is not, add s to map
                         if(!hm.containsKey(ds)){
@@ -110,9 +110,9 @@ public class GraphManager {
         }
         return list;
     }
-    private ArrayList<Node> ListOfMapsToNodes(ArrayList<LinkedHashMap<Dimension,String>> mapArrayList){
+    private ArrayList<Node> ListOfMapsToNodes(ArrayList<LinkedHashMap<Dimension,Level>> mapArrayList){
         ArrayList<Node> new_nodes = new ArrayList<>();
-        for(LinkedHashMap<Dimension,String> lhm : mapArrayList){
+        for(LinkedHashMap<Dimension,Level> lhm : mapArrayList){
             Node new_node = new Node();
             for(Dimension val :lhm.keySet()){
                 new_node.addDimension(lhm.get(val),val);
