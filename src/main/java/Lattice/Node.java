@@ -8,25 +8,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Node {
-    LinkedHashMap<Dimension, String> dimensions = new LinkedHashMap<>();
+    LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
     private ArrayList<Node> parents = new ArrayList<>();
     private ArrayList<Node> children = new ArrayList<>();
 
-    public static void main(String[] args) {
-        Dimension d1 = new Dimension(new String[]{"P","C","None"});
-        Dimension d2 = new Dimension(new String[]{"A","B","None"});
-        Node n = new Node(new Object[][]{
-                {d1,"C"},
-                {d2,"A"}
-        });
-    }
 
     public Node() {
     }
 
     public Node(Object[][] mapArray){
-        Map<Dimension,String> temp = Stream.of(mapArray).collect(
-                Collectors.toMap(data -> (Dimension) data[0], data -> (String) data[1]));
+        Map<Dimension,Level> temp = Stream.of(mapArray).collect(
+                Collectors.toMap(data -> (Dimension) data[0], data -> (Level) data[1]));
         this.dimensions.putAll(temp);
     }
 
@@ -69,16 +61,16 @@ public class Node {
         return true;
     }
 
-    private boolean containsStringDimension(String cmp_s, Dimension cmp_d){
+    private boolean containsStringDimension(Level cmp_l, Dimension cmp_d){
         for(Dimension d : this.dimensions.keySet()){
-            if(this.dimensions.get(d).equals(cmp_s) && d.equals(cmp_d)){
+            if(this.dimensions.get(d).equals(cmp_l) && d.equals(cmp_d)){
                 return true;
             }
         }
         return false;
     }
 
-    public void addDimension(String value, Dimension key){
+    public void addDimension(Level value, Dimension key){
         this.dimensions.put(key,value);
     }
 }
