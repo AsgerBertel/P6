@@ -22,8 +22,12 @@ public class Dimension {
             throw new RuntimeException("String not in hierarchy");
         }
     }
-    public int getLevel(Level l){
+    public int getLevelIndex(Level l){
         return this.hierarchy.indexOf(l);
+    }
+
+    public Level getLevel(int levelIndex){
+        return this.hierarchy.get(levelIndex);
     }
     public Level getDescendant(Level l){
         if(this.hierarchy.contains(l)){
@@ -64,9 +68,10 @@ public class Dimension {
         return descendants;
     }
 
-    public Dimension(Level[] array){
+    public Dimension(Level[] array) {
         this.hierarchy.addAll(Arrays.asList(array));
     }
+
 
     @Override
     public int hashCode() {
