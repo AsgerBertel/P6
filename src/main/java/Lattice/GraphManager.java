@@ -6,29 +6,9 @@ import java.util.*;
 
 public class GraphManager {
 
-    private HashMap<Node,Node> nodes = new HashMap<>();
+    public HashMap<Node,Node> nodes = new HashMap<>();
     private Node curr_node;
     private Set<Node> doneNodes = new HashSet<>();
-    public static void main(String[] args) {
-        GraphManager gm = new GraphManager();
-        gm.lol();
-    }
-    public void lol(){
-        Dimension d1 = new Dimension(new String[]{"Prod","Category","None"});
-        Dimension d2 = new Dimension(new String[]{"Location", "District","County","City","Country","None"});
-        Dimension d3 = new Dimension(new String[]{"Day","Month","Year","None"});
-        Dimension d4 = new Dimension(new String[]{"Opinion","None"});
-        //Create the root node
-        Node n = new Node(new Object[][]{
-                {d1,"Prod"},
-                {d2,"Location"},
-                {d3, "Day"},
-                {d4, "Opinion"}
-        });
-        this.nodes.put(n,n);
-        generateTree(n);
-        System.out.println(nodes.size());
-    }
 
     //Generates children for every Node
     public void generateTree(Node n){
