@@ -1,5 +1,7 @@
 package ViewCalculations;
 
+import uk.ac.wlv.sentistrength.SentiStrength;
+
 import java.util.HashMap;
 
 public class Main {
