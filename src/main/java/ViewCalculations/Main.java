@@ -9,6 +9,8 @@ public class Main {
     HashMap<String, Integer> listOfDateRows = new HashMap<>();
     HashMap<String, Integer> listOfOpinionRows = new HashMap<>();
     HashMap<String, Integer> listOfAllRowCombinations;
+    String fistSmallest;
+    String secondSmallest;
 
     public static void main(String[] args) {
         Main main = new Main();
