@@ -1,5 +1,9 @@
 package Lattice.GreedyAlgorithm;
 
+import Lattice.Dimension;
+import Lattice.GraphManager;
+import Lattice.Node;
+
 import java.util.ArrayList;
 
 public class Main {
@@ -14,6 +18,11 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
         main.calculateRelations();
+
+        GreedyAlgorithm greedyAlgorithm = new GreedyAlgorithm();
+        greedyAlgorithm.materializeNodes(3);
+        int i = 1;
+
     }
 
 
