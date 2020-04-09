@@ -1,30 +1,29 @@
 package Lattice.GreedyAlgorithm;
 
-import Lattice.Dimension;
 import Lattice.GraphManager;
 import Lattice.Node;
-import nu.xom.Nodes;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class GreedyAlgorithm {
     //When we find our own benefit calculation model, this should probably be a double value
     LinkedHashMap<Node, Integer> benefitValueTree = new LinkedHashMap<>();
-    HashSet<Node> materializedNodes = new HashSet<>();
+    LinkedHashSet<Node> materializedNodes = new LinkedHashSet<>();
     GraphManager gm= new GraphManager();
 
     public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize){
+        initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
             selectHighestBenefit();
+            updateCurrentBenefit();
         }
         return materializedNodes;
     }
 
-    public void selectHighestBenefit(){
-        calcBenefitValue();
+    private void selectHighestBenefit(){
         Node bestNode = null;
         int bestNodeVal = 0;
         for(Node n: benefitValueTree.keySet()){
@@ -38,26 +37,28 @@ public class GreedyAlgorithm {
 
     }
 
-    public void updateActualCost(Node n){
+    private void updateActualCost(Node n){
         n.setActualCost(n.calculateOwnCost());
-        for(Node child: n.BFS_GetSubgraph(gm.nodes)){
+        for(Node child: n.BFS_GetSubGraph(gm.nodes)){
             if(child.getActualCost() > n.getActualCost()){
                 child.setActualCost(n.getOwnCost());
                 child.setMaterializedUpperNode(n);
+
             }
         }
     }
-    public void calcBenefitValue(){
+    private void initializeGraph(){
         gm.greedyAlgBaseTest();
         calculateInitialValue(gm.getTopNode(), gm.nodes.keySet());
+        updateCurrentBenefit();
+    }
 
+    private void updateCurrentBenefit(){
         for(Node n: gm.nodes.keySet()){
             benefitValueTree.put(n,n.getBenefit(gm.nodes));
         }
-
     }
-
-    public void calculateInitialValue(Node topNode, Set<Node> keyset){
+    private void calculateInitialValue(Node topNode, Set<Node> keyset){
             int rootNodeCost = topNode.calculateOwnCost();
             for(Node n: keyset){
                 n.calculateOwnCost();

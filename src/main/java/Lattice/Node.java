@@ -104,13 +104,13 @@ public class Node {
     public boolean equals(Object obj) {
         Node compareNode = (Node) obj;
         for (Dimension d : compareNode.dimensions.keySet()) {
-            if (!containsStringDimension(compareNode.dimensions.get(d), d))
+            if (!containsLevelDimension(compareNode.dimensions.get(d), d))
                 return false;
         }
         return true;
     }
 
-    private boolean containsStringDimension(Level cmp_l, Dimension cmp_d) {
+    private boolean containsLevelDimension(Level cmp_l, Dimension cmp_d) {
         for (Dimension d : this.dimensions.keySet()) {
             if (this.dimensions.get(d).equals(cmp_l) && d.equals(cmp_d)) {
                 return true;
@@ -125,8 +125,8 @@ public class Node {
 
 
     public int getBenefit(HashMap<Node, Node> nodes) {
-        int benefit = actualCost-ownCost;
-        for(Node n: BFS_GetSubgraph(nodes)){
+        int benefit = 0;
+        for(Node n: BFS_GetSubGraph(nodes)){
             if(!(n.actualCost < this.ownCost)) {
                 benefit = benefit + n.actualCost - this.ownCost;
             }
@@ -138,7 +138,7 @@ public class Node {
         return ownCost;
     }
 
-    public ArrayList<Node> BFS_GetSubgraph(HashMap<Node, Node> nodes) {
+    public ArrayList<Node> BFS_GetSubGraph(HashMap<Node, Node> nodes) {
         ArrayList<Node> subGraphNodes = new ArrayList<>();
         LinkedHashMap<Node, Boolean> visited = new LinkedHashMap<>();
         for(Node n: nodes.keySet()){
