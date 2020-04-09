@@ -7,12 +7,8 @@ import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
-import edu.stanford.nlp.trees.EnglishPTBTreebankCorrector;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
-import SentimentSpark.LanguageCheck;
-
-import static SentimentSpark.LanguageCheck.CorrectSpell;
 
 public class StanfordSentiment {
 
@@ -23,7 +19,7 @@ public class StanfordSentiment {
 
 
     public static Double GetSentiment(String text) {
-        String checkedText = CorrectSpell(text);
+        String checkedText = LanguageCheck.CorrectSpell(text);
 
         Annotation document = new Annotation(checkedText);
         pipeline.annotate(document);

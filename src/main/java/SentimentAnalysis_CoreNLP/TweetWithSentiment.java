@@ -1,3 +1,5 @@
+package SentimentAnalysis_CoreNLP;
+
 public class TweetWithSentiment {
 
     private String line;
@@ -22,7 +24,7 @@ public class TweetWithSentiment {
 
     @Override
     public String toString() {
-        return "TweetWithSentiment [line=" + line + ", cssClass=" + cssClass + "]";
+        return "SentimentAnalysis_CoreNLP.TweetWithSentiment [line=" + line + ", cssClass=" + cssClass + "]";
     }
 
 }
