@@ -36,20 +36,12 @@ public class LDAMananger {
             if(doc == null)
                 continue;
             //loop over top 3 topics assigned to tweet
-            for(TupleTwo<Integer,Double> tuple : doc.topTopics(3)){
-                int added = 0;
+            for(TupleTwo<Integer,Double> tuple : doc.topTopics(5)){
                 //if probability that topic is correct is less than 50% then skip
-                if(tuple._2() < 0.5 && !doc.topTopics(3).get(0)._1().equals(tuple._1())){
+                if(tuple._2() < 0.5 && !t.getTopics().isEmpty()){
                     continue;
                 }
-                //add the topics that "should" describe the content of the tweet
-                for(String s : descriptors.get(tuple._1())){
-                    //only add top3
-                    if(added < 3){
-                        t.addTopic(s);
-                        added++;
-                    }else break;
-                }
+                t.addTopic(tuple._1());
             }
         }
     }

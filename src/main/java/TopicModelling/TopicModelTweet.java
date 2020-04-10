@@ -6,9 +6,9 @@ public class TopicModelTweet {
     String id, topic_text, original_text;
     Sentiment sentiment;
     String date;
-    private ArrayList<String> topics = new ArrayList<>();
+    private ArrayList<Integer> topics = new ArrayList<>();
 
-    public ArrayList<String> getTopics() {
+    public ArrayList<Integer> getTopics() {
         return topics;
     }
 
@@ -16,8 +16,8 @@ public class TopicModelTweet {
         return original_text;
     }
 
-    public void addTopic(String s){
-        topics.add(s);
+    public void addTopic(Integer i){
+        topics.add(i);
     }
 
     public TopicModelTweet(String id, String topic_text, String original_text, String date) {
