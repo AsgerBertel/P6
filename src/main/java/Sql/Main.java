@@ -1,13 +1,16 @@
 package Sql;
 
 import atlas.Atlas;
+import org.apache.spark.sql.catalyst.plans.logical.Except;
+import org.json4s.DateFormat;
+import org.json4s.JsonAST;
 
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Main {
     ResultSet resultSet;
@@ -15,17 +18,21 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-        FileGenerator fileGenerator = new FileGenerator();
-        try {
-            fileGenerator.mergeFiles();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-     /*   FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();
+        FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();
+        Set<Date> dateSet;
 
         try {
-            factTableIdGenerator.generateFactTableElement();
+
+            dateSet = main.getDatesFromTweets("assets/CleanedData/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt");
+            for(Date d: dateSet){
+                System.out.println();
+                //ConnectionManager.updateSql(QueryManager.insertIntoDate(d.getDay(), d.getMonth(), d.getYear()));
+            }
+
+
+            System.out.println(dateSet.size());
+            //main.insertIntoDates(dateSet);
+            //factTableIdGenerator.generateFactTableElement();
             //main.insertIntoProduct();
             //  main.insertIntoDates();
             //  main.multithreadedInsertIntoLocation();
@@ -33,20 +40,17 @@ public class Main {
             //main.insertIntoFactTable();
 
 
-        } catch (SQLException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
-    private void insertIntoFactTable() throws SQLException, IOException {
+    private void insertIntoFactTable() throws SQLException {
         ResultSet resultSets;
-        BufferedReader br = new BufferedReader(new FileReader("C:/Users/madsfDesktop/tweet-editing/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt"));
+
         resultSets = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
         System.out.println("starting loading list");
-        String tweet;
-        while ((tweet = br.readLine()) != null) {
-            String tweetArr[] = tweet.split("\\|");
-
+        while (resultSets.next()) {
             TweetElement tweetElement = new TweetElement(resultSets.getString(1), resultSets.getDouble(2), resultSets.getDouble(3), resultSets.getString(4), resultSets.getString(5));
             listOfFactTableElements.add(tweetElement);
 
@@ -105,19 +109,16 @@ public class Main {
     }
 
 
-    private void insertIntoDates() throws SQLException {
-      /*  resultSet = ConnectionManager.selectSQL(QueryManager.selectDateFromTweet);
-        while (resultSet.next()) {
-            String result = resultSet.getString(1);
-            String[] arrOfStr = result.split("/");
-            ConnectionManager.updateSql(QueryManager.insertIntoDate(Integer.parseInt(arrOfStr[0].trim()), Integer.parseInt(arrOfStr[1].trim()), Integer.parseInt(arrOfStr[2].trim())));
-        }*/
-
-        for (int month = 1; month <= 36; month++) {
-            for (int day = 1; day <= 31; day++) {
-                ConnectionManager.updateSql(QueryManager.insertIntoDay(day, month));
-            }
+    private void insertIntoDates(Set<Date> dateSet) throws SQLException {
+        ArrayList<Integer> alreadyExistsList = new ArrayList<>();
+        for(Date d: dateSet){
+            if(alreadyExistsList.contains(d.getYear()))
+            ConnectionManager.updateSql(QueryManager.insertIntoYear(d.getYear()));
+            alreadyExistsList.add(d.getYear());
         }
+
+        //ConnectionManager.updateSql(QueryManager.insertIntoDate())
+
     }
 
     private void multithreadedInsertIntoLocation() throws SQLException, InterruptedException {
@@ -148,6 +149,77 @@ public class Main {
             values = sc.nextLine().split(",");
             ConnectionManager.updateSql(QueryManager.insertIntoProduct(values[1], values[0]));
         }
+    }
+
+    private Set<Date> getDatesFromTweets(String file) throws IOException {
+        BufferedReader bf = new BufferedReader(new FileReader(file));
+        String tweet;
+        String[] tweetArray = null;
+        HashSet<Date> uniqueDates = new HashSet<>();
+        int i = 0;
+        while( (tweet = bf.readLine())!= null){
+            try{
+                tweetArray = tweet.split("\\|");
+            } catch(Exception e){
+
+            }
+            int month = 0;
+            try {
+
+                if(!tweetArray[2].contains("+0000")){
+                    continue;
+                }
+
+                String[] datearray = tweetArray[2].split("\\s");
+                Date date = new Date(Integer.parseInt(datearray[5]),findMonthInDate(datearray[1]), Integer.parseInt(datearray[2]));
+
+                resultSet = ConnectionManager.selectSQL(QueryManager.selectAllDayIDFromDay(date.getDay(), date.getMonth(), date.getYear()));
+
+                int dateID = 0;
+                while(resultSet.next()){
+                    dateID = resultSet.getInt(1);
+                }
+                PrintWriter writer = new PrintWriter("assets/CleanedData/test.txt");
+                writer.write(tweetArray[1] + "|" + dateID + "|" + tweetArray[3].trim() + "|" + tweetArray[4] + "\n");
+
+                uniqueDates.add(date);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return uniqueDates;
+    }
+
+    private int findMonthInDate(String month) throws Exception {
+        switch(month){
+            case "Jan":
+                return 1;
+            case "Feb":
+                return 2;
+            case "Mar":
+                return 3;
+            case "Apr":
+                return 4;
+            case "May":
+                return 5;
+            case "Jun":
+                return 6;
+            case "Jul":
+                return 7;
+            case "Aug":
+                return 8;
+            case "Sep":
+                return 9;
+            case "Okt":
+                return 10;
+            case "Nov":
+                return 11;
+            case "Dec":
+                return 12;
+            default:
+                throw new Exception("Month is not a month:" + month);
+        }
+
     }
 }
 

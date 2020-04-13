@@ -10,11 +10,18 @@ public class QueryManager {
     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
 
     public static String insertIntoDate(int day, int month, int year) {
-        return "INSERT INTO cube.datedimenson (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
+        return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
+    }
+
+    public static String insertIntoYear(int year){
+        return "INSERT INTO cubefrequency.cube.year (year) VALUES ("+year+")";
+    }
+    public static String insertIntoMonth(int month, int year){
+        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES("+month+", "+year+")";
     }
 
     public static String insertIntoDay(int day, int month) {
-        return "INSERT INTO cube.day (monthid,day)  VALUES ( '" + month + "', '" + day + "')";
+        return "INSERT INTO cube.day (monthid,day)  VALUES (" + month + ", " + day + ")";
     }
 
     public static String selectProductIDFromProduct(String product) {
