@@ -1,11 +1,9 @@
 package Sentiment;
 
-import opennlp.tools.parser.Parse;
+
 import uk.ac.wlv.sentistrength.SentiStrength;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
@@ -23,15 +21,14 @@ public class Main {
     }
 
     private void createAnalysis() throws FileNotFoundException, IOException {
-
-
         String opinion;
         String sshint[] = {"sentidata", "C:/Programering/Java_Programmer/P6/assets/TextFiles/", "explain"};
         SentiStrength sentiStrength = new SentiStrength();
+
         sentiStrength.initialise(sshint);
 
 
-        File file = new File("C:/Users/madsf/Downloads/topicSenti/topicSentiTest.txt");    //creates a new file instance
+        File file = new File("C:/Users/madsf/Downloads/tweetsWithTopicMetaFile/topicSenti.txt");    //creates a new file instance
         Scanner sc = new Scanner(file);
         int i = 0;
         double p = 0;
@@ -66,7 +63,7 @@ public class Main {
             } catch (IndexOutOfBoundsException e) {
                 opinion = "neutral";
             }
-            File sentimenttext = new File("C:/Users/madsf/Downloads/topicSenti/sentiment/test.txt");
+            File sentimenttext = new File("C:/Users/madsf/Downloads/tweetsWithTopicMetaFile/tweetsWithTopicAndSentimentMetaFile.txt");
             FileWriter fr = new FileWriter(sentimenttext, true);
             BufferedWriter writer = new BufferedWriter(fr);
 

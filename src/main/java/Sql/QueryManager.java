@@ -7,6 +7,7 @@ public class QueryManager {
     public static String selectCoordinatesFromTweet = "SELECT lat,long FROM cube.tweets WHERE cube.tweets.tweetid > 10000000";
     public static String selectAllFromTweet = "SELECT product,lat,long,opinion,date FROM cube.tweets Where tweetid > 162928 AND tweetid < 2000000";
     public static String selectProductIDFromProduct = "SELECT lat,long FROM cube.tweets ";
+    public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
 
     public static String insertIntoDate(int day, int month, int year) {
         return "INSERT INTO cube.datedimenson (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
@@ -45,16 +46,15 @@ public class QueryManager {
         return "SELECT coordinate.locationid FROM cube.coordinate";
     }
 
-    public static String selectAllDayIDFromDay() {
-        return "SELECT dayid FROM cube.day d INNER JOIN cube.month ON d.monthid = month.monthid INNER JOIN cube.year ON month.yearid = year.yearid ";
+    public static String selectAllDayIDFromDay(int day, int month, int year) {
+        return "SELECT dayid FROM cube.day d INNER JOIN cube.month ON d.monthid = month.monthid INNER JOIN cube.year ON month.yearid = year.yearid WHERE day = " + day + " AND month.month = " + month + " AND year.year= " + year + "";
     }
-
-
 
     public static String insertFactTable(int productid, int opinionid, int dateid, int coordinateid) {
         return "INSERT INTO cube.facttable ( productid, opinionid, dateid, coordinateid)\n" +
                 "VALUES( " + productid + ", " + opinionid + "," + dateid + "," + coordinateid + ")";
     }
+
     public static String insertIntoLocation(String district, String county, String City, String country, double lat, double longtitude) {
         return "INSERT INTO cube.locationdimension (district,county,City,country,lat,long)  VALUES ( '" + district + "', '" + county + "','" + City + "','" + country + "','" + lat + "','" + longtitude + "')";
     }

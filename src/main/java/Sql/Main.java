@@ -1,10 +1,8 @@
 package Sql;
 
 import atlas.Atlas;
-import org.json4s.JsonAST;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -17,7 +15,14 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-        FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();
+        FileGenerator fileGenerator = new FileGenerator();
+        try {
+            fileGenerator.mergeFiles();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+     /*   FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();
 
         try {
             factTableIdGenerator.generateFactTableElement();
@@ -30,15 +35,18 @@ public class Main {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
-    private void insertIntoFactTable() throws SQLException {
+    private void insertIntoFactTable() throws SQLException, IOException {
         ResultSet resultSets;
-
+        BufferedReader br = new BufferedReader(new FileReader("C:/Users/madsfDesktop/tweet-editing/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt"));
         resultSets = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);
         System.out.println("starting loading list");
-        while (resultSets.next()) {
+        String tweet;
+        while ((tweet = br.readLine()) != null) {
+            String tweetArr[] = tweet.split("\\|");
+
             TweetElement tweetElement = new TweetElement(resultSets.getString(1), resultSets.getDouble(2), resultSets.getDouble(3), resultSets.getString(4), resultSets.getString(5));
             listOfFactTableElements.add(tweetElement);
 
