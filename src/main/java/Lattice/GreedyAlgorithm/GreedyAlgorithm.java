@@ -3,10 +3,7 @@ package Lattice.GreedyAlgorithm;
 import Lattice.GraphManager;
 import Lattice.Node;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GreedyAlgorithm {
     //When we find our own benefit calculation model, this should probably be a double value
@@ -32,18 +29,44 @@ public class GreedyAlgorithm {
                 bestNodeVal = benefitValueTree.get(n);
             }
         }
-        materializedNodes.add(bestNode);
-        updateActualCost(bestNode);
-
+        if (bestNode != null) {
+            bestNode.setMaterialised(true);
+            materializedNodes.add(bestNode);
+            updateActualCost(bestNode);
+        } else throw new RuntimeException("No best node found - Greedy algo bugged?");
+        //todo better exception desc/custom exception
     }
 
     private void updateActualCost(Node n){
         n.setActualCost(n.calculateOwnCost());
-        for(Node child: n.BFS_GetSubGraph(gm.nodes)){
+        ArrayList<Node> subgraphNodes = n.BFS_GetSubGraph(gm.nodes);
+        for(Node child: subgraphNodes){
             if(child.getActualCost() > n.getActualCost()){
                 child.setActualCost(n.getOwnCost());
                 child.setMaterializedUpperNode(n);
-
+            }
+        }
+        updateImmediateParent(n,subgraphNodes);
+    }
+    private void updateImmediateParent(Node materialisedNode, ArrayList<Node> subgraphNodes){
+        for(Node n : subgraphNodes){
+            if(n.getActualCost() < materialisedNode.getActualCost()){
+                continue;
+            }
+            if(n.equals(materialisedNode) || n.getParents().contains(materialisedNode)){
+                n.setImmediateParentNode(materialisedNode);
+            }else{
+                for(Node parent : n.getParents()){
+                    if(parent.getActualCost() == materialisedNode.getOwnCost()){
+                        n.setImmediateParentNode(parent);
+                        break;
+                    }
+                }
+                //If there is no immediateParentNode throw an exception
+                if(n.getImmediateParentNode() == null){
+                    throw new RuntimeException("No immediate parent node has been set");
+                    //todo custom exception/better desc
+                }
             }
         }
     }
@@ -64,6 +87,7 @@ public class GreedyAlgorithm {
                 n.calculateOwnCost();
                 n.setActualCost(rootNodeCost);
                 n.setMaterializedUpperNode(topNode);
+                n.setImmediateParentNode(topNode);
         }
 
     }

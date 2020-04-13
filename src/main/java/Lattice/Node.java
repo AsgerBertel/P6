@@ -9,8 +9,19 @@ public class Node {
     public LinkedHashMap<Dimension, Level> getDimensions() {
         return dimensions;
     }
-
+    //These values are set during the greedy algorithm
     private Node materializedUpperNode = null;
+    private Node immediateParentNode = null;
+
+    private boolean isMaterialised = false;
+
+    public boolean isMaterialised() {
+        return isMaterialised;
+    }
+
+    public void setMaterialised(boolean materialised) {
+        isMaterialised = materialised;
+    }
 
     public int getActualCost() {
         return actualCost;
@@ -18,6 +29,14 @@ public class Node {
 
     public Node getMaterializedUpperNode() {
         return materializedUpperNode;
+    }
+
+    public Node getImmediateParentNode() {
+        return immediateParentNode;
+    }
+
+    public void setImmediateParentNode(Node immediateParentNode) {
+        this.immediateParentNode = immediateParentNode;
     }
 
     public void setMaterializedUpperNode(Node materializedUpperNode) {
@@ -33,19 +52,12 @@ public class Node {
         this.actualCost = actualCost;
     }
 
+    public ArrayList<Node> getParents() {
+        return parents;
+    }
+
     private int actualCost;
 
-    public static void main(String[] args) {
-        /*
-        Dimension d1 = new Dimension(new String[]{"P","C","None"}, new int []{});
-        Dimension d2 = new Dimension(new String[]{"A","B","None"}, new int[]{});
-        Node n = new Node(new Object[][]{
-                {d1,"C"},
-                {d2,"A"}
-        });
-
-         */
-    }
 
     public Node() {
     }
