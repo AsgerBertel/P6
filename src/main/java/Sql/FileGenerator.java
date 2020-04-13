@@ -62,7 +62,7 @@ public class FileGenerator {
         }
 
     }
-
+//asger this
     public void generateFactTableFile() throws IOException {
         FileWriter fr = new FileWriter("C:/Users/madsf/Desktop/tweet-editing/locationid.txt");
         BufferedReader br1 = new BufferedReader(new FileReader("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentMetaFile.txt"));
