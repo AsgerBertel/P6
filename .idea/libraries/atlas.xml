@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="atlas">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/assets/library/atlas.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
