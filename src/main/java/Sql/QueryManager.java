@@ -25,7 +25,7 @@ public class QueryManager {
         return "SELECT opinionid FROM cube.opinion WHERE opinion.opinion = '" + opinion + "'";
     }
 
-    public static String selectLocationIDFromCoordinates(double lat, double longi) {
+    public static String selectLocationIDFromCoordinates(double lat, double longi) {    
         return "SELECT coordinate.locationid FROM cube.coordinate WHERE lat = " + lat + " AND long =" + longi + "";
     }
 

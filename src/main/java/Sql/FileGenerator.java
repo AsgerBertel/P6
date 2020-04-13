@@ -37,31 +37,49 @@ public class FileGenerator {
 
 
         String output = "";
-        try (Scanner sc1 = new Scanner((new File("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentMetaFile.txt")));
-             Scanner sc2 = new Scanner((new File("C:/Users/madsf/Desktop/tweet-editing/locationid.txt")))) {
-            System.out.println("write to file");
-            String firstLine = "";
-            String secondLine = "";
-            int i = 0;
-            while (i < 4935709 ) {
-                firstLine = br1.readLine();
-                secondLine = br2.readLine();
-                if (secondLine ==null){
-                    br2 = br4;
-                    output = firstLine + " |" + secondLine;
-                    output += "\n";
 
-                } else{
-                    output = firstLine + " |" + secondLine;
-                    output += "\n";
-                }
-               // System.out.println(output);
-                pw.write(output);
-                i++;
+        System.out.println("write to file");
+        String firstLine = "";
+        String secondLine = "";
+        int i = 0;
+        while (i < 4935709) {
+            firstLine = br1.readLine();
+            secondLine = br2.readLine();
+            if (secondLine == null) {
+                br2 = br4;
+                output = firstLine + " |" + secondLine;
+                output += "\n";
+
+            } else {
+                output = firstLine + " |" + secondLine;
+                output += "\n";
             }
+            // System.out.println(output);
+            pw.write(output);
+            i++;
+
 
         }
 
+    }
+
+    public void generateFactTableFile() throws IOException {
+        FileWriter fr = new FileWriter("C:/Users/madsf/Desktop/tweet-editing/locationid.txt");
+        BufferedReader br1 = new BufferedReader(new FileReader("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentMetaFile.txt"));
+        String line;
+        int opinionID;
+        while ((line = br1.readLine()) != null) {
+            String tweetArr[] = line.split("\\Q|");
+            if (tweetArr[2] == "neutral") {
+                opinionID = 1;
+
+            } else if (tweetArr[2] == "positive") {
+                opinionID = 2;
+            } else {
+                opinionID = 3;
+            }
+            fr.write(tweetArr[0] + "|" + tweetArr[1] + "|" + opinionID + "|" + tweetArr[3]);
+        }
     }
 
 }
