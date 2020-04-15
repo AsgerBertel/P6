@@ -20,10 +20,10 @@ public class LatticeGraphTests {
     Level d4opinion,d4none;
     @Before
     public void init(){
-        d1prod = new Level("Prod",1);
-        d1cat = new Level("Category",1);
+        d1prod = new Level("TopTopics",70);
+        d1cat = new Level("SubTopics",1401);
         d1none = new Level("None",1);
-        d2loc = new Level("Location",1);
+        d2loc = new Level("Coordinate",1);
         d2dis = new Level("District",1);
         d2county= new Level("County",1);
         d2cit= new Level("City",1);
@@ -83,6 +83,10 @@ public class LatticeGraphTests {
             }
         }
 
+    }
+    @Test
+    public void correctNumberOfDifferingDimensionsFromParentTest(){
+        //todo implement
     }
 
 }

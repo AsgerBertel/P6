@@ -20,7 +20,7 @@ public class FactTableIdGenerator {
     private static DecimalFormat df2 = new DecimalFormat("#.#");
 
     public void generateFactTableElement() throws SQLException {
-        getDateID();
+        //getDateID();
         getLocationID();
         getProductID();
         getOpinionID();
@@ -95,12 +95,12 @@ public class FactTableIdGenerator {
 
     }
 
-    private void getDateID() throws SQLException {
+    /*private void getDateID() throws SQLException {
         ResultSet resultSet;
         resultSet = ConnectionManager.selectSQL(QueryManager.selectAllDayIDFromDay());
         while (resultSet.next())
             listOfDateID.add(resultSet.getInt(1));
-    }
+    }*/
 
 
 }

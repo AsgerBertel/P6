@@ -6,15 +6,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Node {
-    public LinkedHashMap<Dimension, Level> getDimensions() {
-        return dimensions;
-    }
     //These values are set during the greedy algorithm
     private Node materializedUpperNode = null;
     private Node immediateParentNode = null;
+    LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
+    private ArrayList<Node> parents = new ArrayList<>();
+    private ArrayList<Node> children = new ArrayList<>();
+    private int ownCost;
 
     private boolean isMaterialised = false;
 
+    public LinkedHashMap<Dimension, Level> getDimensions() {
+        return dimensions;
+    }
     public boolean isMaterialised() {
         return isMaterialised;
     }
@@ -43,11 +47,6 @@ public class Node {
         this.materializedUpperNode = materializedUpperNode;
     }
 
-    LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
-    private ArrayList<Node> parents = new ArrayList<>();
-    private ArrayList<Node> children = new ArrayList<>();
-    private int ownCost;
-
     public void setActualCost(int actualCost) {
         this.actualCost = actualCost;
     }
@@ -59,8 +58,7 @@ public class Node {
     private int actualCost;
 
 
-    public Node() {
-    }
+    public Node() {}
 
     public Node(Object[][] mapArray){
         Map<Dimension, Level> temp = Stream.of(mapArray).collect(
