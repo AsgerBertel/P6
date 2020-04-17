@@ -69,5 +69,11 @@ public class QueryManager {
     public static String insertIntoProduct(String product, String category) {
         return "INSERT INTO cube.productdimension (category,product)  VALUES ( '" + product + "','" + category + "')";
     }
+    public static String insertIntoTopTopics(int id, String topic){
+        return "INSERT INTO cube.toptopics (toptopicid, topic) VALUES (" + id + "," + "'" + topic + "')";
+    }
 
+    public static String insertIntoSubTopics(String topic, int toptopicid){
+        return "INSERT INTO cube.subtopics (subtopic, toptopicid) VALUES ('" + topic + "'," + toptopicid + ")";
+    }
 }

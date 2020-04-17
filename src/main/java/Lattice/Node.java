@@ -6,11 +6,26 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Node {
+    //These values are set during the greedy algorithm
+    private Node materializedUpperNode = null;
+    private Node immediateParentNode = null;
+    LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
+    private ArrayList<Node> parents = new ArrayList<>();
+    private ArrayList<Node> children = new ArrayList<>();
+    private int ownCost;
+
+    private boolean isMaterialised = false;
+
     public LinkedHashMap<Dimension, Level> getDimensions() {
         return dimensions;
     }
+    public boolean isMaterialised() {
+        return isMaterialised;
+    }
 
-    private Node materializedUpperNode = null;
+    public void setMaterialised(boolean materialised) {
+        isMaterialised = materialised;
+    }
 
     public int getActualCost() {
         return actualCost;
@@ -20,35 +35,30 @@ public class Node {
         return materializedUpperNode;
     }
 
+    public Node getImmediateParentNode() {
+        return immediateParentNode;
+    }
+
+    public void setImmediateParentNode(Node immediateParentNode) {
+        this.immediateParentNode = immediateParentNode;
+    }
+
     public void setMaterializedUpperNode(Node materializedUpperNode) {
         this.materializedUpperNode = materializedUpperNode;
     }
-
-    LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
-    private ArrayList<Node> parents = new ArrayList<>();
-    private ArrayList<Node> children = new ArrayList<>();
-    private int ownCost;
 
     public void setActualCost(int actualCost) {
         this.actualCost = actualCost;
     }
 
+    public ArrayList<Node> getParents() {
+        return parents;
+    }
+
     private int actualCost;
 
-    public static void main(String[] args) {
-        /*
-        Dimension d1 = new Dimension(new String[]{"P","C","None"}, new int []{});
-        Dimension d2 = new Dimension(new String[]{"A","B","None"}, new int[]{});
-        Node n = new Node(new Object[][]{
-                {d1,"C"},
-                {d2,"A"}
-        });
 
-         */
-    }
-
-    public Node() {
-    }
+    public Node() {}
 
     public Node(Object[][] mapArray){
         Map<Dimension, Level> temp = Stream.of(mapArray).collect(

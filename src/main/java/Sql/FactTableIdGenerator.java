@@ -94,15 +94,13 @@ public class FactTableIdGenerator {
             listOfLocationID.add(resultSet.getInt(1));
 
     }
-/*
-    private void getDateID() throws SQLException {
+
+    /*private void getDateID() throws SQLException {
         ResultSet resultSet;
         resultSet = ConnectionManager.selectSQL(QueryManager.selectAllDayIDFromDay());
         while (resultSet.next())
             listOfDateID.add(resultSet.getInt(1));
-    }
-
- */
+    }*/
 
 
 }

@@ -26,6 +26,7 @@ public class Main {
         topicModel(tl.getTweets(),tl);
         //sentiment(tl.getTweets());
         writeToFile("C:/Users/Mads/Desktop/CleanedData/topicSenti.txt",tl.getTweets());
+
         //TopicAmountCalculator topicAmountCalculator = new TopicAmountCalculator();
         //topicAmountCalculator.jaccardAverage(10, orderedDescriptors);
 
@@ -50,16 +51,33 @@ public class Main {
         SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
         sentimentAnalyzer.findSentiment(tweets);
     }
-    private static void topicModel(ArrayList<TopicModelTweet> tweets,TweetLoader tl){
+    private static void topicModel(ArrayList<TopicModelTweet> tweets,TweetLoader tl) throws IOException {
         LDAMananger ldaMananger = new LDAMananger();
         ldaMananger.extractTweetText(tweets);
-        LdaResult result = ldaMananger.calculateTopics(50,50000);
+        LdaResult result = ldaMananger.calculateTopics(70,70000);
         TopicLabelCalculator topicCalc = new TopicLabelCalculator(result,tl);
         topicCalc.simpleCalcTopicLabelScore();
         HashMap<Integer, ArrayList<String>> orderedDescriptors = topicCalc.getOrderedTopicDescriptors();
+        writeTopicMetaFile(orderedDescriptors, "C:/Users/Mads/Desktop/CleanedData/TopicMetaFile.txt");
         ldaMananger.assignTopics(tweets,result,orderedDescriptors);
         //remove any tweets that for some reason, might not have topics assigned to them.
         tweets.removeIf(topicModelTweet -> topicModelTweet.getTopics().isEmpty());
+    }
+    private static void writeTopicMetaFile(HashMap<Integer, ArrayList<String>> orderedDescriptors, String filePath) throws IOException {
+        File topics = new File(filePath);
+        BufferedWriter bfw = new BufferedWriter(new FileWriter(topics));
+        for(int i : orderedDescriptors.keySet()){
+            StringBuilder sb = new StringBuilder();
+            for(int j = 0; j < orderedDescriptors.get(i).size();j++){
+                sb.append(orderedDescriptors.get(i).get(j));
+                if(i != orderedDescriptors.get(i).size()-1){
+                    sb.append(", ");
+                }
+            }
+            bfw.write(i + "|" + sb.toString());
+            bfw.newLine();
+        }
+        bfw.close();
     }
     private static void writeToFile(String filePath, ArrayList<TopicModelTweet> tweets) throws IOException {
         File topicSentiTweet = new File(filePath);
