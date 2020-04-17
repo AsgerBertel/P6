@@ -7,7 +7,7 @@ import java.util.*;
 
 public class GreedyAlgorithm {
     //When we find our own benefit calculation model, this should probably be a double value
-    LinkedHashMap<Node, Integer> benefitValueTree = new LinkedHashMap<>();
+    LinkedHashMap<Node, Double> benefitValueTree = new LinkedHashMap<>();
     LinkedHashSet<Node> materializedNodes = new LinkedHashSet<>();
     Set<Node> nodes;
     Node rootNode;
@@ -28,7 +28,7 @@ public class GreedyAlgorithm {
 
     private void selectHighestBenefit(){
         Node bestNode = null;
-        int bestNodeVal = 0;
+        double bestNodeVal = 0;
         for(Node n: benefitValueTree.keySet()){
             if((bestNode == null || benefitValueTree.get(n) > bestNodeVal) && !materializedNodes.contains(n)){
                 bestNode = n;
@@ -55,11 +55,22 @@ public class GreedyAlgorithm {
         updateCurrentBenefit();
     }
 
-    private void updateCurrentBenefit(){
+    public void updateCurrentBenefit(){
         for(Node n: nodes){
             benefitValueTree.put(n,getBenefit(nodes, n));
         }
     }
+
+    public double getBenefit(Set<Node> nodes, Node currentNode) {
+        int benefit = 0;
+        for(Node n: BFS_GetSubGraph(nodes, currentNode)){
+            if(!(n.getActualCost() < currentNode.getOwnCost())) {
+                benefit = benefit + n.getActualCost() - currentNode.getOwnCost();
+            }
+        }
+        return benefit * currentNode.getScale();
+    }
+
     private void calculateInitialValue(Node topNode, Set<Node> keyset){
             int rootNodeCost = topNode.calculateOwnCost();
             for(Node n: keyset){
@@ -70,15 +81,6 @@ public class GreedyAlgorithm {
 
     }
 
-    public int getBenefit(Set<Node> nodes, Node currentNode) {
-        int benefit = 0;
-        for(Node n: BFS_GetSubGraph(nodes, currentNode)){
-            if(!(n.getActualCost() < currentNode.getOwnCost())) {
-                benefit = benefit + n.getActualCost() - currentNode.getOwnCost();
-            }
-        }
-        return benefit;
-    }
 
     public ArrayList<Node> BFS_GetSubGraph(Set<Node> nodes, Node subTreeRootNode) {
         ArrayList<Node> subGraphNodes = new ArrayList<>();

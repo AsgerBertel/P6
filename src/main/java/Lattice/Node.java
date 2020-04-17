@@ -6,6 +6,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Node {
+
+    private double scale = 1;
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
     //These values are set during the greedy algorithm
     private Node materializedUpperNode = null;
     private Node immediateParentNode = null;
