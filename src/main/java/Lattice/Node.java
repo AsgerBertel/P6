@@ -124,44 +124,12 @@ public class Node {
     }
 
 
-    public int getBenefit(HashMap<Node, Node> nodes) {
-        int benefit = 0;
-        for(Node n: BFS_GetSubGraph(nodes)){
-            if(!(n.actualCost < this.ownCost)) {
-                benefit = benefit + n.actualCost - this.ownCost;
-            }
-        }
-        return benefit;
-    }
+
 
     public int getOwnCost() {
         return ownCost;
     }
 
-    public ArrayList<Node> BFS_GetSubGraph(HashMap<Node, Node> nodes) {
-        ArrayList<Node> subGraphNodes = new ArrayList<>();
-        LinkedHashMap<Node, Boolean> visited = new LinkedHashMap<>();
-        for(Node n: nodes.keySet()){
-            visited.put(n, false);
-        }
-        visited.put(this, true);
-        subGraphNodes.add(this);
-        LinkedList<Node> queue = new LinkedList<>();
-        queue.add(this);
-        while (queue.size() != 0) {
-            Node s = queue.poll();
-            Iterator<Node> it = s.getChildren().iterator();
-            while (it.hasNext()) {
-                Node i = it.next();
-                if (!visited.get(i)) {
-                    visited.put(i, true);
-                    queue.add(i);
-                    subGraphNodes.add(i);
-                }
-            }
-        }
-        return subGraphNodes;
 
-    }
 
 }

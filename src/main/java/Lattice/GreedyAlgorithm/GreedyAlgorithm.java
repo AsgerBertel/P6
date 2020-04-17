@@ -3,16 +3,19 @@ package Lattice.GreedyAlgorithm;
 import Lattice.GraphManager;
 import Lattice.Node;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GreedyAlgorithm {
     //When we find our own benefit calculation model, this should probably be a double value
     LinkedHashMap<Node, Integer> benefitValueTree = new LinkedHashMap<>();
     LinkedHashSet<Node> materializedNodes = new LinkedHashSet<>();
-    GraphManager gm= new GraphManager();
+    Set<Node> nodes;
+    Node rootNode;
+
+    public GreedyAlgorithm(Set<Node> nodes, Node rootNode){
+        this.nodes = nodes;
+        this.rootNode = rootNode;
+    }
 
     public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize){
         initializeGraph();
@@ -39,7 +42,7 @@ public class GreedyAlgorithm {
 
     private void updateActualCost(Node n){
         n.setActualCost(n.calculateOwnCost());
-        for(Node child: n.BFS_GetSubGraph(gm.nodes)){
+        for(Node child: BFS_GetSubGraph(nodes, n)){
             if(child.getActualCost() > n.getActualCost()){
                 child.setActualCost(n.getOwnCost());
                 child.setMaterializedUpperNode(n);
@@ -48,14 +51,13 @@ public class GreedyAlgorithm {
         }
     }
     private void initializeGraph(){
-        gm.greedyAlgBaseTest();
-        calculateInitialValue(gm.getTopNode(), gm.nodes.keySet());
+        calculateInitialValue(rootNode, nodes);
         updateCurrentBenefit();
     }
 
     private void updateCurrentBenefit(){
-        for(Node n: gm.nodes.keySet()){
-            benefitValueTree.put(n,n.getBenefit(gm.nodes));
+        for(Node n: nodes){
+            benefitValueTree.put(n,getBenefit(nodes, n));
         }
     }
     private void calculateInitialValue(Node topNode, Set<Node> keyset){
@@ -65,6 +67,42 @@ public class GreedyAlgorithm {
                 n.setActualCost(rootNodeCost);
                 n.setMaterializedUpperNode(topNode);
         }
+
+    }
+
+    public int getBenefit(Set<Node> nodes, Node currentNode) {
+        int benefit = 0;
+        for(Node n: BFS_GetSubGraph(nodes, currentNode)){
+            if(!(n.getActualCost() < currentNode.getOwnCost())) {
+                benefit = benefit + n.getActualCost() - currentNode.getOwnCost();
+            }
+        }
+        return benefit;
+    }
+
+    public ArrayList<Node> BFS_GetSubGraph(Set<Node> nodes, Node subTreeRootNode) {
+        ArrayList<Node> subGraphNodes = new ArrayList<>();
+        LinkedHashMap<Node, Boolean> visited = new LinkedHashMap<>();
+        for(Node n: nodes){
+            visited.put(n, false);
+        }
+        visited.put(subTreeRootNode, true);
+        subGraphNodes.add(subTreeRootNode);
+        LinkedList<Node> queue = new LinkedList<>();
+        queue.add(subTreeRootNode);
+        while (queue.size() != 0) {
+            Node s = queue.poll();
+            Iterator<Node> it = s.getChildren().iterator();
+            while (it.hasNext()) {
+                Node i = it.next();
+                if (!visited.get(i)) {
+                    visited.put(i, true);
+                    queue.add(i);
+                    subGraphNodes.add(i);
+                }
+            }
+        }
+        return subGraphNodes;
 
     }
 

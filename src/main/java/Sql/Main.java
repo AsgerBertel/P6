@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-
+//FileGeneratorClass kald function når den er done
 public class Main {
     ResultSet resultSet;
     ArrayList<TweetElement> listOfFactTableElements = new ArrayList<>();
