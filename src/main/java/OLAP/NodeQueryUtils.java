@@ -124,7 +124,7 @@ public class NodeQueryUtils {
         sb.append(" = ").append(getNodeViewName(node.getImmediateParentNode())).append(".").append(node.getDimensions().get(diff_dimension).getName()).append("id");
         return sb.toString();
     }
-    private static String getNodeViewName(Node node){
+    public static String getNodeViewName(Node node){
         StringBuilder sb = new StringBuilder();
         for(Dimension d: node.getDimensions().keySet()){
             sb.append(node.getDimensions().get(d).getName());

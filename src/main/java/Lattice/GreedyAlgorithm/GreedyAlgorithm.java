@@ -2,6 +2,7 @@ package Lattice.GreedyAlgorithm;
 
 import Lattice.GraphManager;
 import Lattice.Node;
+import OLAP.NodeQueryUtils;
 
 import java.util.*;
 
@@ -22,6 +23,7 @@ public class GreedyAlgorithm {
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
             selectHighestBenefit();
             updateCurrentBenefit();
+            printBenefitTree();
         }
         return materializedNodes;
     }
@@ -108,5 +110,10 @@ public class GreedyAlgorithm {
 
     }
 
-
+    private void printBenefitTree(){
+        System.out.println("Benefit:");
+        for(Node n: benefitValueTree.keySet()){
+            System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + benefitValueTree.get(n));
+        }
+    }
 }
