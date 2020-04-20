@@ -26,6 +26,10 @@ public class Dimension {
         return this.hierarchy.indexOf(l);
     }
 
+    public ArrayList<Level> getHierarchy() {
+        return hierarchy;
+    }
+
     public Level getLevel(int levelIndex){
         return this.hierarchy.get(levelIndex);
     }
