@@ -6,7 +6,7 @@ import java.util.*;
 
 public class GraphManager {
 
-    public HashMap<Node,Node> nodes = new HashMap<>();
+    public LinkedHashMap<Node,Node> nodes = new LinkedHashMap<>();
     private Node curr_node;
     private Set<Node> doneNodes = new HashSet<>();
 
