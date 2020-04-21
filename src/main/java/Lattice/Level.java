@@ -1,12 +1,13 @@
 package Lattice;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 public class Level {
     private String name;
-    private int rows;
+    private BigInteger rows;
 
-    public Level(String name, int rows) {
+    public Level(String name, BigInteger rows) {
         this.name = name;
         this.rows = rows;
     }
@@ -19,11 +20,11 @@ public class Level {
         this.name = name;
     }
 
-    public int getRows() {
+    public BigInteger getRows() {
         return rows;
     }
 
-    public void setRows(int rows) {
+    public void setRows(BigInteger rows) {
         this.rows = rows;
     }
 
@@ -32,7 +33,7 @@ public class Level {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Level level = (Level) o;
-        return rows == level.rows &&
+        return rows.equals(level.rows) &&
                 Objects.equals(name, level.name);
     }
 

@@ -1,6 +1,7 @@
 package Lattice;
 
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +24,7 @@ public class Node {
     LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
     private ArrayList<Node> parents = new ArrayList<>();
     private ArrayList<Node> children = new ArrayList<>();
-    private int ownCost;
+    private BigInteger ownCost;
 
     private boolean isMaterialised = false;
 
@@ -38,7 +39,7 @@ public class Node {
         isMaterialised = materialised;
     }
 
-    public int getActualCost() {
+    public BigInteger getActualCost() {
         return actualCost;
     }
 
@@ -58,7 +59,7 @@ public class Node {
         this.materializedUpperNode = materializedUpperNode;
     }
 
-    public void setActualCost(int actualCost) {
+    public void setActualCost(BigInteger actualCost) {
         this.actualCost = actualCost;
     }
 
@@ -66,7 +67,7 @@ public class Node {
         return parents;
     }
 
-    private int actualCost;
+    private BigInteger actualCost;
 
 
     public Node() {}
@@ -107,14 +108,14 @@ public class Node {
         return 0;
     }
 
-    public int calculateOwnCost() {
-        int rowVal = 0;
+    public BigInteger calculateOwnCost() {
+        BigInteger rowVal = BigInteger.valueOf(0);
         for (Dimension d : this.dimensions.keySet()) {
-            if (rowVal == 0) {
+            if (rowVal.intValue() == 0) {
                 rowVal = d.getLevel(d.getLevelIndex(this.dimensions.get(d))).getRows();
 
             } else {
-                rowVal = rowVal * d.getLevel(d.getLevelIndex(this.dimensions.get(d))).getRows();
+                rowVal = rowVal.multiply(d.getLevel(d.getLevelIndex(this.dimensions.get(d))).getRows());
             }
         }
         this.ownCost = rowVal;
@@ -147,7 +148,7 @@ public class Node {
 
 
 
-    public int getOwnCost() {
+    public BigInteger getOwnCost() {
         return ownCost;
     }
 

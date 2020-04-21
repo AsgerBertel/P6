@@ -20,6 +20,7 @@ public class Main {
     }
 
     public void greedyAlgBaseTest(){
+        /*
         Level d1Category = new Level("Category", 40);
         Level d2Country = new Level("Country", 2);
         Level d3Year = new Level("Year", 3);
@@ -42,7 +43,7 @@ public class Main {
 
 
         graphManager.nodes.put(topNode,topNode);
-        graphManager.generateTree(topNode);
+        graphManager.generateTree(topNode);*/
     }
 
 

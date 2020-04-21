@@ -5,6 +5,7 @@ import Lattice.Node;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -20,21 +21,21 @@ public class LatticeGraphTests {
     Level d4opinion,d4none;
     @Before
     public void init(){
-        d1prod = new Level("TopTopics",70);
-        d1cat = new Level("SubTopics",1401);
-        d1none = new Level("None",1);
-        d2loc = new Level("Coordinate",1);
-        d2dis = new Level("District",1);
-        d2county= new Level("County",1);
-        d2cit= new Level("City",1);
-        d2country = new Level("Country",1);
-        d2none = new Level("None",1);
-        d3day = new Level("Day",1);
-        d3month = new Level("Month",1);
-        d3year= new Level("Year",1);
-        d3none = new Level("None",1);
-        d4opinion = new Level("Opinion",1);
-        d4none = new Level("None",1);
+        d1prod = new Level("TopTopics", new BigInteger(String.valueOf(70)));
+        d1cat = new Level("SubTopics", new BigInteger(String.valueOf(1401)));
+        d1none = new Level("None", new BigInteger(String.valueOf(1)));
+        d2loc = new Level("Coordinate", new BigInteger(String.valueOf(3861358)));
+        d2dis = new Level("District", new BigInteger(String.valueOf(143)));
+        d2county = new Level("County", new BigInteger(String.valueOf(15)));
+        d2cit = new Level("City", new BigInteger(String.valueOf(2)));
+        d2country = new Level("Country", new BigInteger(String.valueOf(1)));
+        d2none = new Level("None", new BigInteger(String.valueOf(1)));
+        d3day = new Level("Day", new BigInteger(String.valueOf(19)));
+        d3month = new Level("Month", new BigInteger(String.valueOf(3)));
+        d3year = new Level("Year", new BigInteger(String.valueOf(1)));
+        d3none = new Level("None", new BigInteger(String.valueOf(1)));
+        d4opinion = new Level("Opinion", new BigInteger(String.valueOf(3)));
+        d4none = new Level("None", new BigInteger(String.valueOf(1)));
         d1 = new Dimension(new Level[]{d1prod,d1cat,d1none});
         d2 = new Dimension(new Level[]{d2loc,d2dis,d2county,d2cit,d2country,d2none});
         d3 = new Dimension(new Level[]{d3day,d3month,d3year,d3none});

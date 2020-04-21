@@ -4,6 +4,7 @@ import Lattice.GraphManager;
 import Lattice.Node;
 import OLAP.NodeQueryUtils;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class GreedyAlgorithm {
@@ -23,7 +24,7 @@ public class GreedyAlgorithm {
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
             selectHighestBenefit();
             updateCurrentBenefit();
-            printBenefitTree();
+            //printBenefitTree();
         }
         return materializedNodes;
     }
@@ -45,7 +46,7 @@ public class GreedyAlgorithm {
     private void updateActualCost(Node n){
         n.setActualCost(n.calculateOwnCost());
         for(Node child: BFS_GetSubGraph(nodes, n)){
-            if(child.getActualCost() > n.getActualCost()){
+            if(child.getActualCost().compareTo(n.getActualCost()) > 0){
                 child.setActualCost(n.getOwnCost());
                 child.setMaterializedUpperNode(n);
 
@@ -64,17 +65,17 @@ public class GreedyAlgorithm {
     }
 
     public double getBenefit(Set<Node> nodes, Node currentNode) {
-        int benefit = 0;
+        BigInteger benefit = BigInteger.valueOf(0);
         for(Node n: BFS_GetSubGraph(nodes, currentNode)){
-            if(!(n.getActualCost() < currentNode.getOwnCost())) {
-                benefit = benefit + n.getActualCost() - currentNode.getOwnCost();
+            if(!(n.getActualCost().compareTo(currentNode.getOwnCost()) < 0 )) {
+                benefit = benefit.add(n.getActualCost().subtract(currentNode.getOwnCost()));
             }
         }
-        return benefit * currentNode.getScale();
+        return benefit.intValue() * currentNode.getScale();
     }
 
     private void calculateInitialValue(Node topNode, Set<Node> keyset){
-            int rootNodeCost = topNode.calculateOwnCost();
+            BigInteger rootNodeCost = topNode.calculateOwnCost();
             for(Node n: keyset){
                 n.calculateOwnCost();
                 n.setActualCost(rootNodeCost);
