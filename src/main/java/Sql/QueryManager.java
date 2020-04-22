@@ -8,6 +8,8 @@ public class QueryManager {
     public static String selectAllFromTweet = "SELECT product,lat,long,opinion,date FROM cube.tweets Where tweetid > 162928 AND tweetid < 2000000";
     public static String selectProductIDFromProduct = "SELECT lat,long FROM cube.tweets ";
     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
+    public static String dropSchemaPublic = "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;";
+
 
     public static String insertIntoDate(int day, int month, int year) {
         return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";

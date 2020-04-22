@@ -7,12 +7,15 @@ import Lattice.Level;
 import Lattice.Node;
 import OLAP.ViewGeneration.ViewQueryManager;
 import Sql.ConnectionManager;
+import Sql.QueryManager;
 
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 public class DEMO {
     public static void main(String[] args) {
+        ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         Dimension d1, d2, d3, d4;
         Level d1prod, d1cat, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;
@@ -54,9 +57,15 @@ public class DEMO {
         }
         System.out.println(gm.nodes.keySet().size());
         boolean isNNNN = false;
+
         for(Node n : gm.nodes.keySet()){
             if(n.isMaterialised()){
                 ConnectionManager.updateSql(vqm.createView(n));
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         int i = 0;
