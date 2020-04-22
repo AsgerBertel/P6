@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-public class DEMO {
+public class ViewGenerator {
     public static void main(String[] args) {
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         Dimension d1, d2, d3, d4;
