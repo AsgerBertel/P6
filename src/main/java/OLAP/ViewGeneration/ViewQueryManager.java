@@ -115,7 +115,7 @@ public class ViewQueryManager {
 
     }
 
-    private static String createVirtViewFromFactTable(Node n) {
+    public static String createVirtViewFromFactTable(Node n) {
         String query = "CREATE VIEW " + NodeQueryUtils.getNodeViewName(n)
                 + " AS SELECT " + selectQuery(n) + "\n"
                 + "FROM " + fromUpperNode(n) + innerJoinQuery(n)

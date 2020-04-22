@@ -1,41 +1,20 @@
-package OLAP;
+package Lattice.GreedyAlgorithm;
 
 import Lattice.Dimension;
 import Lattice.GraphManager;
-import Lattice.GreedyAlgorithm.GreedyAlgorithm;
 import Lattice.Level;
 import Lattice.Node;
+import OLAP.NodeQueryUtils;
 import OLAP.ViewGeneration.ViewQueryManager;
+import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
 
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import java.sql.ResultSet;
 
-public class ViewGenerator {
-    public static void generateOnlyVirtualViews(LinkedHashMap<Node,Node> nodes, ViewQueryManager vqm){
-        ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
-        boolean isNNNN = false;
-        for(Node n : nodes.keySet()){
-            //IF NONE NONE NONE NONE skip
-            for(Level l : n.getDimensions().values()){
-                if(!l.getName().equals("None")){
-                    isNNNN = false;
-                    break;
-                }
-                isNNNN = true;
-            }
-            if(isNNNN)
-                continue;
-            if(!n.isMaterialised()){
-                ConnectionManager.updateSql(vqm.createVirtViewFromFactTable(n));
-            }
-        }
-    }
+public class GreedyAlgoMain {
     public static void main(String[] args) {
-        //ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         Dimension d1, d2, d3, d4;
         Level d1prod, d1cat, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;
@@ -67,41 +46,26 @@ public class ViewGenerator {
                 {d3,d3day},
                 {d4,d4opinion}
         });
+        //Generate tree and nodes
         ViewQueryManager vqm = new ViewQueryManager(root);
         gm.generateTree(root);
-        GreedyAlgorithm ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
-        HashSet<Node> nodies = ga.materializeNodes(4);
-        for(Node n : gm.nodes.keySet()){
-            if(nodies.contains(n))
-                n.setMaterialised(true);
+        for(Node n: gm.nodes.keySet()){
+            n.setMaterializedUpperNode(root);
         }
-        System.out.println("Materialised Nodes");
-        boolean isNNNN = false;
-        for(Node n : gm.nodes.keySet()){
-            if(n.isMaterialised()){
-                //System.out.println(NodeQueryUtils.getNodeViewName(n));
-                //ConnectionManager.updateSql(vqm.createView(n));
+        ViewGenerator.generateOnlyVirtualViews(gm.nodes,vqm);
+        //Set the size for all nodes
+        //Set uppermatirialised node as root for all nodes
+
+        for(Node n: gm.nodes.keySet()){
+            try{
+                ResultSet rs = ConnectionManager.selectSQL(QueryManager.getViewSize(NodeQueryUtils.getNodeViewName(n)));
+                rs.next();
+                System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + rs.getInt(1) + " rows in view");
+                n.setViewSize(BigInteger.valueOf(rs.getInt(1)));
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+                n.setViewSize(BigInteger.valueOf(1));
             }
-        }
-        int i = 0,j=0;
-        for(Node n : gm.nodes.keySet()){
-            if(!n.getMaterializedUpperNode().equals(root)){
-                System.out.println(++i + " Nodes dependant on materialised views :)");
-            }
-            //IF NONE NONE NONE NONE skip
-            for(Level l : n.getDimensions().values()){
-                if(!l.getName().equals("None")){
-                    isNNNN = false;
-                    break;
-                }
-                isNNNN = true;
-            }
-            if(isNNNN)
-                continue;
-            if(!n.isMaterialised()){
-                //ConnectionManager.updateSql(vqm.createView(n));
-            }
-               //
         }
     }
 }
