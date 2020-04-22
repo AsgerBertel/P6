@@ -15,6 +15,7 @@
             <scope>test</scope>
         </dependency>
 
+
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
