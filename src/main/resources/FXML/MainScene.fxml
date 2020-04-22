@@ -16,7 +16,7 @@
 
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu" >
-
+        <Button text="Update Views"></Button>
 
 
         </VBox>

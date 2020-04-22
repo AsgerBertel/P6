@@ -1,6 +1,8 @@
 #background {
     -fx-min-height: 500;
     -fx-min-width: 400;
+    -fx-border-width: 2 0 0 0;
+    -fx-border-color: #4F5153;
 }
 
 #leftSide {
