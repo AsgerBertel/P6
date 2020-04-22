@@ -3,6 +3,7 @@ package Lattice.GreedyAlgorithm;
 import Lattice.GraphManager;
 import Lattice.Node;
 import OLAP.NodeQueryUtils;
+import OLAP.ViewGenerator;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -60,7 +61,7 @@ public class GreedyAlgorithm {
 
     public void updateCurrentBenefit(){
         for(Node n: nodes){
-            benefitValueTree.put(n,getBenefit(nodes, n));
+            benefitValueTree.put(n,getBenefit(nodes,n));
         }
     }
 
@@ -71,7 +72,7 @@ public class GreedyAlgorithm {
                 benefit = benefit.add(n.getActualCost().subtract(currentNode.getOwnCost()));
             }
         }
-        return benefit.intValue() * currentNode.getScale();
+        return benefit.doubleValue() * currentNode.getScale();
     }
 
     private void calculateInitialValue(Node topNode, Set<Node> keyset){
