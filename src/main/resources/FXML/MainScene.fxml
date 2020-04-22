@@ -6,9 +6,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <VBox xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="GUI.Controller.MainSceneController"
       stylesheets="@/Style/MainScene.css"
       fx:id="background">
+    <HBox fx:id="container" id="container">
+        <VBox id="leftSide" fx:id="leftSide" prefWidth="${background.width}" prefHeight="${background.height}">
+
+
+        </VBox>
+        <VBox id="rightSideMenu" fx:id="rightSideMenu" >
+
+
+
+        </VBox>
+    </HBox>
 </VBox>

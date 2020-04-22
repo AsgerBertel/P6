@@ -20,7 +20,7 @@ public class MainWindow extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root =  FXMLLoader.load(getClass().getResource("/MainScene.fxml"));
+        Parent root =  FXMLLoader.load(getClass().getResource("/FXML/MainScene.fxml"));
         primaryStage.setTitle("P6");
         Scene scene = new Scene(root);
         primaryStage.setMinHeight(MIN_HEIGHT);
