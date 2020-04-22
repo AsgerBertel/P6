@@ -1,0 +1,19 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_17-04-2020_14_18_[Default_Changelist]" date="1587125979275" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_17-04-2020_14_18_[Default_Changelist]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 17-04-2020 14:18 [Default Changelist]" />
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/META-INF/P6.kotlin_module" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/Sql/QueryManager.class" />
+    <option name="AFTER_PATH" value="target/classes/Sql/QueryManager.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_17-04-2020_14_18_[Default_Changelist]/QueryManager.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/Sql/Main.class" />
+    <option name="AFTER_PATH" value="target/classes/Sql/Main.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_17-04-2020_14_18_[Default_Changelist]/Main.class" />
+  </binary>
+</changelist>

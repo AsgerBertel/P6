@@ -1,0 +1,291 @@
+Index: src/main/java/Sql/QueryManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Sql;\r\n\r\n\r\npublic class QueryManager {\r\n    public static String connectionString = \"jdbc:postgresql://62.107.118.55:5432/cubefrequency?user=postgres&password=password\";\r\n    public static String selectDateFromTweet = \"SELECT date FROM cube.tweets \";\r\n    public static String selectCoordinatesFromTweet = \"SELECT lat,long FROM cube.tweets WHERE cube.tweets.tweetid > 10000000\";\r\n    public static String selectAllFromTweet = \"SELECT product,lat,long,opinion,date FROM cube.tweets Where tweetid > 162928 AND tweetid < 2000000\";\r\n    public static String selectProductIDFromProduct = \"SELECT lat,long FROM cube.tweets \";\r\n    public static String selectCoordinatesidFromCoordinates = \"SELECT locationid FROM cubefrequency.cube.coordinate\";\r\n\r\n    public static String insertIntoDate(int day, int month, int year) {\r\n        return \"INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('\" + year + \"', '\" + month + \"', '\" + day + \"')\";\r\n    }\r\n\r\n    public static String insertIntoYear(int year){\r\n        return \"INSERT INTO cubefrequency.cube.year (year) VALUES (\"+year+\")\";\r\n    }\r\n    public static String insertIntoMonth(int month, int year){\r\n        return \"INSERT INTO cubefrequency.cube.month (month, yearid) VALUES(\"+month+\", \"+year+\")\";\r\n    }\r\n\r\n    public static String insertIntoDay(int day, int month) {\r\n        return \"INSERT INTO cube.day (monthid,day)  VALUES (\" + month + \", \" + day + \")\";\r\n    }\r\n\r\n    public static String selectProductIDFromProduct(String product) {\r\n        return \"SELECT productid FROM cube.product WHERE product.product = '\" + product + \"'\";\r\n    }\r\n\r\n    public static String selectOpinionIDFromOpinion(String opinion) {\r\n        return \"SELECT opinionid FROM cube.opinion WHERE opinion.opinion = '\" + opinion + \"'\";\r\n    }\r\n\r\n    public static String selectLocationIDFromCoordinates(double lat, double longi) {    \r\n        return \"SELECT coordinate.locationid FROM cube.coordinate WHERE lat = \" + lat + \" AND long =\" + longi + \"\";\r\n    }\r\n\r\n    public static String selectDayIDFromDay(int day, int month, int year) {\r\n        return \"SELECT dayid FROM cube.day d INNER JOIN cube.month ON d.monthid = month.monthid INNER JOIN cube.year ON month.yearid = year.yearid WHERE day = \" + day + \" AND month.month = \" + month + \" AND year.year =\" + year + \"\";\r\n    }\r\n\r\n    /**/\r\n    public static String selectAllProductIDFromProduct() {\r\n        return \"SELECT productid FROM cube.product\";\r\n    }\r\n\r\n    public static String selectAllOpinionIDFromOpinion() {\r\n        return \"SELECT opinionid FROM cube.opinion\";\r\n    }\r\n\r\n    public static String selecAlltLocationIDFromCoordinates() {\r\n        return \"SELECT coordinate.locationid FROM cube.coordinate\";\r\n    }\r\n\r\n    public static String selectAllDayIDFromDay(int day, int month, int year) {\r\n        return \"SELECT dayid FROM cube.day d INNER JOIN cube.month ON d.monthid = month.monthid INNER JOIN cube.year ON month.yearid = year.yearid WHERE day = \" + day + \" AND month.month = \" + month + \" AND year.year= \" + year + \"\";\r\n    }\r\n\r\n    public static String insertFactTable(int productid, int opinionid, int dateid, int coordinateid) {\r\n        return \"INSERT INTO cube.facttable ( productid, opinionid, dateid, coordinateid)\\n\" +\r\n                \"VALUES( \" + productid + \", \" + opinionid + \",\" + dateid + \",\" + coordinateid + \")\";\r\n    }\r\n\r\n    public static String insertIntoLocation(String district, String county, String City, String country, double lat, double longtitude) {\r\n        return \"INSERT INTO cube.locationdimension (district,county,City,country,lat,long)  VALUES ( '\" + district + \"', '\" + county + \"','\" + City + \"','\" + country + \"','\" + lat + \"','\" + longtitude + \"')\";\r\n    }\r\n\r\n    public static String insertIntoProduct(String product, String category) {\r\n        return \"INSERT INTO cube.productdimension (category,product)  VALUES ( '\" + product + \"','\" + category + \"')\";\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/Sql/QueryManager.java	(revision 6cdd06d979d71ac6e6a060bd6d238fa5395b4616)
++++ src/main/java/Sql/QueryManager.java	(date 1586851788388)
+@@ -8,16 +8,18 @@
+     public static String selectAllFromTweet = "SELECT product,lat,long,opinion,date FROM cube.tweets Where tweetid > 162928 AND tweetid < 2000000";
+     public static String selectProductIDFromProduct = "SELECT lat,long FROM cube.tweets ";
+     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
++    public static String selectDatesFromDayMonthYear = "SELECT d.dayid, d.day, month.month, year.year FROM cube.day d INNER JOIN cube.month ON d.monthid = month.monthid INNER JOIN cube.year ON month.yearid = year.yearid";
+ 
+     public static String insertIntoDate(int day, int month, int year) {
+         return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
+     }
+ 
+-    public static String insertIntoYear(int year){
+-        return "INSERT INTO cubefrequency.cube.year (year) VALUES ("+year+")";
++    public static String insertIntoYear(int year) {
++        return "INSERT INTO cubefrequency.cube.year (year) VALUES (" + year + ")";
+     }
+-    public static String insertIntoMonth(int month, int year){
+-        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES("+month+", "+year+")";
++
++    public static String insertIntoMonth(int month, int year) {
++        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES(" + month + ", " + year + ")";
+     }
+ 
+     public static String insertIntoDay(int day, int month) {
+@@ -32,7 +34,7 @@
+         return "SELECT opinionid FROM cube.opinion WHERE opinion.opinion = '" + opinion + "'";
+     }
+ 
+-    public static String selectLocationIDFromCoordinates(double lat, double longi) {    
++    public static String selectLocationIDFromCoordinates(double lat, double longi) {
+         return "SELECT coordinate.locationid FROM cube.coordinate WHERE lat = " + lat + " AND long =" + longi + "";
+     }
+ 
+Index: src/main/java/Sql/FileGenerator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Sql;\r\n\r\nimport uk.ac.wlv.sentistrength.SentiStrength;\r\n\r\nimport java.io.*;\r\nimport java.sql.ResultSet;\r\nimport java.sql.SQLException;\r\nimport java.text.DecimalFormat;\r\nimport java.util.Scanner;\r\n\r\npublic class FileGenerator {\r\n\r\n    private ResultSet resultSet;\r\n\r\n    public void createFileWithLocationId() throws SQLException, IOException {\r\n\r\n        resultSet = ConnectionManager.selectSQL(QueryManager.selectCoordinatesidFromCoordinates);\r\n        System.out.println(\"starting loading list\");\r\n        File sentimenttext = new File(\"C:/Users/madsf/Desktop/tweet-editing/locationid.txt\");\r\n        FileWriter fr = new FileWriter(sentimenttext, true);\r\n        BufferedWriter writer = new BufferedWriter(fr);\r\n        while (resultSet.next()) {\r\n            System.out.println(resultSet.getInt(1));\r\n            writer.write(resultSet.getInt(1) + \"\\n\");\r\n\r\n        }\r\n        writer.close();\r\n    }\r\n\r\n    public void mergeFiles() throws FileNotFoundException, IOException {\r\n        PrintWriter pw = new PrintWriter(new File(\"C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt\"));\r\n        // BufferedReader object for file1.txt\r\n        BufferedReader br1 = new BufferedReader(new FileReader(\"C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentMetaFile.txt\"));\r\n        BufferedReader br2 = new BufferedReader(new FileReader(\"C:/Users/madsf/Desktop/tweet-editing/locationid.txt\"));\r\n        BufferedReader br4 = new BufferedReader(new FileReader(\"C:/Users/madsf/Desktop/tweet-editing/locationid.txt\"));\r\n        BufferedReader br3 = new BufferedReader(new FileReader(\"C:/Users/madsf/Desktop/tweet-editing/locationid.txt\"));\r\n\r\n\r\n        String output = \"\";\r\n\r\n        System.out.println(\"write to file\");\r\n        String firstLine = \"\";\r\n        String secondLine = \"\";\r\n        int i = 0;\r\n        while (i < 4935709) {\r\n            firstLine = br1.readLine();\r\n            secondLine = br2.readLine();\r\n            if (secondLine == null) {\r\n                br2 = br4;\r\n                output = firstLine + \" |\" + secondLine;\r\n                output += \"\\n\";\r\n\r\n            } else {\r\n                output = firstLine + \" |\" + secondLine;\r\n                output += \"\\n\";\r\n            }\r\n            // System.out.println(output);\r\n            pw.write(output);\r\n            i++;\r\n\r\n\r\n        }\r\n\r\n    }\r\n//asger this\r\n    public void generateFactTableFile() throws IOException {\r\n        FileWriter fr = new FileWriter(\"C:/Users/madsf/Desktop/tweet-editing/locationid.txt\");\r\n        BufferedReader br1 = new BufferedReader(new FileReader(\"C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentMetaFile.txt\"));\r\n        String line;\r\n        int opinionID;\r\n        while ((line = br1.readLine()) != null) {\r\n            String tweetArr[] = line.split(\"\\\\Q|\");\r\n            if (tweetArr[2] == \"neutral\") {\r\n                opinionID = 1;\r\n\r\n            } else if (tweetArr[2] == \"positive\") {\r\n                opinionID = 2;\r\n            } else {\r\n                opinionID = 3;\r\n            }\r\n            fr.write(tweetArr[0] + \"|\" + tweetArr[1] + \"|\" + opinionID + \"|\" + tweetArr[3]);\r\n        }\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/Sql/FileGenerator.java	(revision 6cdd06d979d71ac6e6a060bd6d238fa5395b4616)
++++ src/main/java/Sql/FileGenerator.java	(date 1586853712253)
+@@ -57,28 +57,32 @@
+             // System.out.println(output);
+             pw.write(output);
+             i++;
+-
+-
+         }
+ 
+     }
+ //asger this
+     public void generateFactTableFile() throws IOException {
+-        FileWriter fr = new FileWriter("C:/Users/madsf/Desktop/tweet-editing/locationid.txt");
+-        BufferedReader br1 = new BufferedReader(new FileReader("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentMetaFile.txt"));
++        int i = 0;
++        FileWriter fr = new FileWriter("C:/Users/madsf/Desktop/tweet-editing/facttable.txt");
++        BufferedReader br1 = new BufferedReader(new FileReader("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndCoordinatesAndDateMetaFile.txt"));
+         String line;
+         int opinionID;
+         while ((line = br1.readLine()) != null) {
+             String tweetArr[] = line.split("\\Q|");
+-            if (tweetArr[2] == "neutral") {
++            if (tweetArr[2].equals("neutral")) {
+                 opinionID = 1;
+ 
+-            } else if (tweetArr[2] == "positive") {
++            } else if (tweetArr[2] .equals("positive")) {
+                 opinionID = 2;
+-            } else {
++            } else{
+                 opinionID = 3;
+             }
+-            fr.write(tweetArr[0] + "|" + tweetArr[1] + "|" + opinionID + "|" + tweetArr[3]);
++            fr.write(tweetArr[0] + "|" + tweetArr[1] + "|" + opinionID + "|" + tweetArr[3]+"\n");
++            i++;
++            if (i == 10000)
++                System.out.println(i);
++            else if (i == 100000)
++                System.out.println(i);
+         }
+     }
+ 
+Index: src/main/java/Sql/Date.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Sql;\r\n\r\nimport java.util.Objects;\r\n\r\npublic class Date {\r\n    int day, month, year;\r\n\r\n\r\n    Date(int year, int month, int day){\r\n        this.day = day;\r\n        this.month = month;\r\n        this.year = year;\r\n    }\r\n    public int getDay() {\r\n        return day;\r\n    }\r\n\r\n    public int getMonth() {\r\n        return month;\r\n    }\r\n\r\n    public int getYear() {\r\n        return year;\r\n    }\r\n\r\n    @Override\r\n    public boolean equals(Object o) {\r\n        if (this == o) return true;\r\n        if (o == null || getClass() != o.getClass()) return false;\r\n        Date date = (Date) o;\r\n        return day == date.day &&\r\n                month == date.month &&\r\n                year == date.year;\r\n    }\r\n\r\n    @Override\r\n    public int hashCode() {\r\n        return Objects.hash(day, month, year);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/Sql/Date.java	(revision 6cdd06d979d71ac6e6a060bd6d238fa5395b4616)
++++ src/main/java/Sql/Date.java	(date 1586852272341)
+@@ -37,4 +37,13 @@
+     public int hashCode() {
+         return Objects.hash(day, month, year);
+     }
++
++    @Override
++    public String toString() {
++        return "Date{" +
++                "day=" + day +
++                ", month=" + month +
++                ", year=" + year +
++                '}';
++    }
+ }
+Index: src/main/java/Sql/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Sql;\r\n\r\nimport atlas.Atlas;\r\nimport org.apache.spark.sql.catalyst.plans.logical.Except;\r\nimport org.json4s.DateFormat;\r\nimport org.json4s.JsonAST;\r\n\r\nimport java.io.*;\r\nimport java.sql.ResultSet;\r\nimport java.sql.SQLException;\r\n\r\nimport java.text.SimpleDateFormat;\r\nimport java.util.*;\r\n\r\npublic class Main {\r\n    ResultSet resultSet;\r\n    ArrayList<TweetElement> listOfFactTableElements = new ArrayList<>();\r\n\r\n    public static void main(String[] args) {\r\n        Main main = new Main();\r\n        FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();\r\n        Set<Date> dateSet;\r\n\r\n        try {\r\n\r\n            dateSet = main.getDatesFromTweets(\"assets/CleanedData/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt\");\r\n            for(Date d: dateSet){\r\n                System.out.println();\r\n                //ConnectionManager.updateSql(QueryManager.insertIntoDate(d.getDay(), d.getMonth(), d.getYear()));\r\n            }\r\n\r\n\r\n            System.out.println(dateSet.size());\r\n            //main.insertIntoDates(dateSet);\r\n            //factTableIdGenerator.generateFactTableElement();\r\n            //main.insertIntoProduct();\r\n            //  main.insertIntoDates();\r\n            //  main.multithreadedInsertIntoLocation();\r\n            //  main.insertIntoFactTable();\r\n            //main.insertIntoFactTable();\r\n\r\n\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n\r\n    private void insertIntoFactTable() throws SQLException {\r\n        ResultSet resultSets;\r\n\r\n        resultSets = ConnectionManager.selectSQL(QueryManager.selectAllFromTweet);\r\n        System.out.println(\"starting loading list\");\r\n        while (resultSets.next()) {\r\n            TweetElement tweetElement = new TweetElement(resultSets.getString(1), resultSets.getDouble(2), resultSets.getDouble(3), resultSets.getString(4), resultSets.getString(5));\r\n            listOfFactTableElements.add(tweetElement);\r\n\r\n        }\r\n        System.out.println(listOfFactTableElements.size());\r\n        System.out.println(\"done loading data\");\r\n        System.out.println(\"inserting data\");\r\n        for (TweetElement tweetelement : listOfFactTableElements) {\r\n\r\n            String[] arrOfStr = tweetelement.getDate().split(\"/\", 4);\r\n            arrOfStr[0] = arrOfStr[0].trim();\r\n            //   System.out.println(tweetelement.getProduct());\r\n            int productID = getProductID(tweetelement.getProduct().trim());\r\n            int opinionID = getOpinionID(tweetelement.getOpinion().trim());\r\n            int dateID = getDateID(Integer.parseInt(arrOfStr[0]), Integer.parseInt(arrOfStr[1]), Integer.parseInt(arrOfStr[2]));\r\n            int locationID = getLocationID(tweetelement.getLat(), tweetelement.getLongitude());\r\n            if (productID != 0 || opinionID != 0 || dateID != 0 || locationID != 0)\r\n                ConnectionManager.updateSql(QueryManager.insertFactTable(productID, opinionID, dateID, locationID));\r\n\r\n        }\r\n\r\n    }\r\n\r\n    private int getProductID(String product) throws SQLException {\r\n        ResultSet resultSet;\r\n        resultSet = ConnectionManager.selectSQL(QueryManager.selectProductIDFromProduct(product));\r\n\r\n        while (resultSet.next())\r\n            return resultSet.getInt(1);\r\n        return 0;\r\n\r\n    }\r\n\r\n    private int getOpinionID(String opinion) throws SQLException {\r\n        ResultSet resultSet;\r\n        resultSet = ConnectionManager.selectSQL(QueryManager.selectOpinionIDFromOpinion(opinion));\r\n        while (resultSet.next())\r\n            return resultSet.getInt(1);\r\n        return 0;\r\n    }\r\n\r\n    private int getLocationID(double lat, double longi) throws SQLException {\r\n        ResultSet resultSet;\r\n        resultSet = ConnectionManager.selectSQL(QueryManager.selectLocationIDFromCoordinates(lat, longi));\r\n        while (resultSet.next())\r\n            return resultSet.getInt(1);\r\n        return 0;\r\n    }\r\n\r\n    private int getDateID(int day, int month, int year) throws SQLException {\r\n        ResultSet resultSet;\r\n        resultSet = ConnectionManager.selectSQL(QueryManager.selectDayIDFromDay(day, month, year));\r\n        while (resultSet.next())\r\n            return resultSet.getInt(1);\r\n        return 0;\r\n    }\r\n\r\n\r\n    private void insertIntoDates(Set<Date> dateSet) throws SQLException {\r\n        ArrayList<Integer> alreadyExistsList = new ArrayList<>();\r\n        for(Date d: dateSet){\r\n            if(alreadyExistsList.contains(d.getYear()))\r\n            ConnectionManager.updateSql(QueryManager.insertIntoYear(d.getYear()));\r\n            alreadyExistsList.add(d.getYear());\r\n        }\r\n\r\n        //ConnectionManager.updateSql(QueryManager.insertIntoDate())\r\n\r\n    }\r\n\r\n    private void multithreadedInsertIntoLocation() throws SQLException, InterruptedException {\r\n        Atlas atlas = new Atlas();\r\n        resultSet = ConnectionManager.selectSQL(QueryManager.selectCoordinatesFromTweet);\r\n        System.out.println(\"connected/loaded\");\r\n        SynchronizedLocationManager syncSet = new SynchronizedLocationManager(resultSet);\r\n\r\n        ArrayList<InsertThread> threads = new ArrayList<>();\r\n        for (int i = 0; i < 5; i++) {\r\n            InsertThread t1 = new InsertThread(syncSet, atlas);\r\n            threads.add(t1);\r\n            t1.start();\r\n        }\r\n        for (InsertThread it : threads) {\r\n            it.join();\r\n        }\r\n    }\r\n\r\n    private void insertIntoProduct() throws SQLException, FileNotFoundException {\r\n        File file =\r\n                new File(\"C:/Users/madsf/Desktop/Sentence word lists/Map/ProductCategory.txt\");\r\n        Scanner sc = new Scanner(file);\r\n\r\n        String[] values;\r\n        while (sc.hasNextLine()) {\r\n            // String[] arrSplit = strMain.split(\", \");\r\n            values = sc.nextLine().split(\",\");\r\n            ConnectionManager.updateSql(QueryManager.insertIntoProduct(values[1], values[0]));\r\n        }\r\n    }\r\n\r\n    private Set<Date> getDatesFromTweets(String file) throws IOException {\r\n        BufferedReader bf = new BufferedReader(new FileReader(file));\r\n        String tweet;\r\n        String[] tweetArray = null;\r\n        HashSet<Date> uniqueDates = new HashSet<>();\r\n        int i = 0;\r\n        while( (tweet = bf.readLine())!= null){\r\n            try{\r\n                tweetArray = tweet.split(\"\\\\|\");\r\n            } catch(Exception e){\r\n\r\n            }\r\n            int month = 0;\r\n            try {\r\n\r\n                if(!tweetArray[2].contains(\"+0000\")){\r\n                    continue;\r\n                }\r\n\r\n                String[] datearray = tweetArray[2].split(\"\\\\s\");\r\n                Date date = new Date(Integer.parseInt(datearray[5]),findMonthInDate(datearray[1]), Integer.parseInt(datearray[2]));\r\n\r\n                resultSet = ConnectionManager.selectSQL(QueryManager.selectAllDayIDFromDay(date.getDay(), date.getMonth(), date.getYear()));\r\n\r\n                int dateID = 0;\r\n                while(resultSet.next()){\r\n                    dateID = resultSet.getInt(1);\r\n                }\r\n                PrintWriter writer = new PrintWriter(\"assets/CleanedData/test.txt\");\r\n                writer.write(tweetArray[1] + \"|\" + dateID + \"|\" + tweetArray[3].trim() + \"|\" + tweetArray[4] + \"\\n\");\r\n\r\n                uniqueDates.add(date);\r\n            } catch (Exception e) {\r\n                e.printStackTrace();\r\n            }\r\n        }\r\n        return uniqueDates;\r\n    }\r\n\r\n    private int findMonthInDate(String month) throws Exception {\r\n        switch(month){\r\n            case \"Jan\":\r\n                return 1;\r\n            case \"Feb\":\r\n                return 2;\r\n            case \"Mar\":\r\n                return 3;\r\n            case \"Apr\":\r\n                return 4;\r\n            case \"May\":\r\n                return 5;\r\n            case \"Jun\":\r\n                return 6;\r\n            case \"Jul\":\r\n                return 7;\r\n            case \"Aug\":\r\n                return 8;\r\n            case \"Sep\":\r\n                return 9;\r\n            case \"Okt\":\r\n                return 10;\r\n            case \"Nov\":\r\n                return 11;\r\n            case \"Dec\":\r\n                return 12;\r\n            default:\r\n                throw new Exception(\"Month is not a month:\" + month);\r\n        }\r\n\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/Sql/Main.java	(revision 6cdd06d979d71ac6e6a060bd6d238fa5395b4616)
++++ src/main/java/Sql/Main.java	(date 1586852730517)
+@@ -4,6 +4,7 @@
+ import org.apache.spark.sql.catalyst.plans.logical.Except;
+ import org.json4s.DateFormat;
+ import org.json4s.JsonAST;
++import scala.Int;
+ 
+ import java.io.*;
+ import java.sql.ResultSet;
+@@ -15,34 +16,30 @@
+ public class Main {
+     ResultSet resultSet;
+     ArrayList<TweetElement> listOfFactTableElements = new ArrayList<>();
++    HashMap<Date, Integer> mapOfDates = new HashMap<>();
+ 
+     public static void main(String[] args) {
+         Main main = new Main();
+         FactTableIdGenerator factTableIdGenerator = new FactTableIdGenerator();
+-        Set<Date> dateSet;
++        FileGenerator fileGenerator = new FileGenerator();
+ 
+         try {
+-
+-            dateSet = main.getDatesFromTweets("assets/CleanedData/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt");
+-            for(Date d: dateSet){
+-                System.out.println();
+-                //ConnectionManager.updateSql(QueryManager.insertIntoDate(d.getDay(), d.getMonth(), d.getYear()));
+-            }
++fileGenerator.generateFactTableFile();
++        } catch (IOException e) {
++            e.printStackTrace();
++        }
++        //ConnectionManager.updateSql(QueryManager.insertIntoDate(d.getDay(), d.getMonth(), d.getYear()));
+ 
+ 
+-            System.out.println(dateSet.size());
+-            //main.insertIntoDates(dateSet);
+-            //factTableIdGenerator.generateFactTableElement();
+-            //main.insertIntoProduct();
+-            //  main.insertIntoDates();
+-            //  main.multithreadedInsertIntoLocation();
+-            //  main.insertIntoFactTable();
+-            //main.insertIntoFactTable();
++        //main.insertIntoDates(dateSet);
++        //factTableIdGenerator.generateFactTableElement();
++        //main.insertIntoProduct();
++        //  main.insertIntoDates();
++        //  main.multithreadedInsertIntoLocation();
++        //  main.insertIntoFactTable();
++        //main.insertIntoFactTable();
+ 
+ 
+-        } catch (IOException e) {
+-            e.printStackTrace();
+-        }
+     }
+ 
+     private void insertIntoFactTable() throws SQLException {
+@@ -111,9 +108,9 @@
+ 
+     private void insertIntoDates(Set<Date> dateSet) throws SQLException {
+         ArrayList<Integer> alreadyExistsList = new ArrayList<>();
+-        for(Date d: dateSet){
+-            if(alreadyExistsList.contains(d.getYear()))
+-            ConnectionManager.updateSql(QueryManager.insertIntoYear(d.getYear()));
++        for (Date d : dateSet) {
++            if (alreadyExistsList.contains(d.getYear()))
++                ConnectionManager.updateSql(QueryManager.insertIntoYear(d.getYear()));
+             alreadyExistsList.add(d.getYear());
+         }
+ 
+@@ -151,47 +148,79 @@
+         }
+     }
+ 
+-    private Set<Date> getDatesFromTweets(String file) throws IOException {
+-        BufferedReader bf = new BufferedReader(new FileReader(file));
++    private HashMap<Date, Integer> fillHashMap() throws SQLException {
++        HashMap<Date, Integer> mapOfDates = new HashMap<>();
++        resultSet = ConnectionManager.selectSQL(QueryManager.selectDatesFromDayMonthYear);
++        while (resultSet.next()) {
++            mapOfDates.put(new Date(resultSet.getInt(4), resultSet.getInt(3), resultSet.getInt(2)), resultSet.getInt(1));
++        }
++
++
++        return mapOfDates;
++    }
++
++    private void getDatesFromTweets() throws IOException {
++        PrintWriter writer = new PrintWriter("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndCoordinatesAndDateMetaFile.txt");
++        BufferedReader bf = new BufferedReader(new FileReader("C:/Users/madsf/Desktop/tweet-editing/tweetsWithTopicAndSentimentAndCoordinatesMetaFile.txt"));
++        try {
++            mapOfDates = fillHashMap();
++        } catch (SQLException throwables) {
++            throwables.printStackTrace();
++        }
+         String tweet;
+         String[] tweetArray = null;
+         HashSet<Date> uniqueDates = new HashSet<>();
+         int i = 0;
+-        while( (tweet = bf.readLine())!= null){
+-            try{
++        System.out.println("starting loop");
++        while ((tweet = bf.readLine()) != null) {
++            try {
+                 tweetArray = tweet.split("\\|");
+-            } catch(Exception e){
++            } catch (Exception e) {
+ 
+             }
+             int month = 0;
+             try {
+ 
+-                if(!tweetArray[2].contains("+0000")){
++                if (!tweetArray[2].contains("+0000")) {
+                     continue;
+                 }
+ 
+                 String[] datearray = tweetArray[2].split("\\s");
+-                Date date = new Date(Integer.parseInt(datearray[5]),findMonthInDate(datearray[1]), Integer.parseInt(datearray[2]));
++
++                Date date = new Date(Integer.parseInt(datearray[5]), findMonthInDate(datearray[1]), Integer.parseInt(datearray[2]));
++                int dateID = mapOfDates.get(date);
+ 
+-                resultSet = ConnectionManager.selectSQL(QueryManager.selectAllDayIDFromDay(date.getDay(), date.getMonth(), date.getYear()));
+-
+-                int dateID = 0;
+-                while(resultSet.next()){
+-                    dateID = resultSet.getInt(1);
+-                }
+-                PrintWriter writer = new PrintWriter("assets/CleanedData/test.txt");
+-                writer.write(tweetArray[1] + "|" + dateID + "|" + tweetArray[3].trim() + "|" + tweetArray[4] + "\n");
++                String strArr[];
++                if (tweetArray[1].contains(",")) {
++                    strArr = tweetArray[1].split(",");
++                    writer.write(strArr[0] + "|" + dateID + "|" + tweetArray[3].trim() + "|" + tweetArray[4] + "\n");
++                } else {
++                    writer.write(tweetArray[1] + "|" + dateID + "|" + tweetArray[3].trim() + "|" + tweetArray[4] + "\n");
++                }
+ 
+-                uniqueDates.add(date);
++                writer.flush();
++                // uniqueDates.add(date);
+             } catch (Exception e) {
+                 e.printStackTrace();
+             }
++            i++;
++            if (i == 10)
++                System.out.println("10 rows");
++            else if (i == 1000)
++                System.out.println("1000 rows");
++            else if (i == 10000)
++                System.out.println("10000 rows");
++            else if (i == 100000)
++                System.out.println("100000 rows");
++            else if (i == 1000000)
++                System.out.println("1000000 rows");
++
+         }
+-        return uniqueDates;
++
+     }
+ 
+     private int findMonthInDate(String month) throws Exception {
+-        switch(month){
++        switch (month) {
+             case "Jan":
+                 return 1;
+             case "Feb":
