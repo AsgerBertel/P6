@@ -24,7 +24,7 @@ public class Node {
     LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
     private ArrayList<Node> parents = new ArrayList<>();
     private ArrayList<Node> children = new ArrayList<>();
-    private BigInteger ownCost;
+    private BigInteger ownCost, viewSize;
 
     private boolean isMaterialised = false;
 
@@ -33,6 +33,14 @@ public class Node {
     }
     public boolean isMaterialised() {
         return isMaterialised;
+    }
+
+    public BigInteger getViewSize() {
+        return viewSize;
+    }
+
+    public void setViewSize(BigInteger viewSize) {
+        this.viewSize = viewSize;
     }
 
     public void setMaterialised(boolean materialised) {
