@@ -55,20 +55,15 @@ public class DEMO {
             if(nodies.contains(n))
                 n.setMaterialised(true);
         }
-        System.out.println(gm.nodes.keySet().size());
+        System.out.println("Materialised Nodes");
         boolean isNNNN = false;
-
         for(Node n : gm.nodes.keySet()){
             if(n.isMaterialised()){
+                //System.out.println(NodeQueryUtils.getNodeViewName(n));
                 ConnectionManager.updateSql(vqm.createView(n));
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         }
-        int i = 0;
+        int i = 0,j=0;
         for(Node n : gm.nodes.keySet()){
             if(!n.getMaterializedUpperNode().equals(root)){
                 System.out.println(++i + " Nodes dependant on materialised views :)");
@@ -76,14 +71,17 @@ public class DEMO {
             //IF NONE NONE NONE NONE skip
             for(Level l : n.getDimensions().values()){
                 if(!l.getName().equals("None")){
+                    isNNNN = false;
                     break;
                 }
                 isNNNN = true;
             }
             if(isNNNN)
                 continue;
-            if(!n.isMaterialised())
+            if(!n.isMaterialised()){
                 ConnectionManager.updateSql(vqm.createView(n));
+            }
+               //
         }
     }
 }

@@ -139,6 +139,7 @@ public class ViewQueryManager {
             if(l.getName().equals("coordinate")){
                 sb.append(CUBE_PREFIX + "coordinate.lat,");
                 sb.append(CUBE_PREFIX + "coordinate.long,");
+                sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
             }else{
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append(",");
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
@@ -147,6 +148,11 @@ public class ViewQueryManager {
         String s = sb.toString();
         if(s.substring(s.length()-1).equals(",")){
             s = s.substring(0,s.length()-1);
+        }
+        if(n.isMaterialised()){
+            if(!containsTopicDimension(n.getDimensions())){
+                s = s + ", f.toptopicid";
+            }
         }
         return s;
     }
@@ -230,6 +236,7 @@ public class ViewQueryManager {
             if(l.getName().equals("coordinate")){
                 sb.append(CUBE_PREFIX + "coordinate.lat,");
                 sb.append(CUBE_PREFIX + "coordinate.long,");
+                sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
             } else{
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append(",");
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
@@ -237,7 +244,12 @@ public class ViewQueryManager {
         }
         //Select count/sum
         sb.append(aggregateFunction(n));
-
+        if(n.isMaterialised()){
+            //If topic dimension is None
+            if(!containsTopicDimension(n.getDimensions())){
+                sb.append(", f.toptopicid");
+            }
+        }
         return sb.toString();
     }
 
