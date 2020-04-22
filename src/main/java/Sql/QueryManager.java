@@ -15,6 +15,10 @@ public class QueryManager {
         return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
     }
 
+    public static String getViewSize(String viewName){
+        return "SELECT count(*) FROM " + viewName;
+    }
+
     public static String insertIntoYear(int year){
         return "INSERT INTO cubefrequency.cube.year (year) VALUES ("+year+")";
     }
