@@ -15,11 +15,23 @@ public class QueryManager {
         return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
     }
 
-    public static String insertIntoYear(int year){
-        return "INSERT INTO cubefrequency.cube.year (year) VALUES ("+year+")";
+    public static String selectTopTopics(String searchWord) {
+        return "SELECT toptopic.toptopic FROM cube.toptopic WHERE toptopic.toptopic LIKE '%" + searchWord + "%' limit 5";
     }
-    public static String insertIntoMonth(int month, int year){
-        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES("+month+", "+year+")";
+
+    public static String selectSubTopics(String searchWord) {
+        return "SELECT Distinct subtopic.subtopic FROM cube.subtopic WHERE subtopic.subtopic LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectTopicFromView(String topic,String view) {
+        return "SELECT * FROM cubefrequency.public."+view+" WHERE toptopic = '"+topic+"'";
+    }
+
+    public static String insertIntoYear(int year) {
+        return "INSERT INTO cubefrequency.cube.year (year) VALUES (" + year + ")";
+    }
+
+    public static String insertIntoMonth(int month, int year) {
+        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES(" + month + ", " + year + ")";
     }
 
     public static String insertIntoDay(int day, int month) {
@@ -34,7 +46,7 @@ public class QueryManager {
         return "SELECT opinionid FROM cube.opinion WHERE opinion.opinion = '" + opinion + "'";
     }
 
-    public static String selectLocationIDFromCoordinates(double lat, double longi) {    
+    public static String selectLocationIDFromCoordinates(double lat, double longi) {
         return "SELECT coordinate.locationid FROM cube.coordinate WHERE lat = " + lat + " AND long =" + longi + "";
     }
 
@@ -71,11 +83,12 @@ public class QueryManager {
     public static String insertIntoProduct(String product, String category) {
         return "INSERT INTO cube.productdimension (category,product)  VALUES ( '" + product + "','" + category + "')";
     }
-    public static String insertIntoTopTopics(int id, String topic){
+
+    public static String insertIntoTopTopics(int id, String topic) {
         return "INSERT INTO cube.toptopics (toptopicid, topic) VALUES (" + id + "," + "'" + topic + "')";
     }
 
-    public static String insertIntoSubTopics(String topic, int toptopicid){
+    public static String insertIntoSubTopics(String topic, int toptopicid) {
         return "INSERT INTO cube.subtopics (subtopic, toptopicid) VALUES ('" + topic + "'," + toptopicid + ")";
     }
 }

@@ -16,13 +16,15 @@
 
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu">
-            <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate"></Button>
-            <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation"></ComboBox>
-            <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion"></ComboBox>
-            <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic"></ComboBox>
-            <ComboBox promptText="Date" fx:id="comboDate" id="comboDate"></ComboBox>
-
-
+            <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate" onAction="#UpdateViews"/>
+            <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation" styleClass="comboboxDimension"/>
+            <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion" styleClass="comboboxDimension"/>
+            <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic" styleClass="comboboxDimension"/>
+            <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
+            <HBox>
+                <TextField promptText="Search" fx:id="txtTopic" id="txtTopic"/>
+                <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
+            </HBox>
 
         </VBox>
     </HBox>

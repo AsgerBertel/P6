@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 public class ViewGenerator {
-    public static void main(String[] args) {
+    public  void runUpdate() {
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         Dimension d1, d2, d3, d4;
         Level d1prod, d1cat, d1none;
