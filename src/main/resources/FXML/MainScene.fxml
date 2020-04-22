@@ -15,8 +15,13 @@
 
 
         </VBox>
-        <VBox id="rightSideMenu" fx:id="rightSideMenu" >
-        <Button text="Update Views"></Button>
+        <VBox id="rightSideMenu" fx:id="rightSideMenu">
+            <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate"></Button>
+            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
+            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
+            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
+            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
+
 
 
         </VBox>
