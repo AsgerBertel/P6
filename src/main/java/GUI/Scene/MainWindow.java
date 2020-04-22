@@ -12,16 +12,20 @@ import javafx.stage.Stage;
 
 
 public class MainWindow extends Application {
+    private static final int MIN_WIDTH = 1024;
+    private static final int MIN_HEIGHT = 768;
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage primaryStage) throws Exception {
         Parent root =  FXMLLoader.load(getClass().getResource("/MainScene.fxml"));
-        stage.setTitle("P6");
+        primaryStage.setTitle("P6");
         Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        primaryStage.setMinHeight(MIN_HEIGHT);
+        primaryStage.setMinWidth(MIN_WIDTH);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 }
