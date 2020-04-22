@@ -1,5 +1,6 @@
 package GUI.Controller;
 
-public class MainSceneController {
+public class MainSceneController implements Controller {
+
 
 }

@@ -17,10 +17,10 @@
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu">
             <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate"></Button>
-            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
-            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
-            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
-            <ComboBox promptText="location" fx:id="comboLocation" id="comboLocation"></ComboBox>
+            <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation"></ComboBox>
+            <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion"></ComboBox>
+            <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic"></ComboBox>
+            <ComboBox promptText="Date" fx:id="comboDate" id="comboDate"></ComboBox>
 
 
 
