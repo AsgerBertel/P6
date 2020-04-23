@@ -9,15 +9,15 @@ public class QueryManager {
     public static String selectProductIDFromProduct = "SELECT lat,long FROM cube.tweets ";
     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
     public static String dropSchemaPublic = "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;";
+    public static String selectAllFromViewsize = "SELECT viewname, size FROM cubefrequency.cube.viewsize";
 
-
+    public static String insertIntoViewsize(String viewName, long size){
+        return "INSERT INTO cubefrequency.cube.viewsize(viewname, size) VALUES ('" + viewName + "', " + size + ")";
+    }
     public static String insertIntoDate(int day, int month, int year) {
         return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
     }
 
-    public static String getViewSize(String viewName){
-        return "SELECT count(*) FROM " + viewName;
-    }
 
     public static String insertIntoYear(int year){
         return "INSERT INTO cubefrequency.cube.year (year) VALUES ("+year+")";
