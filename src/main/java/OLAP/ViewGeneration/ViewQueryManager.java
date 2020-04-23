@@ -169,7 +169,7 @@ public class ViewQueryManager {
     }
 
     private static Level setInitialCurrLevel(Node n, Dimension currDimension){
-        if(n.getMaterializedUpperNode().equals(n)){
+        if(n.isMaterialised()){
             return currDimension.getLevel(0);
         }
         else return n.getMaterializedUpperNode().getDimensions().get(currDimension);
@@ -254,7 +254,7 @@ public class ViewQueryManager {
     }
 
     private static String aggregateFunction(Node n) {
-        if(!n.getMaterializedUpperNode().equals(root)){
+        if(!n.getMaterializedUpperNode().equals(root) && !n.isMaterialised()){
             return "sum(f.count)";
         }else{
             for(Level l : n.getDimensions().values()){
