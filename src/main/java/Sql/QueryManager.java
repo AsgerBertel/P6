@@ -93,6 +93,7 @@ public class QueryManager {
     public static String selectAllOpinionIDFromOpinion() {
         return "SELECT opinionid FROM cube.opinion";
     }
+    public static String selectAllFromSubTopics(){return "SELECT subtopicID, subtopic.subtopic, toptopicid FROM cube.subtopic";}
 
     public static String selecAlltLocationIDFromCoordinates() {
         return "SELECT coordinate.locationid FROM cube.coordinate";
