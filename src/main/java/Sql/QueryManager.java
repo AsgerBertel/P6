@@ -18,12 +18,43 @@ public class QueryManager {
     public static String selectTopTopics(String searchWord) {
         return "SELECT toptopic.toptopic FROM cube.toptopic WHERE toptopic.toptopic LIKE '%" + searchWord + "%' limit 5";
     }
+    public static String selectDistrict(String searchWord) {
+        return "SELECT district.district FROM cube.district WHERE district.district LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectCounty(String searchWord) {
+        return "SELECT county.county  FROM cube.county WHERE county.county LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectCity(String searchWord) {
+        return "SELECT city.city  FROM cube.city WHERE city.city LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectCountry(String searchWord) {
+        return "SELECT country.country FROM cube.country WHERE country.country LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectDay(String searchWord) {
+        return "SELECT day.day  FROM cube.day WHERE CAST(day.day AS TEXT)LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectMonth(String searchWord) {
+        return "SELECT month.month FROM cube.month WHERE CAST(month.month AS TEXT)LIKE '%" + searchWord + "%' limit 5";
+    }
+    public static String selectYear(String searchWord) {
+        return "SELECT year.year FROM cube.year WHERE CAST(year.year AS TEXT) LIKE '%" + searchWord + "%' limit 5";
+    }
+
+    public static String selectOpinions(String searchWord) {
+        return "SELECT opinion.opinion FROM cube.opinion WHERE opinion.opinion  LIKE '%" + searchWord +"%' limit 5";
+    }
 
     public static String selectSubTopics(String searchWord) {
         return "SELECT Distinct subtopic.subtopic FROM cube.subtopic WHERE subtopic.subtopic LIKE '%" + searchWord + "%' limit 5";
     }
-    public static String selectTopicFromView(String topic,String view) {
+    public static String selectTopTopicFromView(String topic, String view) {
         return "SELECT * FROM cubefrequency.public."+view+" WHERE toptopic = '"+topic+"'";
+    }
+    public static String selectSubTopicFromView(String topic, String view) {
+        return "SELECT * FROM cubefrequency.public."+view+" WHERE subtopic = '"+topic+"'";
+    }
+    public static String selectView( String view) {
+        return "SELECT * FROM cubefrequency.public."+view+"";
     }
 
     public static String insertIntoYear(int year) {

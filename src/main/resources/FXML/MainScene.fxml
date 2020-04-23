@@ -6,13 +6,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+
 <VBox xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="GUI.Controller.MainSceneController"
       stylesheets="@/Style/MainScene.css"
       fx:id="background">
     <HBox fx:id="container" id="container">
         <VBox id="leftSide" fx:id="leftSide" prefWidth="${background.width}" prefHeight="${background.height}">
-
 
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu">
@@ -21,10 +21,15 @@
             <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion" styleClass="comboboxDimension"/>
             <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic" styleClass="comboboxDimension"/>
             <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
-            <HBox>
-                <TextField promptText="Search" fx:id="txtTopic" id="txtTopic"/>
+            <VBox>
+                <TextField promptText="Topic Filter" fx:id="txtTopic" id="txtTopic" styleClass="searchField"/>
+                <TextField promptText="Location Filter" fx:id="txtLocation" id="txtLocation" styleClass="searchField"/>
+                <TextField promptText="Opinion Filter" fx:id="txtOpinion" id="txtOpinion" styleClass="searchField"/>
+                <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
+
                 <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
-            </HBox>
+            </VBox>
+
 
         </VBox>
     </HBox>

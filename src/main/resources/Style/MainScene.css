@@ -29,27 +29,23 @@
     -fx-background-color: white;
 }
 
-#txtTopic {
-    -fx-pref-width: 200;
-    -fx-max-width: 200;
-    -fx-background-color: white;
-    -fx-padding: 7px;
-    -fx-background-insets: 2px;
-}
-
-#txtTopic:selected {
-    -fx-pref-width: 200;
-    -fx-max-width: 200;
-    -fx-background-color: white;
-    -fx-padding: 7px;
-    -fx-background-insets: 2px;
-
-}
-
 .searchBarContextMenu {
     -fx-pref-width: 200;
     -fx-max-width: 200;
 }
+.searchField{ -fx-pref-width: 200;
+    -fx-max-width: 200;
+    -fx-background-color: white;
+    -fx-padding: 7px;
+    -fx-background-insets: 2px;}
+
+.searchField:selected {    -fx-pref-width: 200;
+    -fx-max-width: 200;
+    -fx-background-color: white;
+    -fx-padding: 7px;
+    -fx-background-insets: 2px;
+}
+
 
 #btnSearch {
     -fx-background-color: white;
