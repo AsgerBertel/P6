@@ -11,8 +11,10 @@
       stylesheets="@/Style/MainScene.css"
       fx:id="background">
     <HBox fx:id="container" id="container">
-        <VBox id="leftSide" fx:id="leftSide" prefWidth="${background.width}" prefHeight="${background.height}">
+        <VBox id="leftSide" fx:id="leftSide">
+            <TableView id="tableViewLeft" fx:id="tableViewLeft" prefWidth="${background.width}" prefHeight="${background.height}">
 
+            </TableView>
 
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu">
