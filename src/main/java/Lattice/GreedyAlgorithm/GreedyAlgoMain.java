@@ -10,11 +10,16 @@ import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigInteger;
-import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 public class GreedyAlgoMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Dimension d1, d2, d3, d4;
         Level d1prod, d1cat, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;
@@ -49,23 +54,24 @@ public class GreedyAlgoMain {
         //Generate tree and nodes
         ViewQueryManager vqm = new ViewQueryManager(root);
         gm.generateTree(root);
+
+        /*
         for(Node n: gm.nodes.keySet()){
             n.setMaterializedUpperNode(root);
         }
         ViewGenerator.generateOnlyVirtualViews(gm.nodes,vqm);
         //Set the size for all nodes
         //Set uppermatirialised node as root for all nodes
-
+        System.out.println("Started Counting");
         for(Node n: gm.nodes.keySet()){
             try{
-                ResultSet rs = ConnectionManager.selectSQL(QueryManager.getViewSize(NodeQueryUtils.getNodeViewName(n)));
-                rs.next();
-                System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + rs.getInt(1) + " rows in view");
-                n.setViewSize(BigInteger.valueOf(rs.getInt(1)));
+                BigInteger rs = BigInteger.valueOf(ConnectionManager.fetchViewRowSizeEstimateFromQueryPlan(QueryManager.getEstimatedViewSize(NodeQueryUtils.getNodeViewName(n))));
+                n.setViewSize(rs);
+                System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + rs);
             }catch (Exception e){
-                System.out.println(e.getMessage());
+                e.printStackTrace();
                 n.setViewSize(BigInteger.valueOf(1));
             }
-        }
+        }*/
     }
 }

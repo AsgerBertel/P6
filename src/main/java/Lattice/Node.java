@@ -24,7 +24,7 @@ public class Node {
     LinkedHashMap<Dimension, Level> dimensions = new LinkedHashMap<>();
     private ArrayList<Node> parents = new ArrayList<>();
     private ArrayList<Node> children = new ArrayList<>();
-    private BigInteger ownCost, viewSize;
+    private BigInteger viewSize;
 
     private boolean isMaterialised = false;
 
@@ -116,20 +116,6 @@ public class Node {
         return 0;
     }
 
-    public BigInteger calculateOwnCost() {
-        BigInteger rowVal = BigInteger.valueOf(0);
-        for (Dimension d : this.dimensions.keySet()) {
-            if (rowVal.intValue() == 0) {
-                rowVal = d.getLevel(d.getLevelIndex(this.dimensions.get(d))).getRows();
-
-            } else {
-                rowVal = rowVal.multiply(d.getLevel(d.getLevelIndex(this.dimensions.get(d))).getRows());
-            }
-        }
-        this.ownCost = rowVal;
-        return rowVal;
-    }
-
     @Override
     public boolean equals(Object obj) {
         Node compareNode = (Node) obj;
@@ -152,14 +138,6 @@ public class Node {
     public void addDimension(Level value, Dimension key) {
         this.dimensions.put(key, value);
     }
-
-
-
-
-    public BigInteger getOwnCost() {
-        return ownCost;
-    }
-
 
 
 }
