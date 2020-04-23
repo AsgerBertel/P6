@@ -44,16 +44,18 @@ public class GreedyAlgoMain {
         d2 = new Dimension(new Level[]{d2loc, d2dis, d2county, d2cit, d2country, d2none});
         d3 = new Dimension(new Level[]{d3day, d3month, d3year, d3none});
         d4 = new Dimension(new Level[]{d4opinion, d4none});
-        GraphManager gm = new GraphManager();
+
         Node root = new Node(new Object[][]{
                 {d1,d1prod},
                 {d2,d2loc},
                 {d3,d3day},
                 {d4,d4opinion}
         });
+        GraphManager gm = new GraphManager(root);
         //Generate tree and nodes
-        ViewQueryManager vqm = new ViewQueryManager(root);
         gm.generateTree(root);
+        ViewQueryManager vqm = new ViewQueryManager(root);
+
 
         /*
         for(Node n: gm.nodes.keySet()){
