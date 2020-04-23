@@ -35,7 +35,6 @@ public class MainSceneController {
 
     private ObservableList<ObservableList> data = FXCollections.observableArrayList();
 
-    ResultSet resultSet_Tableview;
     @FXML
     private VBox leftSide;
     ResultSet resultSet;
@@ -46,24 +45,16 @@ public class MainSceneController {
         comboOpinion.setItems(FXCollections.observableArrayList("opinion", "none"));
         comboTopic.setItems(FXCollections.observableArrayList("subtopic", "toptopic", "none"));
         comboDate.setItems(FXCollections.observableArrayList("day", "month", "year", "none"));
-        txtTopic.setOnKeyPressed(event -> {
-            try {
-                searchBarContextMenu.getItems().clear();
-                searchBarContextMenu.loadProducts(txtTopic.getText());
-                searchBarContextMenu.show(txtTopic, Side.BOTTOM, 0, 0);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-        try {
-            resultSet_Tableview = ConnectionManager.selectSQL(QueryManager.selectAllFromSubTopics());
-            buildTable(resultSet_Tableview);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        initializeTopicOnKeyPressedEvent(comboTopic);
+        initializeOpinionOnKeyPressedEvent(comboOpinion);
+        initializeLocationOnKeyPressedEvent(comboLocation);
+        initializeateDateOnKeyPressedEvent(comboDate);
+        tableViewLeft.setItems(data);
     }
 
     public void buildTable(ResultSet resultSet_Tableview) throws SQLException {
+       data.removeAll(data);
+
         for(int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++){
             final int j = i;
             TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i+1));
@@ -73,6 +64,7 @@ public class MainSceneController {
                 }
             });
             tableViewLeft.getColumns().addAll(col);
+
             System.out.println(col.getText() + "["+i+"]" + "has been added");
         }
         while(resultSet_Tableview.next()){
@@ -83,11 +75,7 @@ public class MainSceneController {
             data.add(row);
         }
 
-        initializeTopicOnKeyPressedEvent(comboTopic);
-        initializeOpinionOnKeyPressedEvent(comboOpinion);
-        initializeLocationOnKeyPressedEvent(comboLocation);
-        initializeateDateOnKeyPressedEvent(comboDate);
-        tableViewLeft.setItems(data);
+      tableViewLeft.setItems(data);
     }
 
     public void UpdateViews() {
@@ -135,9 +123,7 @@ public class MainSceneController {
                 resultSet = ConnectionManager.selectSQL(viewQueryWhereFirst);
             else
                 resultSet = ConnectionManager.selectSQL(viewQuery);
-
-            while (resultSet.next())
-                System.out.println(resultSet.getString(1));
+         buildTable(resultSet);
 
         } catch (NullPointerException e) {
             System.out.println("Choose some");
