@@ -44,6 +44,8 @@ public class GreedyAlgorithm {
             }
         }
         materializedNodes.add(bestNode);
+        assert bestNode != null;
+        bestNode.setMaterialised(true);
         updateActualCost(bestNode);
 
     }
