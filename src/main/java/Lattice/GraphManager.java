@@ -12,6 +12,10 @@ public class GraphManager {
 
     Node topNode = new Node();
 
+    public GraphManager(Node topNode) {
+        this.topNode = topNode;
+    }
+
     public Node getTopNode() {
         return topNode;
     }

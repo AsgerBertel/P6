@@ -45,7 +45,7 @@ public class LatticeGraphTests {
 
     @Test
     public void visitAllNodesTest(){
-        GraphManager gm = new GraphManager();
+
         //Create the root node
         Node root = new Node(new Object[][]{
                 {d1,d1prod},
@@ -53,6 +53,7 @@ public class LatticeGraphTests {
                 {d3,d3day},
                 {d4,d4opinion}
         });
+        GraphManager gm = new GraphManager(root);
         gm.nodes.put(root,root);
         gm.generateTree(root);
         assertEquals(144, gm.nodes.size());

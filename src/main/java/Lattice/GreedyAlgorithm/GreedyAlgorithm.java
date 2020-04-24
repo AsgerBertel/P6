@@ -3,8 +3,13 @@ package Lattice.GreedyAlgorithm;
 import Lattice.GraphManager;
 import Lattice.Node;
 import OLAP.NodeQueryUtils;
+import OLAP.ViewGenerator;
+import Sql.ConnectionManager;
+import Sql.QueryManager;
 
 import java.math.BigInteger;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class GreedyAlgorithm {
@@ -19,7 +24,7 @@ public class GreedyAlgorithm {
         this.rootNode = rootNode;
     }
 
-    public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize){
+    public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
         initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
             selectHighestBenefit();
@@ -39,45 +44,52 @@ public class GreedyAlgorithm {
             }
         }
         materializedNodes.add(bestNode);
+        assert bestNode != null;
+        bestNode.setMaterialised(true);
         updateActualCost(bestNode);
 
     }
 
     private void updateActualCost(Node n){
-        n.setActualCost(n.calculateOwnCost());
+        n.setActualCost(n.getViewSize());
         for(Node child: BFS_GetSubGraph(nodes, n)){
             if(child.getActualCost().compareTo(n.getActualCost()) > 0){
-                child.setActualCost(n.getOwnCost());
+                child.setActualCost(n.getViewSize());
                 child.setMaterializedUpperNode(n);
 
             }
         }
     }
-    private void initializeGraph(){
+    private void initializeGraph() throws SQLException {
         calculateInitialValue(rootNode, nodes);
         updateCurrentBenefit();
     }
 
     public void updateCurrentBenefit(){
         for(Node n: nodes){
-            benefitValueTree.put(n,getBenefit(nodes, n));
+            benefitValueTree.put(n,getBenefit(nodes,n));
         }
     }
 
     public double getBenefit(Set<Node> nodes, Node currentNode) {
         BigInteger benefit = BigInteger.valueOf(0);
         for(Node n: BFS_GetSubGraph(nodes, currentNode)){
-            if(!(n.getActualCost().compareTo(currentNode.getOwnCost()) < 0 )) {
-                benefit = benefit.add(n.getActualCost().subtract(currentNode.getOwnCost()));
+            if(!(n.getActualCost().compareTo(currentNode.getViewSize()) < 0 )) {
+                benefit = benefit.add(n.getActualCost().subtract(currentNode.getViewSize()));
             }
         }
-        return benefit.intValue() * currentNode.getScale();
+        return benefit.doubleValue() * currentNode.getScale();
     }
 
-    private void calculateInitialValue(Node topNode, Set<Node> keyset){
-            BigInteger rootNodeCost = topNode.calculateOwnCost();
+    private void calculateInitialValue(Node topNode, Set<Node> keyset) throws SQLException {
+        ResultSet rs = ConnectionManager.selectSQL(QueryManager.selectAllFromViewsize);
+        HashMap<String,Long> viewNameSizeMap = new HashMap<>();
+        while(rs.next()){
+            viewNameSizeMap.put(rs.getString(1),rs.getLong(2));
+        }
+        BigInteger rootNodeCost = BigInteger.valueOf(viewNameSizeMap.get(NodeQueryUtils.getNodeViewName(topNode)));
             for(Node n: keyset){
-                n.calculateOwnCost();
+                n.setViewSize(new BigInteger(String.valueOf(viewNameSizeMap.get(NodeQueryUtils.getNodeViewName(n)))));
                 n.setActualCost(rootNodeCost);
                 n.setMaterializedUpperNode(topNode);
         }

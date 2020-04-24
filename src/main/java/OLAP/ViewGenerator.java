@@ -10,11 +10,59 @@ import Sql.ConnectionManager;
 import Sql.QueryManager;
 
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class ViewGenerator {
-    public static void main(String[] args) {
+    public static void generateOnlyVirtualViews(LinkedHashMap<Node,Node> nodes, ViewQueryManager vqm){
+        ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
+        boolean isNNNN = false;
+        for(Node n : nodes.keySet()){
+            //IF NONE NONE NONE NONE skip
+            for(Level l : n.getDimensions().values()){
+                if(!l.getName().equals("None")){
+                    isNNNN = false;
+                    break;
+                }
+                isNNNN = true;
+            }
+            if(isNNNN)
+                continue;
+            if(!n.isMaterialised()){
+                ConnectionManager.updateSql(vqm.createVirtViewFromFactTable(n));
+            }
+        }
+    }
+    public static void generateViews(LinkedHashMap<Node,Node> nodes, Node root){
+        ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
+        ViewQueryManager vqm = new ViewQueryManager(root);
+        boolean isNNNN = false;
+        for(Node n : nodes.keySet()){
+            if(n.isMaterialised()){
+                System.out.println(NodeQueryUtils.getNodeViewName(n));
+                ConnectionManager.updateSql(vqm.createView(n));
+            }
+        }
+        int i = 0;
+        for(Node n : nodes.keySet()){
+            //IF NONE NONE NONE NONE skip
+            for(Level l : n.getDimensions().values()){
+                if(!l.getName().equals("None")){
+                    isNNNN = false;
+                    break;
+                }
+                isNNNN = true;
+            }
+            if(isNNNN)
+                continue;
+            if(!n.isMaterialised()){
+                ConnectionManager.updateSql(vqm.createView(n));
+            }
+    }
+    }
+    public static void main(String[] args) throws SQLException {
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         Dimension d1, d2, d3, d4;
         Level d1prod, d1cat, d1none;
@@ -40,13 +88,14 @@ public class ViewGenerator {
         d2 = new Dimension(new Level[]{d2loc, d2dis, d2county, d2cit, d2country, d2none});
         d3 = new Dimension(new Level[]{d3day, d3month, d3year, d3none});
         d4 = new Dimension(new Level[]{d4opinion, d4none});
-        GraphManager gm = new GraphManager();
+
         Node root = new Node(new Object[][]{
                 {d1,d1prod},
                 {d2,d2loc},
                 {d3,d3day},
                 {d4,d4opinion}
         });
+        GraphManager gm = new GraphManager(root);
         ViewQueryManager vqm = new ViewQueryManager(root);
         gm.generateTree(root);
         GreedyAlgorithm ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
@@ -56,32 +105,6 @@ public class ViewGenerator {
                 n.setMaterialised(true);
         }
         System.out.println("Materialised Nodes");
-        boolean isNNNN = false;
-        for(Node n : gm.nodes.keySet()){
-            if(n.isMaterialised()){
-                //System.out.println(NodeQueryUtils.getNodeViewName(n));
-                ConnectionManager.updateSql(vqm.createView(n));
-            }
-        }
-        int i = 0,j=0;
-        for(Node n : gm.nodes.keySet()){
-            if(!n.getMaterializedUpperNode().equals(root)){
-                System.out.println(++i + " Nodes dependant on materialised views :)");
-            }
-            //IF NONE NONE NONE NONE skip
-            for(Level l : n.getDimensions().values()){
-                if(!l.getName().equals("None")){
-                    isNNNN = false;
-                    break;
-                }
-                isNNNN = true;
-            }
-            if(isNNNN)
-                continue;
-            if(!n.isMaterialised()){
-                ConnectionManager.updateSql(vqm.createView(n));
-            }
-               //
-        }
+        generateViews(gm.nodes,root);
     }
 }
