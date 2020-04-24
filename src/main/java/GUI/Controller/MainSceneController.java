@@ -4,6 +4,7 @@ import GUI.ContextMenu.SearchBarContextMenu;
 import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -33,7 +34,7 @@ public class MainSceneController {
     @FXML
     private TableView tableViewLeft;
 
-    private ObservableList<ObservableList> data = FXCollections.observableArrayList();
+    private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
 
     @FXML
     private VBox leftSide;
@@ -53,8 +54,9 @@ public class MainSceneController {
     }
 
     public void buildTable(ResultSet resultSet_Tableview) throws SQLException {
-       data.removeAll(data);
-
+        data.clear();
+        tableViewLeft.getColumns().clear();
+        tableViewLeft.getItems().clear();
         for(int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++){
             final int j = i;
             TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i+1));
