@@ -27,7 +27,6 @@ public class PerformanceTester {
         ViewGenerator vg = new ViewGenerator();
         //Runs all tests for all queries and stores them in an xls file
         LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap = new LinkedHashMap<>();
-        ViewGenerator vg = new ViewGenerator();
         for(int i = 0; i < 2; i++){
             dayQueriesMap.put(i,PerformanceTestQueryGenerator.fullRandomQueries(getAllViewNamesExceptForNNNN(gm.nodes.keySet()),10,random));
         }
