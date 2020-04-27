@@ -95,7 +95,7 @@ public class ViewGenerator {
             }
     }
     }
-    public static void main(String[] args) throws SQLException {
+    public void updateViews() throws SQLException {
         Dimension d1, d2, d3, d4;
         Level d1topic, d1subtopic, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;

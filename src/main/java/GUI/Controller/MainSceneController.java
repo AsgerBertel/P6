@@ -44,7 +44,7 @@ public class MainSceneController {
 
     public void initialize() {
         searchBarContextMenu.setStyle("-fx-pref-width: 200");
-        comboLocation.setItems(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "allD"));
+        comboLocation.setItems(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "all"));
         comboOpinion.setItems(FXCollections.observableArrayList("opinion", "all"));
         comboTopic.setItems(FXCollections.observableArrayList("subtopic", "toptopic", "all"));
         comboDate.setItems(FXCollections.observableArrayList("day", "month", "year", "all"));
@@ -84,7 +84,11 @@ public class MainSceneController {
 
     public void UpdateViews() {
         ViewGenerator viewGenerator = new ViewGenerator();
-        viewGenerator.runUpdate();
+        try {
+            viewGenerator.updateViews();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     public void setAddProductText(String menuItem, TextField currentSearchbar) {
@@ -95,9 +99,21 @@ public class MainSceneController {
 
         try {
             String strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
+            if (strComboTopic.equals("all"))
+                strComboTopic = "none";
+
             String strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
+            if (strComboDate.equals("all"))
+                strComboDate = "none";
+
             String strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
+            if (strComboLocation.equals("all"))
+                strComboLocation = "none";
+
             String strComboOpinion = comboOpinion.getSelectionModel().getSelectedItem().toString();
+            if (strComboOpinion.equals("all"))
+                strComboOpinion = "none";
+
             String viewQuery = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion);
             String viewQueryWhereFirst = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion) + " WHERE ";
             String viewQueryWhereSecond = "";

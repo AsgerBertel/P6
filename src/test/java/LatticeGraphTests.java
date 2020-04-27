@@ -86,7 +86,7 @@ public class LatticeGraphTests {
     }
     @Test
     public void correctNumberOfDifferingDimensionsFromParentTest(){
-        GraphManager gm = new GraphManager();
+       /* GraphManager gm = new GraphManager();
         //Create the root node
         Node root = new Node(new Object[][]{
                 {d1,d1prod},
@@ -120,7 +120,7 @@ public class LatticeGraphTests {
         for(Dimension d: n.getDimensions().keySet()){
             nodeDimensions.add(n.getDimensions().get(d));
         }
-        return nodeDimensions;
+        return nodeDimensions;*/
     }
 }
 
