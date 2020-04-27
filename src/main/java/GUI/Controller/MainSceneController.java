@@ -2,6 +2,7 @@ package GUI.Controller;
 
 import GUI.ContextMenu.SearchBarContextMenu;
 import GUI.Other.PopularityManager;
+import Lattice.GreedyAlgorithm.GreedyAlgorithmType;
 import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
@@ -87,7 +88,7 @@ public class MainSceneController {
     public void UpdateViews() {
         if(!this.isViewGenInitialised){
             viewGenerator = new ViewGenerator();
-            viewGenerator.init();
+            viewGenerator.init(GreedyAlgorithmType.BASE);
         }
         try {
             viewGenerator.updateViews();

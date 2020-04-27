@@ -3,6 +3,8 @@ package OLAP;
 import Lattice.Dimension;
 import Lattice.GraphManager;
 import Lattice.GreedyAlgorithm.GreedyAlgorithm;
+import Lattice.GreedyAlgorithm.GreedyAlgorithmType;
+import Lattice.GreedyAlgorithm.GreedyPopularityAlgorithm;
 import Lattice.Level;
 import Lattice.Node;
 import OLAP.ViewGeneration.ViewQueryManager;
@@ -110,7 +112,7 @@ public class ViewGenerator {
         System.out.println("finished creating views");
     }
 
-    public void init(){
+    public void init(GreedyAlgorithmType type){
         Dimension d1, d2, d3, d4;
         Level d1topic, d1subtopic, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;
@@ -144,7 +146,12 @@ public class ViewGenerator {
         });
         this.gm = new GraphManager(root);
         gm.generateTree(root);
-        this.ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
+        if(type.equals(GreedyAlgorithmType.BASE)){
+            this.ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
+        }else{
+            this.ga = new GreedyPopularityAlgorithm(gm.nodes.keySet(),root);
+        }
+
     }
     public void updateViews() throws SQLException {
         ga.materializeNodes(4);
