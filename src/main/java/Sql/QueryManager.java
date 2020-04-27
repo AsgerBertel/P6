@@ -1,6 +1,8 @@
 package Sql;
 
 
+import java.sql.ResultSet;
+
 public class QueryManager {
     public static String connectionString = "jdbc:postgresql://62.107.118.55:5432/cubefrequency?user=postgres&password=password";
     public static String selectDateFromTweet = "SELECT date FROM cube.tweets ";
@@ -10,6 +12,15 @@ public class QueryManager {
     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
     public static String dropSchemaPublic = "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;";
     public static String selectAllFromViewsize = "SELECT viewname, size FROM cubefrequency.cube.viewsize";
+    public static String selectAllVirtualViewNames = "SELECT viewname from cubefrequency.pg_catalog.pg_views WHERE schemaname = 'public'";
+    public static String selectAllMaterializedlViewNames = "SELECT matviewname from cubefrequency.pg_catalog.pg_matviews WHERE schemaname = 'public'";
+
+    public static String dropMaterializedView(String viewname){
+        return "drop materialized view cubefrequency.public." + viewname;
+    }
+    public static String dropVirtualView(String viewname){
+        return "drop view cubefrequency.public." + viewname;
+    }
 
     public static String insertIntoViewsize(String viewName, long size){
         return "INSERT INTO cubefrequency.cube.viewsize(viewname, size) VALUES ('" + viewName + "', " + size + ")";
