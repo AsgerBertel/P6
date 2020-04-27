@@ -24,6 +24,15 @@ public class GreedyAlgorithm {
         this.rootNode = rootNode;
     }
 
+    public void resetNodes(){
+        //resets all nodes
+        for(Node n : this.nodes){
+            n.setMaterialised(false);
+            n.setMaterializedUpperNode(null);
+            n.setScale(1);
+        }
+    }
+
     public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
         initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
