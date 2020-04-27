@@ -24,6 +24,7 @@ public class PerformanceTester {
     Random random = new Random(RANDOM_SEED);
 
     public void runAllPerformanceTests(GraphManager gm) throws IOException, SQLException {
+        ViewGenerator vg = new ViewGenerator();
         //Runs all tests for all queries and stores them in an xls file
         LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap = new LinkedHashMap<>();
         for(int i = 0; i < 2; i++){
@@ -32,7 +33,7 @@ public class PerformanceTester {
         //Generate the views which the greedy algorithm proposes
         GreedyAlgorithm ga = new GreedyAlgorithm(gm.nodes.keySet(),gm.getTopNode());
         ga.materializeNodes(6);
-        ViewGenerator.generateViews(gm.nodes,gm.getTopNode());
+        vg.generateViews(gm.nodes,gm.getTopNode());
         //Create excel sheet and workbook
         File testOutput = new File("C:/Users/Mads/Desktop/PerformanceTest/results.xls");
         HSSFWorkbook workbook = new HSSFWorkbook();
