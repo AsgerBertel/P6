@@ -13,6 +13,8 @@ public class QueryManager {
     public static String dropSchemaPublic = "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;";
     public static String selectAllFromPopulation = "SELECT * FROM cube.popularity ";
     public static String selectAllFromPopulationWhereCurrentDay = "SELECT * FROM cube.popularity WHERE currentday = true";
+    public static String selectDayFromPopulation = "SELECT day FROM cube.popularity";
+    public static String updateCurrentDayInPopularity = "UPDATE cube.popularity set currentday = false";
     public static String selectAllFromViewsize = "SELECT viewname, size FROM cubefrequency.cube.viewsize";
     public static String selectAllVirtualViewNames = "SELECT viewname from cubefrequency.pg_catalog.pg_views WHERE schemaname = 'public'";
     public static String selectAllMaterializedlViewNames = "SELECT matviewname from cubefrequency.pg_catalog.pg_matviews WHERE schemaname = 'public'";
@@ -20,13 +22,15 @@ public class QueryManager {
     public static String dropMaterializedView(String viewname){
         return "drop materialized view cubefrequency.public." + viewname + " cascade";
     }
-    public static String dropVirtualView(String viewname){
+
+    public static String dropVirtualView(String viewname) {
         return "drop view cubefrequency.public." + viewname;
     }
 
-    public static String insertIntoViewsize(String viewName, long size){
+    public static String insertIntoViewsize(String viewName, long size) {
         return "INSERT INTO cubefrequency.cube.viewsize(viewname, size) VALUES ('" + viewName + "', " + size + ")";
     }
+
     public static String insertIntoDate(int day, int month, int year) {
         return "INSERT INTO cubefrequency.cube.datedimension (year,month,day)  VALUES ('" + year + "', '" + month + "', '" + day + "')";
     }
@@ -86,8 +90,9 @@ public class QueryManager {
     public static String insertIntoYear(int year) {
         return "INSERT INTO cubefrequency.cube.year (year) VALUES (" + year + ")";
     }
-    public static String insertIntoMonth(int month, int year){
-        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES("+month+", "+year+")";
+
+    public static String insertIntoMonth(int month, int year) {
+        return "INSERT INTO cubefrequency.cube.month (month, yearid) VALUES(" + month + ", " + year + ")";
     }
 
     public static String insertIntoDay(int day, int month) {
@@ -102,7 +107,7 @@ public class QueryManager {
         return "SELECT opinionid FROM cube.opinion WHERE opinion.opinion = '" + opinion + "'";
     }
 
-    public static String selectLocationIDFromCoordinates(double lat, double longi) {    
+    public static String selectLocationIDFromCoordinates(double lat, double longi) {
         return "SELECT coordinate.locationid FROM cube.coordinate WHERE lat = " + lat + " AND long =" + longi + "";
     }
 
@@ -143,11 +148,12 @@ public class QueryManager {
     public static String insertIntoProduct(String product, String category) {
         return "INSERT INTO cube.productdimension (category,product)  VALUES ( '" + product + "','" + category + "')";
     }
-    public static String insertIntoTopTopics(int id, String topic){
+
+    public static String insertIntoTopTopics(int id, String topic) {
         return "INSERT INTO cube.toptopics (toptopicid, topic) VALUES (" + id + "," + "'" + topic + "')";
     }
 
-    public static String insertIntoSubTopics(String topic, int toptopicid){
+    public static String insertIntoSubTopics(String topic, int toptopicid) {
         return "INSERT INTO cube.subtopics (subtopic, toptopicid) VALUES ('" + topic + "'," + toptopicid + ")";
     }
 
@@ -155,11 +161,15 @@ public class QueryManager {
         return "INSERT INTO cube.popularity VALUES ('" + view + "',1,1,true)";
     }
 
+    public static String insertNewDayIntoPopularity(String view, int day) {
+        return "INSERT INTO cube.popularity VALUES ('" + view + "',1," + day + ",true)";
+    }
+
     public static String insertIntopopularity(String view, int currentDay) {
         return "INSERT INTO cube.popularity VALUES ('" + view + "',1," + currentDay + ",true)";
     }
 
     public static String updatepopularityIfExists(String view) {
-        return "UPDATE cube.popularity SET dailyvalue = dailyvalue+1 WHERE currentday = true AND viewname = '"+view+"'";
+        return "UPDATE cube.popularity SET dailyvalue = dailyvalue+1 WHERE currentday = true AND viewname = '" + view + "'";
     }
 }

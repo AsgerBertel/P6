@@ -18,7 +18,7 @@
 
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu">
-            <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate" onAction="#UpdateViews"/>
+            <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate" onAction="#updateViews"/>
 
             <VBox>
                 <HBox>

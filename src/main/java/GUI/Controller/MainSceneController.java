@@ -37,7 +37,7 @@ public class MainSceneController {
     @FXML
     private TextField txtTopic, txtLocation, txtOpinion, txtDate;
     @FXML
-    private Button btnUpdate;
+    private Button btnUpdate,btnSearch;
     @FXML
     private TableView tableViewLeft;
 
@@ -85,7 +85,9 @@ public class MainSceneController {
         tableViewLeft.setItems(data);
     }
 
-    public void UpdateViews() {
+    public void updateViews() {
+        btnUpdate.setDisable(false);
+        ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
         if(!this.isViewGenInitialised){
             viewGenerator = new ViewGenerator();
             viewGenerator.init(GreedyAlgorithmType.BASE);
@@ -94,6 +96,8 @@ public class MainSceneController {
             viewGenerator.updateViews();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }finally {
+            btnUpdate.setDisable(false);
         }
     }
 
@@ -102,7 +106,7 @@ public class MainSceneController {
     }
 
     public void loadView() {
-
+        btnSearch.setDisable(false);
         try {
             String strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
             if (strComboTopic.equals("all"))
@@ -158,7 +162,11 @@ public class MainSceneController {
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }finally {
+            btnSearch.setDisable(false);
         }
+
+
     }
 
     private void initializeOpinionOnKeyPressedEvent(ComboBox comboOpinion) {

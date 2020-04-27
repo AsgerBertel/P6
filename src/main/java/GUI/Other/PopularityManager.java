@@ -9,7 +9,6 @@ import java.sql.SQLException;
 public class PopularityManager {
     ResultSet resultSet;
 
-
     public void updatePopularityValue(String viewName) throws SQLException {
         resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopulation);
         if (!resultSet.next()) {
@@ -21,25 +20,32 @@ public class PopularityManager {
             while (resultSet.next()) {
                 currentDay = resultSet.getInt(3);
                 isCurrentDayTrue = resultSet.getBoolean(4);
-            }
+            } boolean viewExists = false;
             if (isCurrentDayTrue) {
                 resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopulationWhereCurrentDay);
-                boolean viewExists = false;
+
                 while (resultSet.next()) {
-                    if (viewName.equals(resultSet.getString(1))) {
+                    String dbViewName = resultSet.getString(1);
+                    if (viewName.equals(dbViewName)) {
                         viewExists = true;
-                        break;
-                    }
-                    if (viewExists == false) {
-                        ConnectionManager.updateSql(QueryManager.insertIntopopularity(viewName, currentDay));
                     } else {
-                        ConnectionManager.updateSql(QueryManager.updatepopularityIfExists(viewName));
+                        viewExists = false;
 
                     }
-                }
 
+                }
+                if (!viewExists) {
+                    ConnectionManager.updateSql(QueryManager.insertIntopopularity(viewName, currentDay));
+                } else {
+                    ConnectionManager.updateSql(QueryManager.updatepopularityIfExists(viewName));
+                }
             } else {
-                ConnectionManager.updateSql(QueryManager.insertpopularityIfNoRowsExists(viewName));
+                resultSet = ConnectionManager.selectSQL(QueryManager.selectDayFromPopulation);
+                int i = 0;
+                while (resultSet.next()) {
+                    i = resultSet.getInt(1);
+                }
+                ConnectionManager.updateSql(QueryManager.insertNewDayIntoPopularity(viewName,i +1 ));
             }
 
         }
