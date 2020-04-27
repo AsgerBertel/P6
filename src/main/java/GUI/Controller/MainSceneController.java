@@ -28,6 +28,8 @@ public class MainSceneController {
     SearchBarContextMenu searchBarContextMenu = new SearchBarContextMenu(this);
     private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
     PopularityManager popularityManager = new PopularityManager();
+    private boolean isViewGenInitialised = false;
+    private ViewGenerator viewGenerator = new ViewGenerator();
 
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
@@ -83,7 +85,10 @@ public class MainSceneController {
     }
 
     public void UpdateViews() {
-        ViewGenerator viewGenerator = new ViewGenerator();
+        if(!this.isViewGenInitialised){
+            viewGenerator = new ViewGenerator();
+            viewGenerator.init();
+        }
         try {
             viewGenerator.updateViews();
         } catch (SQLException throwables) {
