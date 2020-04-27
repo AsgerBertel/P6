@@ -1,5 +1,6 @@
 import Lattice.Dimension;
 import Lattice.GraphManager;
+import Lattice.GreedyAlgorithm.GreedyAlgorithm;
 import Lattice.Level;
 import Lattice.Node;
 import org.junit.Before;
@@ -85,7 +86,6 @@ public class LatticeGraphTests {
     }
     @Test
     public void correctNumberOfDifferingDimensionsFromParentTest(){
-       /* GraphManager gm = new GraphManager();
         //Create the root node
         Node root = new Node(new Object[][]{
                 {d1,d1prod},
@@ -93,6 +93,9 @@ public class LatticeGraphTests {
                 {d3,d3day},
                 {d4,d4opinion}
         });
+
+       GraphManager gm = new GraphManager(root);
+
         gm.nodes.put(root,root);
         gm.generateTree(root);
 
@@ -119,8 +122,38 @@ public class LatticeGraphTests {
         for(Dimension d: n.getDimensions().keySet()){
             nodeDimensions.add(n.getDimensions().get(d));
         }
-        return nodeDimensions;*/
+        return nodeDimensions;
     }
+ /*
+    @Test
+    public void getBenefittest(){
+        GraphManager gm = new GraphManager();
+        //Create the root node
+        Node root = new Node(new Object[][]{
+                {d1,d1cat},
+                {d2,d2cit},
+                {d3,d3month},
+                {d4,d4opinion}
+        });
+        gm.nodes.put(root,root);
+        gm.generateTree(root);
+
+        root.getViewSize();
+        GreedyAlgorithm greedyAlgorithm = new GreedyAlgorithm(gm.nodes.keySet(), root);
+        greedyAlgorithm.initializeGraph();
+        greedyAlgorithm.updateActualCost(root);
+        LinkedHashMap<Node,Boolean> visitedMap = new LinkedHashMap<>();
+        for(Node n : gm.nodes.keySet()){
+            visitedMap.put(n,false);
+        }
+        BFS(root, visitedMap);
+
+        //Calculate root node cost
+        BigInteger totalCost = d1cat.getRows().multiply(d2cit.getRows().multiply(d3month.getRows().multiply(d4opinion.getRows())));
+        assertEquals(totalCost, root.getActualCost());
+    }
+    */
+
 }
 
 
