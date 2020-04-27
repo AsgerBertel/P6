@@ -18,7 +18,7 @@ public class QueryManager {
     public static String selectAllMaterializedlViewNames = "SELECT matviewname from cubefrequency.pg_catalog.pg_matviews WHERE schemaname = 'public'";
 
     public static String dropMaterializedView(String viewname){
-        return "drop materialized view cubefrequency.public." + viewname;
+        return "drop materialized view cubefrequency.public." + viewname + " cascade";
     }
     public static String dropVirtualView(String viewname){
         return "drop view cubefrequency.public." + viewname;
