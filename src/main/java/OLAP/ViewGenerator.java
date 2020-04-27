@@ -13,12 +13,14 @@ import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Set;
 
 public class ViewGenerator {
-    public static void generateOnlyVirtualViews(LinkedHashMap<Node,Node> nodes, Node root){
+    GreedyAlgorithm ga;
+    GraphManager gm;
+    Node root;
+
+    public void generateOnlyVirtualViews(LinkedHashMap<Node,Node> nodes, Node root){
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         ViewQueryManager vqm = new ViewQueryManager(root);
         boolean isNNNN = false;
@@ -39,13 +41,23 @@ public class ViewGenerator {
         }
     }
 
-    private static void deleteViews(LinkedHashMap<Node,Node> nodes){
+    private ArrayList<String> getMaterialisedViewNames() throws SQLException {
+        ResultSet matViews =  ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNames);
+        ArrayList<String> matViewNames = new ArrayList<>();
+        while(matViews.next()){
+            matViewNames.add(matViews.getString(1));
+        }
+        return matViewNames;
+
+    }
+
+    private void deleteViews(LinkedHashMap<Node,Node> nodes){
         //Get resultset of all existing virtual views and material views.
         ArrayList<String> materialisedNodeNames = new ArrayList<>();
         //put all mat node names into a list
         for(Node n: nodes.keySet()){
             if(n.isMaterialised()){
-                materialisedNodeNames.add(NodeQueryUtils.getNodeViewName(n));
+                materialisedNodeNames.add(NodeQueryUtils.getNodeViewName(n).toLowerCase());
             }
         }
         try {
@@ -54,25 +66,28 @@ public class ViewGenerator {
                 //delete every view
                 ConnectionManager.updateSql(QueryManager.dropVirtualView(virtViews.getString(1)));
             }
-            ResultSet matViews = ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNames);
-            while(matViews.next()){
-                //Only delete views that are no longer going to be materialised
-                if(!materialisedNodeNames.contains(matViews.getString(1))){
-                    ConnectionManager.updateSql(QueryManager.dropMaterializedView(matViews.getString(1)));
-                }
-            }
+            ArrayList<String> matViews = getMaterialisedViewNames();
+           for(String s : matViews){
+               if(!materialisedNodeNames.contains(s)){
+                   ConnectionManager.updateSql(QueryManager.dropMaterializedView(s));
+               }
+           }
         } catch (SQLException e) {
             System.exit(420);
         }
 
     }
-    public static void generateViews(LinkedHashMap<Node,Node> nodes, Node root){
+    public void generateViews(LinkedHashMap<Node,Node> nodes, Node root) throws SQLException {
         deleteViews(nodes);
         //We should only drop views that
         ViewQueryManager vqm = new ViewQueryManager(root);
         boolean isNNNN = false;
+        ArrayList<String> matViews = getMaterialisedViewNames();
         for(Node n : nodes.keySet()){
-            if(n.isMaterialised()){ ;
+            if(matViews.contains(NodeQueryUtils.getNodeViewName(n).toLowerCase())){
+                continue;
+            }
+            if(n.isMaterialised()){
                 ConnectionManager.updateSql(vqm.createView(n));
             }
         }
@@ -89,13 +104,13 @@ public class ViewGenerator {
             if(isNNNN)
                 continue;
             if(!n.isMaterialised()){
-                System.out.println("THIS: "+NodeQueryUtils.getNodeViewName(n));
-                System.out.println("UPPER: " + NodeQueryUtils.getNodeViewName(n.getMaterializedUpperNode()));
                 ConnectionManager.updateSql(vqm.createView(n));
             }
+        }
+        System.out.println("finished creating views");
     }
-    }
-    public void updateViews() throws SQLException {
+
+    public void init(){
         Dimension d1, d2, d3, d4;
         Level d1topic, d1subtopic, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;
@@ -121,21 +136,18 @@ public class ViewGenerator {
         d3 = new Dimension(new Level[]{d3day, d3month, d3year, d3none});
         d4 = new Dimension(new Level[]{d4opinion, d4none});
 
-        Node root = new Node(new Object[][]{
+        this.root = new Node(new Object[][]{
                 {d1,d1topic},
                 {d2,d2loc},
                 {d3,d3day},
                 {d4,d4opinion}
         });
-        GraphManager gm = new GraphManager(root);
+        this.gm = new GraphManager(root);
         gm.generateTree(root);
-        GreedyAlgorithm ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
-        HashSet<Node> nodies = ga.materializeNodes(4);
-        for(Node n : gm.nodes.keySet()){
-            if(nodies.contains(n))
-                n.setMaterialised(true);
-        }
-        System.out.println("Materialised Nodes");
+        this.ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
+    }
+    public void updateViews() throws SQLException {
+        ga.materializeNodes(4);
         generateViews(gm.nodes,root);
     }
 }
