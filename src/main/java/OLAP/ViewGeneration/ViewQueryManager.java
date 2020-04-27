@@ -16,86 +16,6 @@ public class ViewQueryManager {
         ViewQueryManager.root = root;
     }
 
-    public static void main(String[] args) {
-       /* Dimension d1 = new Dimension(new Level[]{
-                new Level("coordinate",0),
-                new Level("district",0),
-                new Level("county",0),
-                new Level("city",0),
-                new Level("None",0)
-        });
-        Dimension d2 = new Dimension(new Level[]{
-                new Level("toptopic",0),
-                new Level("subtopic", 0),
-                new Level("None",0)
-        });
-        Dimension d3 = new Dimension(new Level[]{
-                new Level("day",0),
-                new Level("month",0),
-                new Level("year",0),
-                new Level("None",0)
-        });
-        Dimension d4 = new Dimension(new Level[]{
-                new Level("opinion",0),
-                new Level("None",0),
-        });
-
-        Node locRoot = new Node(new Object[][]{
-                {d1, new Level("coordinate",0)},
-                {d2, new Level("toptopic",0)},
-                {d3, new Level("day",0)},
-                {d4, new Level("opinion",0)}
-        });
-        Node intermediate = new Node(new Object[][]{
-                {d1, new Level("district",0)},
-                {d2, new Level("toptopic",0)},
-                {d3, new Level("day",0)},
-                {d4, new Level("opinion",0)}
-        });
-        Node child2 = new Node(new Object[][]{
-                {d1, new Level("district",0)},
-                {d2, new Level("subtopic",0)},
-                {d3, new Level("day",0)},
-                {d4, new Level("opinion",0)}
-        });
-        Node child = new Node(new Object[][]{
-                {d1, new Level("county",0)},
-                {d2, new Level("subtopic",0)},
-                {d3, new Level("day",0)},
-                {d4, new Level("opinion",0)}
-        });
-        Node child3 = new Node(new Object[][]{
-                {d1, new Level("county",0)},
-                {d2, new Level("toptopic",0)},
-                {d3, new Level("month",0)},
-                {d4, new Level("opinion",0)}
-        });
-        Node child4 = new Node(new Object[][]{
-                {d1, new Level("city",0)},
-                {d2, new Level("toptopic",0)},
-                {d3, new Level("year",0)},
-                {d4, new Level("opinion",0)}
-        });
-        root = locRoot;
-        child3.setMaterializedUpperNode(root);
-        child3.setImmediateParentNode(intermediate);
-        child2.setMaterializedUpperNode(root);
-        child2.setImmediateParentNode(root);
-        child.setMaterializedUpperNode(root);
-        child.setImmediateParentNode(intermediate);
-        intermediate.setImmediateParentNode(root);
-        intermediate.setMaterializedUpperNode(root);
-        child3.setMaterialised(true);
-        child4.setMaterializedUpperNode(root);
-        child4.setImmediateParentNode(root);
-
-        //System.out.println("CHILD3: \n " + createView(child3));
-        //System.out.println("CHILD4: \n " + createView(child4));
-        System.out.println("CHILD2: \n " + createView(child2));
-        //ConnectionManager.updateSql(createMatView(child));
-        //ConnectionManager.updateSql(createMatView(child2));
-        //ConnectionManager.updateSql(createMatView(child3));*/
-    }
 
     public static String createView(Node n){
         if(n.isMaterialised()){
@@ -115,7 +35,7 @@ public class ViewQueryManager {
 
     }
 
-    private static String createVirtViewFromFactTable(Node n) {
+    public static String createVirtViewFromFactTable(Node n) {
         String query = "CREATE VIEW " + NodeQueryUtils.getNodeViewName(n)
                 + " AS SELECT " + selectQuery(n) + "\n"
                 + "FROM " + fromUpperNode(n) + innerJoinQuery(n)
@@ -158,6 +78,7 @@ public class ViewQueryManager {
     }
 
     private static boolean containsTopicDimension(LinkedHashMap<Dimension,Level> nodeDimensions){
+
         for(Dimension d : nodeDimensions.keySet()){
             for(Level l : d.getHierarchy()){
                 if(l.getName().equals("toptopic")){
@@ -169,10 +90,10 @@ public class ViewQueryManager {
     }
 
     private static Level setInitialCurrLevel(Node n, Dimension currDimension){
-        if(n.getMaterializedUpperNode().equals(n)){
+        /*if(n.isMaterialised()){
             return currDimension.getLevel(0);
         }
-        else return n.getMaterializedUpperNode().getDimensions().get(currDimension);
+        else*/ return n.getMaterializedUpperNode().getDimensions().get(currDimension);
     }
 
     private static String innerJoinQuery(Node n) {
@@ -222,7 +143,7 @@ public class ViewQueryManager {
     private static String createMatView(Node n) {
         String query = "CREATE MATERIALIZED VIEW " + NodeQueryUtils.getNodeViewName(n)
                 + " AS SELECT " + selectQuery(n) + "\n"
-                + "FROM " + CUBE_PREFIX + "facttable f \n" + innerJoinQuery(n)
+                + "FROM " + fromUpperNode(n) + innerJoinQuery(n)
                 + "GROUP BY " + groupByQuery(n);
         return query;
     }
@@ -254,7 +175,7 @@ public class ViewQueryManager {
     }
 
     private static String aggregateFunction(Node n) {
-        if(!n.getMaterializedUpperNode().equals(root)){
+        if(!n.getMaterializedUpperNode().equals(root) && !n.isMaterialised()){
             return "sum(f.count)";
         }else{
             for(Level l : n.getDimensions().values()){
