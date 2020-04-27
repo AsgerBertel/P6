@@ -6,9 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -87,7 +85,44 @@ public class LatticeGraphTests {
     }
     @Test
     public void correctNumberOfDifferingDimensionsFromParentTest(){
-        //todo implement
-    }
+        GraphManager gm = new GraphManager();
+        //Create the root node
+        Node root = new Node(new Object[][]{
+                {d1,d1prod},
+                {d2,d2loc},
+                {d3,d3day},
+                {d4,d4opinion}
+        });
+        gm.nodes.put(root,root);
+        gm.generateTree(root);
 
+        int counter = 0;
+        ArrayList<Level> parentLevels = new ArrayList<>();
+        ArrayList<Level> childLevels = new ArrayList<>();
+
+        for(Node n: gm.nodes.keySet()){
+            parentLevels = getLevelsInNode(n);
+            for(Node child: n.getChildren()){
+                childLevels = getLevelsInNode(child);
+                for(int i = 0; i < parentLevels.size();i++){
+                    if(parentLevels.get(i) != childLevels.get(i)){
+                        counter++;
+                    }
+                }
+                assertEquals(1, counter);
+                counter = 0;
+            }
+        }
+    }
+    public ArrayList<Level> getLevelsInNode(Node n){
+        ArrayList<Level> nodeDimensions = new ArrayList<>();
+        for(Dimension d: n.getDimensions().keySet()){
+            nodeDimensions.add(n.getDimensions().get(d));
+        }
+        return nodeDimensions;
+    }
 }
+
+
+
+
