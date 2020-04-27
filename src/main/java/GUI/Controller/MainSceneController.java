@@ -1,6 +1,7 @@
 package GUI.Controller;
 
 import GUI.ContextMenu.SearchBarContextMenu;
+import GUI.Other.PopularityManager;
 import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
@@ -25,6 +26,9 @@ import java.sql.SQLException;
 
 public class MainSceneController {
     SearchBarContextMenu searchBarContextMenu = new SearchBarContextMenu(this);
+    private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+    PopularityManager popularityManager = new PopularityManager();
+
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
     @FXML
@@ -33,8 +37,6 @@ public class MainSceneController {
     private Button btnUpdate;
     @FXML
     private TableView tableViewLeft;
-
-    private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
 
     @FXML
     private VBox leftSide;
@@ -57,9 +59,9 @@ public class MainSceneController {
         data.clear();
         tableViewLeft.getColumns().clear();
         tableViewLeft.getItems().clear();
-        for(int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++){
+        for (int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++) {
             final int j = i;
-            TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i+1));
+            TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i + 1));
             col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
                     return new SimpleStringProperty(param.getValue().get(j).toString());
@@ -67,23 +69,22 @@ public class MainSceneController {
             });
             tableViewLeft.getColumns().addAll(col);
 
-            System.out.println(col.getText() + "["+i+"]" + "has been added");
+            System.out.println(col.getText() + "[" + i + "]" + "has been added");
         }
-        while(resultSet_Tableview.next()){
+        while (resultSet_Tableview.next()) {
             ObservableList<String> row = FXCollections.observableArrayList();
-            for(int i = 1; i <= resultSet_Tableview.getMetaData().getColumnCount();i++){
+            for (int i = 1; i <= resultSet_Tableview.getMetaData().getColumnCount(); i++) {
                 row.add(resultSet_Tableview.getString(i));
             }
             data.add(row);
         }
 
-      tableViewLeft.setItems(data);
+        tableViewLeft.setItems(data);
     }
 
     public void UpdateViews() {
         ViewGenerator viewGenerator = new ViewGenerator();
         viewGenerator.runUpdate();
-
     }
 
     public void setAddProductText(String menuItem, TextField currentSearchbar) {
@@ -91,6 +92,7 @@ public class MainSceneController {
     }
 
     public void loadView() {
+
         try {
             String strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
             String strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
@@ -99,6 +101,8 @@ public class MainSceneController {
             String viewQuery = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion);
             String viewQueryWhereFirst = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion) + " WHERE ";
             String viewQueryWhereSecond = "";
+
+            popularityManager.updatePopularityValue((strComboTopic + strComboLocation + strComboDate + strComboOpinion).trim());
             boolean isWhere = false;
             if (txtTopic.getText().trim().isEmpty() && txtDate.getText().trim().isEmpty() && txtLocation.getText().trim().isEmpty() && txtOpinion.getText().trim().isEmpty()) {
                 viewQuery = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion);
@@ -125,7 +129,7 @@ public class MainSceneController {
                 resultSet = ConnectionManager.selectSQL(viewQueryWhereFirst);
             else
                 resultSet = ConnectionManager.selectSQL(viewQuery);
-         buildTable(resultSet);
+            buildTable(resultSet);
 
         } catch (NullPointerException e) {
             System.out.println("Choose some");
@@ -156,7 +160,6 @@ public class MainSceneController {
     }
 
     private void initializeTopicOnKeyPressedEvent(ComboBox comboTopic) {
-
         //searchbar for topics
         txtTopic.setOnKeyReleased(event -> {
             boolean isTopTopic, isSubTopic;
@@ -186,44 +189,48 @@ public class MainSceneController {
 
         //searchbar for topics
         txtLocation.setOnKeyReleased(event -> {
-            boolean isDistrict, isCounty, isCity, isCountry;
-            try {
-                if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("district")) {
-                    isDistrict = true;
-                    isCounty = false;
-                    isCity = false;
-                    isCountry = false;
-                } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("county")) {
-                    isDistrict = false;
-                    isCounty = true;
-                    isCity = false;
-                    isCountry = false;
+            if (!comboLocation.getSelectionModel().getSelectedItem().toString().equals("coordinate")) {
+                boolean isDistrict, isCounty, isCity, isCountry;
+                try {
+                    if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("district")) {
+                        isDistrict = true;
+                        isCounty = false;
+                        isCity = false;
+                        isCountry = false;
+                    } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("county")) {
+                        isDistrict = false;
+                        isCounty = true;
+                        isCity = false;
+                        isCountry = false;
 
-                } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("city")) {
-                    isDistrict = false;
-                    isCounty = false;
-                    isCity = true;
-                    isCountry = false;
+                    } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("city")) {
+                        isDistrict = false;
+                        isCounty = false;
+                        isCity = true;
+                        isCountry = false;
 
-                } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("country")) {
-                    isDistrict = false;
-                    isCounty = false;
-                    isCity = false;
-                    isCountry = true;
+                    } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("country")) {
+                        isDistrict = false;
+                        isCounty = false;
+                        isCity = false;
+                        isCountry = true;
 
-                } else {
-                    isDistrict = false;
-                    isCounty = false;
-                    isCity = false;
-                    isCountry = false;
+                    } else {
+                        isDistrict = false;
+                        isCounty = false;
+                        isCity = false;
+                        isCountry = false;
+                    }
+                    searchBarContextMenu.getItems().clear();
+                    searchBarContextMenu.loadLocation(txtLocation.getText(), isDistrict, isCounty, isCity, isCountry, txtLocation);
+                    searchBarContextMenu.show(txtLocation, Side.BOTTOM, 0, 0);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+                    System.out.println("nothing has been chosen");
                 }
-                searchBarContextMenu.getItems().clear();
-                searchBarContextMenu.loadLocation(txtLocation.getText(), isDistrict, isCounty, isCity, isCountry, txtLocation);
-                searchBarContextMenu.show(txtLocation, Side.BOTTOM, 0, 0);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                System.out.println("nothing has been chosen");
+            } else {
+                txtLocation.clear();
             }
         });
     }
@@ -263,5 +270,4 @@ public class MainSceneController {
             }
         });
     }
-
 }

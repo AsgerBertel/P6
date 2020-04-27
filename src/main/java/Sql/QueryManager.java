@@ -9,6 +9,8 @@ public class QueryManager {
     public static String selectProductIDFromProduct = "SELECT lat,long FROM cube.tweets ";
     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
     public static String dropSchemaPublic = "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;";
+    public static String selectAllFromPopulation = "SELECT * FROM cube.popularity ";
+    public static String selectAllFromPopulationWhereCurrentDay = "SELECT * FROM cube.popularity WHERE currentday = true";
 
 
     public static String insertIntoDate(int day, int month, int year) {
@@ -18,43 +20,53 @@ public class QueryManager {
     public static String selectTopTopics(String searchWord) {
         return "SELECT toptopic.toptopic FROM cube.toptopic WHERE toptopic.toptopic LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectDistrict(String searchWord) {
         return "SELECT district.district FROM cube.district WHERE district.district LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectCounty(String searchWord) {
         return "SELECT county.county  FROM cube.county WHERE county.county LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectCity(String searchWord) {
         return "SELECT city.city  FROM cube.city WHERE city.city LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectCountry(String searchWord) {
         return "SELECT country.country FROM cube.country WHERE country.country LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectDay(String searchWord) {
         return "SELECT day.day  FROM cube.day WHERE CAST(day.day AS TEXT)LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectMonth(String searchWord) {
         return "SELECT month.month FROM cube.month WHERE CAST(month.month AS TEXT)LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectYear(String searchWord) {
         return "SELECT year.year FROM cube.year WHERE CAST(year.year AS TEXT) LIKE '%" + searchWord + "%' limit 5";
     }
 
     public static String selectOpinions(String searchWord) {
-        return "SELECT opinion.opinion FROM cube.opinion WHERE opinion.opinion  LIKE '%" + searchWord +"%' limit 5";
+        return "SELECT opinion.opinion FROM cube.opinion WHERE opinion.opinion  LIKE '%" + searchWord + "%' limit 5";
     }
 
     public static String selectSubTopics(String searchWord) {
         return "SELECT Distinct subtopic.subtopic FROM cube.subtopic WHERE subtopic.subtopic LIKE '%" + searchWord + "%' limit 5";
     }
+
     public static String selectTopTopicFromView(String topic, String view) {
-        return "SELECT * FROM cubefrequency.public."+view+" WHERE toptopic = '"+topic+"'";
+        return "SELECT * FROM cubefrequency.public." + view + " WHERE toptopic = '" + topic + "'";
     }
+
     public static String selectSubTopicFromView(String topic, String view) {
-        return "SELECT * FROM cubefrequency.public."+view+" WHERE subtopic = '"+topic+"'";
+        return "SELECT * FROM cubefrequency.public." + view + " WHERE subtopic = '" + topic + "'";
     }
-    public static String selectView( String view) {
-        return "SELECT * FROM cubefrequency.public."+view+"";
+
+    public static String selectView(String view) {
+        return "SELECT * FROM cubefrequency.public." + view + "";
     }
 
     public static String insertIntoYear(int year) {
@@ -93,7 +105,10 @@ public class QueryManager {
     public static String selectAllOpinionIDFromOpinion() {
         return "SELECT opinionid FROM cube.opinion";
     }
-    public static String selectAllFromSubTopics(){return "SELECT subtopicID, subtopic.subtopic, toptopicid FROM cube.subtopic";}
+
+    public static String selectAllFromSubTopics() {
+        return "SELECT subtopicID, subtopic.subtopic, toptopicid FROM cube.subtopic";
+    }
 
     public static String selecAlltLocationIDFromCoordinates() {
         return "SELECT coordinate.locationid FROM cube.coordinate";
@@ -122,5 +137,17 @@ public class QueryManager {
 
     public static String insertIntoSubTopics(String topic, int toptopicid) {
         return "INSERT INTO cube.subtopics (subtopic, toptopicid) VALUES ('" + topic + "'," + toptopicid + ")";
+    }
+
+    public static String insertpopularityIfNoRowsExists(String view) {
+        return "INSERT INTO cube.popularity VALUES ('" + view + "',1,1,true)";
+    }
+
+    public static String insertIntopopularity(String view, int currentDay) {
+        return "INSERT INTO cube.popularity VALUES ('" + view + "',1," + currentDay + ",true)";
+    }
+
+    public static String updatepopularityIfExists(String view) {
+        return "UPDATE cube.popularity SET dailyvalue = dailyvalue+1 WHERE currentday = true AND viewname = '"+view+"'";
     }
 }

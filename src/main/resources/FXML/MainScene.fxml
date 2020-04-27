@@ -12,22 +12,33 @@
       fx:id="background">
     <HBox fx:id="container" id="container">
         <VBox id="leftSide" fx:id="leftSide">
-            <TableView id="tableViewLeft" fx:id="tableViewLeft" prefWidth="${background.width}" prefHeight="${background.height}">
-
+            <TableView id="tableViewLeft" fx:id="tableViewLeft" prefWidth="${background.width}"
+                       prefHeight="${background.height}">
             </TableView>
 
         </VBox>
         <VBox id="rightSideMenu" fx:id="rightSideMenu">
             <Button text="Update Views" fx:id="btnUpdate" id="btnUpdate" onAction="#UpdateViews"/>
-            <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation" styleClass="comboboxDimension"/>
-            <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion" styleClass="comboboxDimension"/>
-            <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic" styleClass="comboboxDimension"/>
-            <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
+
             <VBox>
-                <TextField promptText="Topic Filter" fx:id="txtTopic" id="txtTopic" styleClass="searchField"/>
-                <TextField promptText="Location Filter" fx:id="txtLocation" id="txtLocation" styleClass="searchField"/>
-                <TextField promptText="Opinion Filter" fx:id="txtOpinion" id="txtOpinion" styleClass="searchField"/>
-                <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
+                <HBox>
+                    <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic" styleClass="comboboxDimension"/>
+                    <TextField promptText="Topic Filter" fx:id="txtTopic" id="txtTopic" styleClass="searchField"/>
+                </HBox>
+
+                <HBox>
+                    <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation" styleClass="comboboxDimension"/>
+                    <TextField promptText="Location Filter" fx:id="txtLocation" id="txtLocation"
+                               styleClass="searchField"/>
+                </HBox>
+                <HBox>
+                    <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion" styleClass="comboboxDimension"/>
+                    <TextField promptText="Opinion Filter" fx:id="txtOpinion" id="txtOpinion" styleClass="searchField"/>
+                </HBox>
+                <HBox>
+                    <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
+                    <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
+                </HBox>
 
                 <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
             </VBox>
