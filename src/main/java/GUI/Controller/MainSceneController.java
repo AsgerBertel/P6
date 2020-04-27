@@ -44,10 +44,10 @@ public class MainSceneController {
 
     public void initialize() {
         searchBarContextMenu.setStyle("-fx-pref-width: 200");
-        comboLocation.setItems(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "none"));
-        comboOpinion.setItems(FXCollections.observableArrayList("opinion", "none"));
-        comboTopic.setItems(FXCollections.observableArrayList("subtopic", "toptopic", "none"));
-        comboDate.setItems(FXCollections.observableArrayList("day", "month", "year", "none"));
+        comboLocation.setItems(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "allD"));
+        comboOpinion.setItems(FXCollections.observableArrayList("opinion", "all"));
+        comboTopic.setItems(FXCollections.observableArrayList("subtopic", "toptopic", "all"));
+        comboDate.setItems(FXCollections.observableArrayList("day", "month", "year", "all"));
         initializeTopicOnKeyPressedEvent(comboTopic);
         initializeOpinionOnKeyPressedEvent(comboOpinion);
         initializeLocationOnKeyPressedEvent(comboLocation);
