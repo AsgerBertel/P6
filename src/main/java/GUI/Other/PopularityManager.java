@@ -10,11 +10,11 @@ public class PopularityManager {
     ResultSet resultSet;
 
     public void updatePopularityValue(String viewName) throws SQLException {
-        resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopulation);
+        resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
         if (!resultSet.next()) {
             ConnectionManager.updateSql(QueryManager.insertpopularityIfNoRowsExists(viewName));
         } else {
-            resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopulation);
+            resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
             int currentDay = 1;
             boolean isCurrentDayTrue = true;
             while (resultSet.next()) {

@@ -1,6 +1,8 @@
 package Lattice.GreedyAlgorithm;
 
+import Lattice.Dimension;
 import Lattice.GraphManager;
+import Lattice.Level;
 import Lattice.Node;
 import OLAP.NodeQueryUtils;
 import OLAP.ViewGenerator;
@@ -36,9 +38,10 @@ public class GreedyAlgorithm {
     public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
         initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
+            printBenefitTree();
             selectHighestBenefit();
             updateCurrentBenefit();
-            //printBenefitTree();
+
         }
         return materializedNodes;
     }
@@ -87,6 +90,7 @@ public class GreedyAlgorithm {
                 benefit = benefit.add(n.getActualCost().subtract(currentNode.getViewSize()));
             }
         }
+
         return benefit.doubleValue() * currentNode.getScale();
     }
 
@@ -94,7 +98,7 @@ public class GreedyAlgorithm {
         ResultSet rs = ConnectionManager.selectSQL(QueryManager.selectAllFromViewsize);
         HashMap<String,Long> viewNameSizeMap = new HashMap<>();
         while(rs.next()){
-            viewNameSizeMap.put(rs.getString(1),rs.getLong(2));
+            viewNameSizeMap.put(rs.getString(1).toLowerCase(),rs.getLong(2));
         }
         BigInteger rootNodeCost = BigInteger.valueOf(viewNameSizeMap.get(NodeQueryUtils.getNodeViewName(topNode)));
             for(Node n: keyset){
@@ -135,7 +139,7 @@ public class GreedyAlgorithm {
     private void printBenefitTree(){
         System.out.println("Benefit:");
         for(Node n: benefitValueTree.keySet()){
-            System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + benefitValueTree.get(n));
+            System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + benefitValueTree.get(n)+ " scale:"+n.getScale());
         }
     }
 }

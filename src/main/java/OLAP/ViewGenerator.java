@@ -154,6 +154,7 @@ public class ViewGenerator {
 
     }
     public void updateViews() throws SQLException {
+        ga.resetNodes();
         ga.materializeNodes(4);
         generateViews(gm.nodes,root);
     }

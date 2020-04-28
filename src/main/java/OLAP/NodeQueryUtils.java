@@ -13,7 +13,7 @@ public class NodeQueryUtils {
         for(Dimension d: node.getDimensions().keySet()){
             sb.append(node.getDimensions().get(d).getName());
         }
-        return sb.toString();
+        return sb.toString().toLowerCase();
     }
 
 }

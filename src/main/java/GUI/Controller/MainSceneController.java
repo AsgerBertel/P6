@@ -87,10 +87,9 @@ public class MainSceneController {
 
     public void updateViews() {
         btnUpdate.setDisable(false);
-        ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
         if(!this.isViewGenInitialised){
             viewGenerator = new ViewGenerator();
-            viewGenerator.init(GreedyAlgorithmType.BASE);
+            viewGenerator.init(GreedyAlgorithmType.POPULARITY);
         }
         try {
             viewGenerator.updateViews();

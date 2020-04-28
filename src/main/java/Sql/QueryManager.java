@@ -11,7 +11,7 @@ public class QueryManager {
     public static String selectProductIDFromProduct = "SELECT lat,long FROM cube.tweets ";
     public static String selectCoordinatesidFromCoordinates = "SELECT locationid FROM cubefrequency.cube.coordinate";
     public static String dropSchemaPublic = "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;";
-    public static String selectAllFromPopulation = "SELECT * FROM cube.popularity ";
+    public static String selectAllFromPopularity = "SELECT * FROM cube.popularity";
     public static String selectAllFromPopulationWhereCurrentDay = "SELECT * FROM cube.popularity WHERE currentday = true";
     public static String selectDayFromPopulation = "SELECT day FROM cube.popularity";
     public static String updateCurrentDayInPopularity = "UPDATE cube.popularity set currentday = false";

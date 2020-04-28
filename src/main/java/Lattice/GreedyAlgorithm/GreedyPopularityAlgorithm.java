@@ -2,11 +2,12 @@ package Lattice.GreedyAlgorithm;
 
 import Lattice.Node;
 import OLAP.NodeQueryUtils;
+import Sql.ConnectionManager;
+import Sql.QueryManager;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
     private double scale = 1;
@@ -14,7 +15,11 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
 
     public GreedyPopularityAlgorithm(Set<Node> nodes, Node rootNode) {
         super(nodes, rootNode);
-        popularityNodeMap = testFillNodePopularityMap();
+        try {
+            popularityNodeMap = FillNodePopularityMap(nodes);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     @Override
@@ -44,12 +49,14 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         double maxVal = sortedNodePopularityMap.get(sortedNodePopularityMap.keySet().toArray()[sortedNodePopularityMap.size() - 1]);
         for (Node n : sortedNodePopularityMap.keySet()) {
             int currentPopularityValue = sortedNodePopularityMap.get(n);
-            if (previousPopularityVal == 0) {
-               n.setScale(scale);
-               previousPopularityVal = currentPopularityValue;
-            } else if(currentPopularityValue == previousPopularityVal){
+            if (currentPopularityValue == 30)
+                System.out.println("i like trains");
+            if (currentPopularityValue == 0) {
                 n.setScale(scale);
-            } else{
+                previousPopularityVal = currentPopularityValue;
+            } else if (currentPopularityValue == previousPopularityVal) {
+                n.setScale(scale);
+            } else {
                 double relativeDifference = (currentPopularityValue / maxVal) - (previousPopularityVal / maxVal);
                 scale = (1 + relativeDifference) * scale;
                 n.setScale(scale);
@@ -60,16 +67,40 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
     }
 
 
-    private LinkedHashMap<String, Integer> testFillNodePopularityMap(){
-        Random r = new Random();
-        LinkedHashMap<String, Integer> testMap = new LinkedHashMap<>();
-        for(Node n: nodes){
-            int tempRandom = r.nextInt(1000);
-            testMap.put(NodeQueryUtils.getNodeViewName(n),tempRandom);
-            System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + tempRandom);
-        }
+    private LinkedHashMap<String, Integer> FillNodePopularityMap(Set<Node> setOfNodes) throws SQLException {
+        LinkedHashMap<String, Integer> viewPopularityMap = new LinkedHashMap<>();
+        ResultSet resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
+        ArrayList<ViewPopularity> listOfViews = new ArrayList<>();
+        while (resultSet.next()) {
+            ViewPopularity view = new ViewPopularity(resultSet.getString(1));
+            if (listOfViews.contains(view)) {
+                view = listOfViews.get(listOfViews.indexOf(view));
+                view.incrementAmountOfTimesUsed();
+                if (resultSet.getBoolean(4))
+                    view.setCurrentDailyValue(resultSet.getInt(2));
+                else
+                    view.setOverAllValue(resultSet.getInt(2));
 
-        return testMap;
+            } else {
+                view.incrementAmountOfTimesUsed();
+                if (resultSet.getBoolean(4))
+                    view.setCurrentDailyValue(resultSet.getInt(2));
+                else
+                    view.setOverAllValue(resultSet.getInt(2));
+
+                listOfViews.add(view);
+            }
+        }
+        for (ViewPopularity v : listOfViews) {
+            viewPopularityMap.put(v.getName(), v.calculatePopularityValue());
+        }
+        for (Node n : nodes) {
+            if (!viewPopularityMap.containsKey(NodeQueryUtils.getNodeViewName(n))) {
+                viewPopularityMap.put(NodeQueryUtils.getNodeViewName(n),0);
+            }
+        }
+        ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
+        return viewPopularityMap;
     }
 
 
