@@ -66,7 +66,6 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         scale = 1;
     }
 
-
     private LinkedHashMap<String, Integer> FillNodePopularityMap(Set<Node> setOfNodes) throws SQLException {
         LinkedHashMap<String, Integer> viewPopularityMap = new LinkedHashMap<>();
         ResultSet resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
