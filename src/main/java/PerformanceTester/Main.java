@@ -17,7 +17,6 @@ public class Main {
         Level d3day, d3month, d3year, d3none;
         Level d4opinion, d4none;
         d1prod = new Level("toptopic", new BigInteger(String.valueOf(70)));
-        d1cat = new Level("subtopic", new BigInteger(String.valueOf(1401)));
         d1none = new Level("None", new BigInteger(String.valueOf(1)));
         d2loc = new Level("coordinate", new BigInteger(String.valueOf(3861358)));
         d2dis = new Level("district", new BigInteger(String.valueOf(143)));
@@ -31,7 +30,7 @@ public class Main {
         d3none = new Level("None", new BigInteger(String.valueOf(1)));
         d4opinion = new Level("opinion", new BigInteger(String.valueOf(3)));
         d4none = new Level("None", new BigInteger(String.valueOf(1)));
-        d1 = new Dimension(new Level[]{d1prod, d1cat, d1none});
+        d1 = new Dimension(new Level[]{d1prod, d1none});
         d2 = new Dimension(new Level[]{d2loc, d2dis, d2county, d2cit, d2country, d2none});
         d3 = new Dimension(new Level[]{d3day, d3month, d3year, d3none});
         d4 = new Dimension(new Level[]{d4opinion, d4none});

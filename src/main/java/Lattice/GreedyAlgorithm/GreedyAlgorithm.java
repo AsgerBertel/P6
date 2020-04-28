@@ -38,7 +38,7 @@ public class GreedyAlgorithm {
     public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
         initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
-            printBenefitTree();
+           // printBenefitTree();
             selectHighestBenefit();
             updateCurrentBenefit();
 

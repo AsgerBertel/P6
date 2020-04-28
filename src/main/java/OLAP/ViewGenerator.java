@@ -22,6 +22,10 @@ public class ViewGenerator {
     GraphManager gm;
     Node root;
 
+    public void setGa(GreedyAlgorithm ga) {
+        this.ga = ga;
+    }
+
     public void generateOnlyVirtualViews(LinkedHashMap<Node,Node> nodes, Node root){
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         ViewQueryManager vqm = new ViewQueryManager(root);

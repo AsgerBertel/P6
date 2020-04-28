@@ -21,6 +21,10 @@ public class PerformanceTestQueryGenerator {
         }
         return queries;
     }
+
+    public static ArrayList<String> weightedRandomQueries(ArrayList<String> possibleViews, int amount, Random r){
+        return null;
+    }
     private static String selectQuery(String view){
         return "EXPLAIN (FORMAT JSON, ANALYSE) SELECT * FROM " + view;
         //todo add possibility for a where clause
