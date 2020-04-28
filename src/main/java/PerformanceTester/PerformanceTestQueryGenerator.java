@@ -22,7 +22,7 @@ public class PerformanceTestQueryGenerator {
         return queries;
     }
     private static String selectQuery(String view){
-        return "EXPLAIN ANALYSE SELECT * FROM " + view;
+        return "EXPLAIN (FORMAT JSON, ANALYSE) SELECT * FROM " + view;
         //todo add possibility for a where clause
     }
 }

@@ -17,13 +17,18 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-
+import org.json.JSONArray;
 public class PerformanceTester {
 
     final static int RANDOM_SEED = 1234;
     Random random = new Random(RANDOM_SEED);
 
     public void runAllPerformanceTests(GraphManager gm) throws IOException, SQLException {
+
+        ResultSet rs = ConnectionManager.selectSQL("EXPLAIN (FORMAT JSON, ANALYSE) SELECT * FROM toptopiccountydayopinion");
+        JSONArray jsonArray = new JSONArray(rs.getString(1));
+        double timeSpent = jsonArray.getJSONObject(1).getDouble("Execution Time");
+
         ViewGenerator vg = new ViewGenerator();
         //Runs all tests for all queries and stores them in an xls file
         LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap = new LinkedHashMap<>();
@@ -57,10 +62,10 @@ public class PerformanceTester {
     private void runPerformanceTest(ArrayList<String> queries, HSSFSheet sheet){
         int rownum = 0;
         for(String s : queries){
-            long startTime = System.currentTimeMillis();
             try {
                 ResultSet rs = ConnectionManager.selectSQL(s);
-                long timeSpent = System.currentTimeMillis() - startTime;
+                JSONArray jsonArray = new JSONArray(rs.getString(1));
+                double timeSpent = jsonArray.getJSONObject(1).getDouble("Execution Time");
                 Row row = sheet.createRow(++rownum);
                 Cell query = row.createCell(0);
                 query.setCellValue(s);
