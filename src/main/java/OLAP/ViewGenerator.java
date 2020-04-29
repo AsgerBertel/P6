@@ -105,7 +105,6 @@ public class ViewGenerator {
                 totalTimeSpent += jsonArray.getJSONObject(0).getDouble("Execution Time");
             }
         }
-        System.out.println("::::::::::::::::::::::::::::::::::::::::::");
         int i = 0;
         for(Node n : nodes.keySet()){
             //IF NONE NONE NONE NONE skip
@@ -161,9 +160,9 @@ public class ViewGenerator {
         this.gm = new GraphManager(root);
         gm.generateTree(root);
         if(type.equals(GreedyAlgorithmType.BASE)){
-            this.ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
+            this.ga = new GreedyAlgorithm(this.gm);
         }else{
-            this.ga = new GreedyPopularityAlgorithm(gm.nodes.keySet(),root);
+            this.ga = new GreedyPopularityAlgorithm(this.gm);
         }
 
     }

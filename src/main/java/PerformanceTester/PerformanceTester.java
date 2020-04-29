@@ -34,12 +34,12 @@ public class PerformanceTester {
     public void runAllPerformanceTests(GraphManager gm) throws IOException, SQLException {
         //Runs all tests for all queries and stores them in an xls file
         this.gm = gm;
-        this.ga = new GreedyAlgorithm(this.gm.nodes.keySet(),this.gm.getTopNode());
-        this.gpa = new GreedyPopularityAlgorithm(this.gm.nodes.keySet(), this.gm.getTopNode());
+        this.ga = new GreedyAlgorithm(this.gm);
+        this.gpa = new GreedyPopularityAlgorithm(this.gm);
 
         LinkedHashMap<Integer, ArrayList<QueryString>> dayQueriesMap = new LinkedHashMap<>();
         for(int i = 0; i < 2; i++){
-            dayQueriesMap.put(i,PerformanceTestQueryGenerator.weightedRandomQueries(getAllViewNamesExceptForNNNN(this.gm.nodes.keySet()),10,this.random));
+            dayQueriesMap.put(i,PerformanceTestQueryGenerator.weightedRandomQueries(getAllViewNamesExceptForNNNN(this.gm.nodes.keySet()),20,this.random));
         }
 
         //Run base and write results
@@ -124,11 +124,16 @@ public class PerformanceTester {
         for(QueryString s : queries){
             try {
                 //update view popularity
-                ResultSet rs = ConnectionManager.selectSQL(s.toString());
                 pm.updatePopularityValue(s.getViewname());
-                rs.next();
-                JSONArray jsonArray = new JSONArray(rs.getString(1));
-                double timeSpent = jsonArray.getJSONObject(0).getDouble("Execution Time");
+                //run query 3 times and get average, to minimize variation. todo set to 5 when doing actual test?
+                double totalTimeSpentOnQuery = 0;
+                for(int i = 0; i < 3; i++){
+                    ResultSet rs = ConnectionManager.selectSQL(s.toString());
+                    rs.next();
+                    JSONArray jsonArray = new JSONArray(rs.getString(1));
+                    totalTimeSpentOnQuery+= jsonArray.getJSONObject(0).getDouble("Execution Time");
+                }
+                double timeSpent = totalTimeSpentOnQuery/3;
                 totalTime+=timeSpent;
                 Row row = sheet.createRow(sheet.getLastRowNum()+1);
                 Cell query = row.createCell(0);
