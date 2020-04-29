@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainSceneController {
     SearchBarContextMenu searchBarContextMenu = new SearchBarContextMenu(this);
@@ -33,6 +34,8 @@ public class MainSceneController {
     PopularityManager popularityManager = new PopularityManager();
     private boolean isViewGenInitialised = false;
     private ViewGenerator viewGenerator = new ViewGenerator();
+    private HashMap<String,String> viewNameSumOrCountMap = new HashMap<>();
+    private boolean isUpdated = true;
 
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
@@ -114,6 +117,7 @@ public class MainSceneController {
         }
         try {
             viewGenerator.updateViews();
+            isUpdated = true;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
@@ -125,33 +129,73 @@ public class MainSceneController {
         currentSearchbar.setText(menuItem);
     }
 
+    private HashMap<String,String> extractViewNameAndAggregate(ResultSet rs) throws SQLException {
+        HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
+        while(rs.next()){
+            if(rs.getString(2).contains("AS sum")){
+                newViewNameSumOrCountMap.put(rs.getString(1),"sum");
+            }else{
+                newViewNameSumOrCountMap.put(rs.getString(1),"count");
+            }
+        }
+        return newViewNameSumOrCountMap;
+    }
+    private HashMap<String,String> getViewNameSumOrCountMap(){
+        HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
+        if(isUpdated){
+            try {
+                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNamesAndDefinitions)));
+                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNamesAndDefinitions)));
+                isUpdated = false;
+                viewNameSumOrCountMap = newViewNameSumOrCountMap;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return viewNameSumOrCountMap;
+    }
+    private String getComboString(ComboBox box){
+        if(box.getSelectionModel().getSelectedItem().toString().equals("all")){
+            return "none";
+        }
+        return box.getSelectionModel().getSelectedItem().toString();
+    }
+    private String addMeasures(){return null;}
+    private String selectQuery(String topic, String location, String date, String opinion){
+        String viewName = topic+location+date+opinion;
+        String[] array = {topic,location,date,opinion};
+        StringBuilder sb = new StringBuilder();
+        //append select
+        sb.append("SELECT ");
+        for(String s : array){
+            if(s.equals("coordinate")){
+                sb.append("lat, long,");
+            }else{
+                sb.append(s).append(",");
+            }
+        }
+        sb.append(getViewNameSumOrCountMap().get(viewName));
+        //ADD MEASURES
+        //sb.append(addMeasures());
+        sb.append(" FROM ").append(viewName);
+        return sb.toString();
+    }
     public void loadView() {
         btnSearch.setDisable(false);
         try {
-            String strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
-            if (strComboTopic.equals("all"))
-                strComboTopic = "none";
+            String strComboTopic = getComboString(this.comboTopic);
+            String strComboDate = getComboString(this.comboDate);
+            String strComboLocation = getComboString(this.comboLocation);
+            String strComboOpinion = getComboString(this.comboOpinion);
 
-            String strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
-            if (strComboDate.equals("all"))
-                strComboDate = "none";
-
-            String strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
-            if (strComboLocation.equals("all"))
-                strComboLocation = "none";
-
-            String strComboOpinion = comboOpinion.getSelectionModel().getSelectedItem().toString();
-            if (strComboOpinion.equals("all"))
-                strComboOpinion = "none";
-
-            String viewQuery = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion);
-            String viewQueryWhereFirst = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion) + " WHERE ";
+            String viewQuery = selectQuery(strComboTopic,strComboLocation,strComboDate,strComboOpinion);
+            String viewQueryWhereFirst = selectQuery(strComboTopic,strComboLocation,strComboDate,strComboOpinion) + " WHERE ";
             String viewQueryWhereSecond = "";
 
             popularityManager.updatePopularityValue((strComboTopic + strComboLocation + strComboDate + strComboOpinion).trim());
             boolean isWhere = false;
             if (txtTopic.getText().trim().isEmpty() && txtDate.getText().trim().isEmpty() && txtLocation.getText().trim().isEmpty() && txtOpinion.getText().trim().isEmpty()) {
-                viewQuery = QueryManager.selectView(strComboTopic + strComboLocation + strComboDate + strComboOpinion);
+                viewQuery = selectQuery(strComboTopic,strComboLocation,strComboDate,strComboOpinion);
                 isWhere = false;
             }
             if (!txtLocation.getText().trim().isEmpty() || !txtLocation.getText().isEmpty()) {
