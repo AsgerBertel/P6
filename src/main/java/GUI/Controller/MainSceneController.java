@@ -34,7 +34,7 @@ public class MainSceneController {
     PopularityManager popularityManager = new PopularityManager();
     private boolean isViewGenInitialised = false;
     private ViewGenerator viewGenerator = new ViewGenerator();
-    private HashMap<String,String> viewNameSumOrCountMap = new HashMap<>();
+    private HashMap<String, String> viewNameSumOrCountMap = new HashMap<>();
     private boolean isUpdated = true;
 
     @FXML
@@ -129,20 +129,21 @@ public class MainSceneController {
         currentSearchbar.setText(menuItem);
     }
 
-    private HashMap<String,String> extractViewNameAndAggregate(ResultSet rs) throws SQLException {
+    private HashMap<String, String> extractViewNameAndAggregate(ResultSet rs) throws SQLException {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
-        while(rs.next()){
-            if(rs.getString(2).contains("AS sum")){
-                newViewNameSumOrCountMap.put(rs.getString(1),"sum");
-            }else{
-                newViewNameSumOrCountMap.put(rs.getString(1),"count");
+        while (rs.next()) {
+            if (rs.getString(2).contains("AS sum")) {
+                newViewNameSumOrCountMap.put(rs.getString(1), "sum");
+            } else {
+                newViewNameSumOrCountMap.put(rs.getString(1), "count");
             }
         }
         return newViewNameSumOrCountMap;
     }
-    private HashMap<String,String> getViewNameSumOrCountMap(){
+
+    private HashMap<String, String> getViewNameSumOrCountMap() {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
-        if(isUpdated){
+        if (isUpdated) {
             try {
                 newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNamesAndDefinitions)));
                 newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNamesAndDefinitions)));
@@ -154,23 +155,28 @@ public class MainSceneController {
         }
         return viewNameSumOrCountMap;
     }
-    private String getComboString(ComboBox box){
-        if(box.getSelectionModel().getSelectedItem().toString().equals("all")){
+
+    private String getComboString(ComboBox box) {
+        if (box.getSelectionModel().getSelectedItem().toString().equals("all")) {
             return "none";
         }
         return box.getSelectionModel().getSelectedItem().toString();
     }
-    private String addMeasures(){return null;}
-    private String selectQuery(String topic, String location, String date, String opinion){
-        String viewName = topic+location+date+opinion;
-        String[] array = {topic,location,date,opinion};
+
+    private String addMeasures() {
+        return null;
+    }
+
+    private String selectQuery(String topic, String location, String date, String opinion) {
+        String viewName = topic + location + date + opinion;
+        String[] array = {topic, location, date, opinion};
         StringBuilder sb = new StringBuilder();
         //append select
         sb.append("SELECT ");
-        for(String s : array){
-            if(s.equals("coordinate")){
+        for (String s : array) {
+            if (s.equals("coordinate")) {
                 sb.append("lat, long,");
-            }else{
+            } else {
                 sb.append(s).append(",");
             }
         }
@@ -180,6 +186,7 @@ public class MainSceneController {
         sb.append(" FROM ").append(viewName);
         return sb.toString();
     }
+
     public void loadView() {
         btnSearch.setDisable(false);
         try {
@@ -188,14 +195,14 @@ public class MainSceneController {
             String strComboLocation = getComboString(this.comboLocation);
             String strComboOpinion = getComboString(this.comboOpinion);
 
-            String viewQuery = selectQuery(strComboTopic,strComboLocation,strComboDate,strComboOpinion);
-            String viewQueryWhereFirst = selectQuery(strComboTopic,strComboLocation,strComboDate,strComboOpinion) + " WHERE ";
+            String viewQuery = selectQuery(strComboTopic, strComboLocation, strComboDate, strComboOpinion);
+            String viewQueryWhereFirst = selectQuery(strComboTopic, strComboLocation, strComboDate, strComboOpinion) + " WHERE ";
             String viewQueryWhereSecond = "";
 
             popularityManager.updatePopularityValue((strComboTopic + strComboLocation + strComboDate + strComboOpinion).trim());
             boolean isWhere = false;
             if (txtTopic.getText().trim().isEmpty() && txtDate.getText().trim().isEmpty() && txtLocation.getText().trim().isEmpty() && txtOpinion.getText().trim().isEmpty()) {
-                viewQuery = selectQuery(strComboTopic,strComboLocation,strComboDate,strComboOpinion);
+                viewQuery = selectQuery(strComboTopic, strComboLocation, strComboDate, strComboOpinion);
                 isWhere = false;
             }
             if (!txtLocation.getText().trim().isEmpty() || !txtLocation.getText().isEmpty()) {
@@ -294,7 +301,7 @@ public class MainSceneController {
 
             if (indexLocation == -1)
                 indexLocation = index;
-            else{
+            else {
                 indexLocation -= 1;
             }
             index -= 1;
@@ -315,25 +322,7 @@ public class MainSceneController {
         }
 
         if (!txtDrillDate.getText().isEmpty()) {
-            index = dateDimension.indexOf(strComboDate);
-            if (indexDate == -1)
-                indexDate = index;
-            else
-                indexDate -= 1;
-
-            index -= 1;
-            comboDate.setValue(dateDimension.get(index));
-            if (index >= 0) {
-                viewName += dateDimension.get(index);
-                innerJoinQueryDateFirst = " INNER JOIN cube." + dateDimension.get(indexDate) + " ON " + dateDimension.get(indexDate) + "." + dateDimension.get(indexDate) + "id = ";
-                innerJoinQueryDateSecond = "." + dateDimension.get(indexDate) + "id";
-                if (isWhere)
-                    whereQuery += " AND " + dateDimension.get(indexDate) + "." + dateDimension.get(indexDate) + " =" + "'" + txtDrillDate.getText() + "'";
-                else
-                    whereQuery += dateDimension.get(indexDate) + "." + dateDimension.get(indexDate) + " =" + "" + txtDrillDate.getText() + "";
-                strComboDate = dateDimension.get(index);
-
-            }
+          whereQuery+=  modifyDrillQuery(viewName, innerJoinQueryDateFirst, innerJoinQueryDateSecond, isWhere, whereQuery,dateDimension,txtDate,strComboDate,comboDate);
 
         } else {
             viewName += strComboDate;
@@ -382,6 +371,29 @@ public class MainSceneController {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+    }
+
+    private String modifyDrillQuery(String viewName, String innerJoinQueryDateFirst, String innerJoinQueryDateSecond, boolean isWhere, String whereQuery,ArrayList <String>dimension, TextField txtDrill,String strCombo ,ComboBox combo) {
+        index = dimension.indexOf(strCombo);
+        if (indexDate == -1)
+            indexDate = index;
+        else
+            indexDate -= 1;
+
+        index -= 1;
+        combo.setValue(dimension.get(index));
+        if (index >= 0) {
+            viewName += dimension.get(index);
+            innerJoinQueryDateFirst = " INNER JOIN cube." + dimension.get(indexDate) + " ON " + dimension.get(indexDate) + "." + dimension.get(indexDate) + "id = ";
+            innerJoinQueryDateSecond = "." + dimension.get(indexDate) + "id";
+            if (isWhere)
+                whereQuery += " AND " + dimension.get(indexDate) + "." + dimension.get(indexDate) + " =" + "'" + txtDrill.getText() + "'";
+            else
+                whereQuery += dimension.get(indexDate) + "." + dimension.get(indexDate) + " =" + "" + txtDrill.getText() + "";
+            strCombo = dimension.get(index);
+
+        }
+        return whereQuery;
     }
 
     private void initializeOpinionOnKeyPressedEvent(ComboBox comboOpinion) {
