@@ -19,6 +19,8 @@ public class QueryManager {
     public static String selectAllVirtualViewNames = "SELECT viewname from cubefrequency.pg_catalog.pg_views WHERE schemaname = 'public'";
     public static String selectAllMaterializedlViewNames = "SELECT matviewname from cubefrequency.pg_catalog.pg_matviews WHERE schemaname = 'public'";
     public static String deleteContentsTablePopularity = "DELETE FROM cubefrequency.cube.popularity";
+    public static String selectAllVirtualViewNamesAndDefinitions = "SELECT viewname, definition from cubefrequency.pg_catalog.pg_views WHERE schemaname = 'public'";
+    public static String selectAllMaterializedlViewNamesAndDefinitions = "SELECT matviewname, definition from cubefrequency.pg_catalog.pg_matviews WHERE schemaname = 'public'";
 
     public static String dropMaterializedView(String viewname){
         return "drop materialized view cubefrequency.public." + viewname + " cascade";
