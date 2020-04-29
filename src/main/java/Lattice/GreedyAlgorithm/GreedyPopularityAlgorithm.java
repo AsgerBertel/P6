@@ -1,5 +1,6 @@
 package Lattice.GreedyAlgorithm;
 
+import Lattice.GraphManager;
 import Lattice.Node;
 import OLAP.NodeQueryUtils;
 import Sql.ConnectionManager;
@@ -11,26 +12,24 @@ import java.util.*;
 
 public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
     private double scale = 1;
-    LinkedHashMap<String, Integer> popularityNodeMap;
 
-    public GreedyPopularityAlgorithm(Set<Node> nodes, Node rootNode) {
-        super(nodes, rootNode);
-        try {
-            popularityNodeMap = FillNodePopularityMap(nodes);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+    public GreedyPopularityAlgorithm(GraphManager gm) {
+        super(gm);
     }
 
     @Override
     public void updateCurrentBenefit() {
-        updateBenefitScale();
+        try {
+            updateBenefitScale();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         super.updateCurrentBenefit();
     }
 
-    private void updateBenefitScale() {
+    private void updateBenefitScale() throws SQLException {
         LinkedHashMap<Node, Integer> sortedNodePopularityMap = new LinkedHashMap<>();
-        LinkedHashMap<Node, Integer> unsortedNodePopularityMap = ViewManager.getNodeReferencesFromViews(popularityNodeMap, nodes);
+        LinkedHashMap<Node, Integer> unsortedNodePopularityMap = ViewManager.getNodeReferencesFromViews(this.fillNodePopularityMap(), this.gm.nodes.keySet());
         unsortedNodePopularityMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sortedNodePopularityMap.put(entry.getKey(), entry.getValue()));
@@ -67,7 +66,7 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
     }
 
 
-    private LinkedHashMap<String, Integer> FillNodePopularityMap(Set<Node> setOfNodes) throws SQLException {
+    private LinkedHashMap<String, Integer> fillNodePopularityMap() throws SQLException {
         LinkedHashMap<String, Integer> viewPopularityMap = new LinkedHashMap<>();
         ResultSet resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
         ArrayList<ViewPopularity> listOfViews = new ArrayList<>();
@@ -94,7 +93,7 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         for (ViewPopularity v : listOfViews) {
             viewPopularityMap.put(v.getName(), v.calculatePopularityValue());
         }
-        for (Node n : nodes) {
+        for (Node n : this.gm.nodes.keySet()) {
             if (!viewPopularityMap.containsKey(NodeQueryUtils.getNodeViewName(n))) {
                 viewPopularityMap.put(NodeQueryUtils.getNodeViewName(n),0);
             }
