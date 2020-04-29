@@ -16,29 +16,31 @@ import java.util.*;
 
 public class GreedyAlgorithm {
     //When we find our own benefit calculation model, this should probably be a double value
-    LinkedHashMap<Node, Double> benefitValueTree = new LinkedHashMap<>();
+    public LinkedHashMap<Node, Double> benefitValueTree = new LinkedHashMap<>();
     LinkedHashSet<Node> materializedNodes = new LinkedHashSet<>();
-    Set<Node> nodes;
+    GraphManager gm;
     Node rootNode;
 
-    public GreedyAlgorithm(Set<Node> nodes, Node rootNode){
-        this.nodes = nodes;
-        this.rootNode = rootNode;
+    public GreedyAlgorithm(GraphManager gm){
+        this.gm = gm;
+        this.rootNode = gm.getTopNode();
     }
 
     public void resetNodes(){
         //resets all nodes
-        for(Node n : this.nodes){
+        benefitValueTree = new LinkedHashMap<>();
+        materializedNodes = new LinkedHashSet<>();
+        for(Node n : this.gm.nodes.keySet()){
             n.setMaterialised(false);
             n.setMaterializedUpperNode(null);
             n.setScale(1);
         }
     }
 
-    public HashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
+    public LinkedHashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
         initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
-            printBenefitTree();
+            //printBenefitTree();
             selectHighestBenefit();
             updateCurrentBenefit();
 
@@ -56,7 +58,6 @@ public class GreedyAlgorithm {
             }
         }
         materializedNodes.add(bestNode);
-        assert bestNode != null;
         bestNode.setMaterialised(true);
         updateActualCost(bestNode);
 
@@ -64,7 +65,7 @@ public class GreedyAlgorithm {
 
     private void updateActualCost(Node n){
         n.setActualCost(n.getViewSize());
-        for(Node child: BFS_GetSubGraph(nodes, n)){
+        for(Node child: BFS_GetSubGraph(this.gm.nodes.keySet(), n)){
             if(child.getActualCost().compareTo(n.getActualCost()) > 0){
                 child.setActualCost(n.getViewSize());
                 child.setMaterializedUpperNode(n);
@@ -72,14 +73,16 @@ public class GreedyAlgorithm {
             }
         }
     }
-    private void initializeGraph() throws SQLException {
-        calculateInitialValue(rootNode, nodes);
+    public void initializeGraph() throws SQLException {
+        //reset in case we've already calculated once
+        resetNodes();
+        calculateInitialValue(rootNode, this.gm.nodes.keySet());
         updateCurrentBenefit();
     }
 
     public void updateCurrentBenefit(){
-        for(Node n: nodes){
-            benefitValueTree.put(n,getBenefit(nodes,n));
+        for(Node n: this.gm.nodes.keySet()){
+            benefitValueTree.put(n,getBenefit(this.gm.nodes.keySet(),n));
         }
     }
 

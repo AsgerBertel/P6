@@ -10,6 +10,7 @@ import Lattice.Node;
 import OLAP.ViewGeneration.ViewQueryManager;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
+import org.json.JSONArray;
 
 import java.math.BigInteger;
 import java.sql.ResultSet;
@@ -21,6 +22,10 @@ public class ViewGenerator {
     GreedyAlgorithm ga;
     GraphManager gm;
     Node root;
+
+    public void setGa(GreedyAlgorithm ga) {
+        this.ga = ga;
+    }
 
     public void generateOnlyVirtualViews(LinkedHashMap<Node,Node> nodes, Node root){
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
@@ -79,18 +84,25 @@ public class ViewGenerator {
         }
 
     }
-    public void generateViews(LinkedHashMap<Node,Node> nodes, Node root) throws SQLException {
+    public double generateViews(LinkedHashMap<Node,Node> nodes, Node root) throws SQLException {
         deleteViews(nodes);
         //We should only drop views that
         ViewQueryManager vqm = new ViewQueryManager(root);
         boolean isNNNN = false;
         ArrayList<String> matViews = getMaterialisedViewNames();
+        double totalTimeSpent = 0;
+        System.out.println("matview names");
         for(Node n : nodes.keySet()){
             if(matViews.contains(NodeQueryUtils.getNodeViewName(n).toLowerCase())){
+                System.out.println(NodeQueryUtils.getNodeViewName(n));
                 continue;
             }
             if(n.isMaterialised()){
-                ConnectionManager.updateSql(vqm.createView(n));
+                System.out.println(NodeQueryUtils.getNodeViewName(n));
+                ResultSet rs = ConnectionManager.selectSQL("EXPLAIN (FORMAT JSON, ANALYSE) "+ vqm.createView(n));
+                rs.next();
+                JSONArray jsonArray = new JSONArray(rs.getString(1));
+                totalTimeSpent += jsonArray.getJSONObject(0).getDouble("Execution Time");
             }
         }
         int i = 0;
@@ -109,7 +121,8 @@ public class ViewGenerator {
                 ConnectionManager.updateSql(vqm.createView(n));
             }
         }
-        System.out.println("finished creating views");
+        System.out.println("Created views in " + totalTimeSpent + "ms");
+        return totalTimeSpent;
     }
 
     public void init(GreedyAlgorithmType type){
@@ -147,9 +160,9 @@ public class ViewGenerator {
         this.gm = new GraphManager(root);
         gm.generateTree(root);
         if(type.equals(GreedyAlgorithmType.BASE)){
-            this.ga = new GreedyAlgorithm(gm.nodes.keySet(),root);
+            this.ga = new GreedyAlgorithm(this.gm);
         }else{
-            this.ga = new GreedyPopularityAlgorithm(gm.nodes.keySet(),root);
+            this.ga = new GreedyPopularityAlgorithm(this.gm);
         }
 
     }

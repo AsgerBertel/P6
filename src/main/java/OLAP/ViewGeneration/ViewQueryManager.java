@@ -64,6 +64,14 @@ public class ViewQueryManager {
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append(",");
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
             }
+            try{
+                Level descendantLevel = d.getDescendant(l);
+                if(descendantLevel.getName().equals("None")){
+                    continue;
+                }
+                sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(descendantLevel.getName()).append("id").append(",");
+            }catch (Exception e ){
+            }
         }
         String s = sb.toString();
         if(s.substring(s.length()-1).equals(",")){
@@ -158,10 +166,21 @@ public class ViewQueryManager {
                 sb.append(CUBE_PREFIX + "coordinate.lat,");
                 sb.append(CUBE_PREFIX + "coordinate.long,");
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
+
             } else{
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append(",");
                 sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(l.getName()).append("id").append(",");
             }
+            //add descendant id
+            try{
+                Level descendantLevel = d.getDescendant(l);
+                if(descendantLevel.getName().equals("None")){
+                    continue;
+                }
+                sb.append(CUBE_PREFIX).append(l.getName()).append(".").append(descendantLevel.getName()).append("id").append(",");
+            }catch (Exception e ){
+            }
+
         }
         //Select count/sum
         sb.append(aggregateFunction(n));

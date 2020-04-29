@@ -1,12 +1,16 @@
 import Lattice.Dimension;
 import Lattice.GraphManager;
 import Lattice.GreedyAlgorithm.GreedyAlgorithm;
+import Lattice.GreedyAlgorithm.GreedyPopularityAlgorithm;
 import Lattice.Level;
 import Lattice.Node;
+import Sql.ConnectionManager;
+import Sql.QueryManager;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -20,19 +24,19 @@ public class LatticeGraphTests {
     Level d4opinion,d4none;
     @Before
     public void init(){
-        d1prod = new Level("TopTopics", new BigInteger(String.valueOf(70)));
+        d1prod = new Level("toptopic", new BigInteger(String.valueOf(70)));
         d1none = new Level("None", new BigInteger(String.valueOf(1)));
-        d2loc = new Level("Coordinate", new BigInteger(String.valueOf(3861358)));
-        d2dis = new Level("District", new BigInteger(String.valueOf(143)));
-        d2county = new Level("County", new BigInteger(String.valueOf(15)));
-        d2cit = new Level("City", new BigInteger(String.valueOf(2)));
-        d2country = new Level("Country", new BigInteger(String.valueOf(1)));
+        d2loc = new Level("coordinate", new BigInteger(String.valueOf(3861358)));
+        d2dis = new Level("district", new BigInteger(String.valueOf(143)));
+        d2county = new Level("county", new BigInteger(String.valueOf(15)));
+        d2cit = new Level("city", new BigInteger(String.valueOf(2)));
+        d2country = new Level("country", new BigInteger(String.valueOf(1)));
         d2none = new Level("None", new BigInteger(String.valueOf(1)));
-        d3day = new Level("Day", new BigInteger(String.valueOf(19)));
-        d3month = new Level("Month", new BigInteger(String.valueOf(3)));
-        d3year = new Level("Year", new BigInteger(String.valueOf(1)));
+        d3day = new Level("day", new BigInteger(String.valueOf(19)));
+        d3month = new Level("month", new BigInteger(String.valueOf(3)));
+        d3year = new Level("year", new BigInteger(String.valueOf(1)));
         d3none = new Level("None", new BigInteger(String.valueOf(1)));
-        d4opinion = new Level("Opinion", new BigInteger(String.valueOf(3)));
+        d4opinion = new Level("opinion", new BigInteger(String.valueOf(3)));
         d4none = new Level("None", new BigInteger(String.valueOf(1)));
         d1 = new Dimension(new Level[]{d1prod,d1none});
         d2 = new Dimension(new Level[]{d2loc,d2dis,d2county,d2cit,d2country,d2none});
@@ -153,6 +157,35 @@ public class LatticeGraphTests {
         assertEquals(totalCost, root.getActualCost());
     }
     */
+    @Test
+    public void identicalBenefitTreeTest() throws SQLException {
+        //Given two greedy algos (pop and base) we check that given no popularity, they give identical results
+        //Generate the lattice graph
+        Node root = new Node(new Object[][]{
+                {d1,d1prod},
+                {d2,d2loc},
+                {d3,d3day},
+                {d4,d4opinion}
+        });
+        GraphManager gm = new GraphManager(root);
+        gm.generateTree(root);
+        GreedyAlgorithm ga = new GreedyAlgorithm(gm);
+        GreedyPopularityAlgorithm gpa = new GreedyPopularityAlgorithm(gm);
+
+        LinkedHashMap<Node,Double> gaBnf,gpaBnf;
+        ga.initializeGraph();
+        gaBnf = ga.benefitValueTree;
+        gpa.initializeGraph();
+        gpaBnf = gpa.benefitValueTree;
+        assertEquals(gpaBnf,gaBnf);
+
+        LinkedHashSet<Node> gaSet = ga.materializeNodes(5);
+        //empty popularity table
+        ConnectionManager.updateSql(QueryManager.deleteContentsTablePopularity);
+        LinkedHashSet<Node> gpaSet = gpa.materializeNodes(5);
+        assertEquals(gaSet,gpaSet);
+        //tree is now generated so we run the base greedy algorithm and save the results
+    }
 
 }
 
