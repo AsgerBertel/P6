@@ -64,6 +64,18 @@ public class MainSceneController {
     int indexOpinion = -1;
     int indexTopic = -1;
 
+    String viewName = "";
+    String selectQuery = "SELECT * FROM ";
+    String innerJoinQueryLocationFirst = "";
+    String innerJoinQueryLocationSecond = "";
+    String innerJoinQueryDateFirst = "";
+    String innerJoinQueryDateSecond = "";
+    String innerJoinQueryOpinionFirst = "";
+    String innerJoinQueryOpinionSecond = "";
+    String innerJoinQueryTopicFirst = "";
+    String innerJoinQueryTopicSecond = "";
+    String whereQuery = " WHERE ";
+
     public void initialize() {
         locationDimension.addAll(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country"));
         dateDimension.addAll(FXCollections.observableArrayList("day", "month", "year"));
@@ -244,108 +256,50 @@ public class MainSceneController {
         strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
         strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
 
-        String strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
+        strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
         if (strComboTopic.equals("all"))
             strComboTopic = "none";
 
-        String strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
+        strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
         if (strComboDate.equals("all"))
             strComboDate = "none";
 
-        String strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
+        strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
         if (strComboLocation.equals("all"))
             strComboLocation = "none";
 
-        String strComboOpinion = comboOpinion.getSelectionModel().getSelectedItem().toString();
+        strComboOpinion = comboOpinion.getSelectionModel().getSelectedItem().toString();
         if (strComboOpinion.equals("all"))
             strComboOpinion = "none";
 
-        String viewName = "";
-        String selectQuery = "SELECT * FROM ";
-        String innerJoinQueryLocationFirst = "";
-        String innerJoinQueryLocationSecond = "";
-        String innerJoinQueryDateFirst = "";
-        String innerJoinQueryDateSecond = "";
-        String innerJoinQueryOpinionFirst = "";
-        String innerJoinQueryOpinionSecond = "";
-        String innerJoinQueryTopicFirst = "";
-        String innerJoinQueryTopicSecond = "";
-        String whereQuery = " WHERE ";
+
         boolean isWhere = false;
 
 
         if (!txtDrillTopic.getText().isEmpty()) {
-            index = topicDimension.indexOf(strComboTopic);
-            if (indexTopic == -1)
-                indexTopic = index;
-            else
-                indexTopic -= 1;
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, topicDimension, txtDrillTopic.getText(), strComboTopic, comboTopic,indexTopic);
 
-            index -= 1;
-            comboTopic.setValue(topicDimension.get(index));
-            if (index >= 0) {
-                viewName += topicDimension.get(index);
-                innerJoinQueryTopicFirst = " INNER JOIN cube." + topicDimension.get(indexTopic) + " ON " + topicDimension.get(indexTopic) + "." + topicDimension.get(index + 1) + "id = ";
-                innerJoinQueryTopicSecond = topicDimension.get(indexTopic) + "." + topicDimension.get(indexTopic) + "id";
-
-                whereQuery += topicDimension.get(indexTopic) + " = " + "'" + txtDrillTopic.getText() + "'";
-                isWhere = true;
-            }
 
         } else {
             viewName += strComboTopic;
         }
 
         if (!txtDrillLocation.getText().isEmpty()) {
-            index = locationDimension.indexOf(strComboLocation);
-
-            if (indexLocation == -1)
-                indexLocation = index;
-            else {
-                indexLocation -= 1;
-            }
-            index -= 1;
-            comboLocation.setValue(locationDimension.get(index));
-            if (index >= 0) {
-                viewName += locationDimension.get(index);
-                innerJoinQueryLocationFirst = " INNER JOIN cube." + locationDimension.get(indexLocation) + " ON " + locationDimension.get(indexLocation) + "." + locationDimension.get(indexLocation) + "id = ";
-                innerJoinQueryLocationSecond = "." + locationDimension.get(indexLocation) + "id";
-                if (isWhere)
-                    whereQuery += " AND " + locationDimension.get(indexLocation) + "." + locationDimension.get(indexLocation) + " = " + "'" + txtDrillLocation.getText() + "'";
-                else
-                    whereQuery += locationDimension.get(indexLocation) + "." + locationDimension.get(indexLocation) + " = " + "'" + txtDrillLocation.getText() + "'";
-                strComboLocation = locationDimension.get(index);
-            }
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, locationDimension, txtDrillLocation.getText(), strComboLocation, comboLocation,indexLocation);
 
         } else {
             viewName += strComboLocation;
         }
 
         if (!txtDrillDate.getText().isEmpty()) {
-          whereQuery+=  modifyDrillQuery(viewName, innerJoinQueryDateFirst, innerJoinQueryDateSecond, isWhere, whereQuery,dateDimension,txtDate,strComboDate,comboDate);
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, dateDimension, txtDrillDate.getText(), strComboDate, comboDate,indexDate);
 
         } else {
             viewName += strComboDate;
         }
 
         if (!txtDrillOpinion.getText().isEmpty()) {
-            index = opinionDimension.indexOf(strComboOpinion);
-            if (indexOpinion == -1)
-                indexOpinion = index;
-            else
-                indexOpinion -= 1;
-            index -= 1;
-            comboOpinion.setValue(opinionDimension.get(index));
-            if (index >= 0) {
-                viewName += opinionDimension.get(index);
-                innerJoinQueryOpinionFirst = " INNER JOIN cube." + opinionDimension.get(indexOpinion) + " ON " + opinionDimension.get(indexOpinion) + "." + opinionDimension.get(indexOpinion) + "id = ";
-                innerJoinQueryOpinionSecond = "." + opinionDimension.get(index) + "id";
-                if (isWhere)
-                    whereQuery += " AND " + opinionDimension.get(indexOpinion) + "." + opinionDimension.get(indexOpinion) + " =" + "'" + txtDrillOpinion.getText() + "'";
-                else
-                    whereQuery += opinionDimension.get(indexOpinion) + "." + opinionDimension.get(indexOpinion) + " =" + "'" + txtDrillOpinion.getText() + "'";
-                strComboOpinion = opinionDimension.get(index);
-            }
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, opinionDimension, txtDrillOpinion.getText(), strComboOpinion, comboOpinion,indexOpinion);
 
         } else {
             viewName += strComboOpinion;
@@ -368,31 +322,51 @@ public class MainSceneController {
         try {
             resultSet = ConnectionManager.selectSQL(selectQuery + viewName + locationInnerJoin + dateInnerJoin + opinionInnerJoin + topicInnerJoin + whereQuery);
             buildTable(resultSet);
+            txtDrillOpinion.clear();
+            txtDrillTopic.clear();
+            txtDrillDate.clear();
+            txtDrillLocation.clear();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        resetGlobalVariables();
+
     }
 
-    private String modifyDrillQuery(String viewName, String innerJoinQueryDateFirst, String innerJoinQueryDateSecond, boolean isWhere, String whereQuery,ArrayList <String>dimension, TextField txtDrill,String strCombo ,ComboBox combo) {
+    public void resetGlobalVariables() {
+        viewName = "";
+         selectQuery = "SELECT * FROM ";
+         innerJoinQueryLocationFirst = "";
+         innerJoinQueryLocationSecond = "";
+         innerJoinQueryDateFirst = "";
+         innerJoinQueryDateSecond = "";
+         innerJoinQueryOpinionFirst = "";
+         innerJoinQueryOpinionSecond = "";
+         innerJoinQueryTopicFirst = "";
+         innerJoinQueryTopicSecond = "";
+         whereQuery = " WHERE ";
+    }
+
+    private String modifyDrillQuery(boolean isWhere, String whereQuery, ArrayList<String> dimension, String drillTextFieldText, String strCombo, ComboBox combo, int IndexForDimension) {
         index = dimension.indexOf(strCombo);
-        if (indexDate == -1)
-            indexDate = index;
+        if (IndexForDimension == -1)
+            IndexForDimension = index;
         else
-            indexDate -= 1;
+            IndexForDimension -= 1;
 
         index -= 1;
         combo.setValue(dimension.get(index));
         if (index >= 0) {
             viewName += dimension.get(index);
-            innerJoinQueryDateFirst = " INNER JOIN cube." + dimension.get(indexDate) + " ON " + dimension.get(indexDate) + "." + dimension.get(indexDate) + "id = ";
-            innerJoinQueryDateSecond = "." + dimension.get(indexDate) + "id";
+            innerJoinQueryDateFirst = " INNER JOIN cube." + dimension.get(IndexForDimension) + " ON " + dimension.get(IndexForDimension) + "." + dimension.get(IndexForDimension) + "id = ";
+            innerJoinQueryDateSecond = "." + dimension.get(IndexForDimension) + "id";
             if (isWhere)
-                whereQuery += " AND " + dimension.get(indexDate) + "." + dimension.get(indexDate) + " =" + "'" + txtDrill.getText() + "'";
+                whereQuery += " AND " + dimension.get(IndexForDimension) + "." + dimension.get(IndexForDimension) + " =" + "'" + drillTextFieldText + "'";
             else
-                whereQuery += dimension.get(indexDate) + "." + dimension.get(indexDate) + " =" + "" + txtDrill.getText() + "";
+                whereQuery += dimension.get(IndexForDimension) + "." + dimension.get(IndexForDimension) + " =" + "'" + drillTextFieldText + "'";
             strCombo = dimension.get(index);
-
         }
+
         return whereQuery;
     }
 
