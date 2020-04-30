@@ -276,34 +276,29 @@ public class MainSceneController {
         boolean isWhere = false;
 
 
-        if (!txtDrillTopic.getText().isEmpty()) {
-            whereQuery = modifyDrillQuery(isWhere, whereQuery, topicDimension, txtDrillTopic.getText(), strComboTopic, comboTopic,indexTopic);
-
-
-        } else {
+        if (!txtDrillTopic.getText().isEmpty())
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, topicDimension, txtDrillTopic.getText(), strComboTopic, comboTopic, indexTopic);
+        else
             viewName += strComboTopic;
-        }
 
-        if (!txtDrillLocation.getText().isEmpty()) {
-            whereQuery = modifyDrillQuery(isWhere, whereQuery, locationDimension, txtDrillLocation.getText(), strComboLocation, comboLocation,indexLocation);
 
-        } else {
+        if (!txtDrillLocation.getText().isEmpty())
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, locationDimension, txtDrillLocation.getText(), strComboLocation, comboLocation, indexLocation);
+        else
             viewName += strComboLocation;
-        }
 
-        if (!txtDrillDate.getText().isEmpty()) {
-            whereQuery = modifyDrillQuery(isWhere, whereQuery, dateDimension, txtDrillDate.getText(), strComboDate, comboDate,indexDate);
 
-        } else {
+        if (!txtDrillDate.getText().isEmpty())
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, dateDimension, txtDrillDate.getText(), strComboDate, comboDate, indexDate);
+        else
             viewName += strComboDate;
-        }
 
-        if (!txtDrillOpinion.getText().isEmpty()) {
-            whereQuery = modifyDrillQuery(isWhere, whereQuery, opinionDimension, txtDrillOpinion.getText(), strComboOpinion, comboOpinion,indexOpinion);
 
-        } else {
+        if (!txtDrillOpinion.getText().isEmpty())
+            whereQuery = modifyDrillQuery(isWhere, whereQuery, opinionDimension, txtDrillOpinion.getText(), strComboOpinion, comboOpinion, indexOpinion);
+        else
             viewName += strComboOpinion;
-        }
+
         String locationInnerJoin = "";
         String dateInnerJoin = "";
         String opinionInnerJoin = "";
@@ -335,16 +330,16 @@ public class MainSceneController {
 
     public void resetGlobalVariables() {
         viewName = "";
-         selectQuery = "SELECT * FROM ";
-         innerJoinQueryLocationFirst = "";
-         innerJoinQueryLocationSecond = "";
-         innerJoinQueryDateFirst = "";
-         innerJoinQueryDateSecond = "";
-         innerJoinQueryOpinionFirst = "";
-         innerJoinQueryOpinionSecond = "";
-         innerJoinQueryTopicFirst = "";
-         innerJoinQueryTopicSecond = "";
-         whereQuery = " WHERE ";
+        selectQuery = "SELECT * FROM ";
+        innerJoinQueryLocationFirst = "";
+        innerJoinQueryLocationSecond = "";
+        innerJoinQueryDateFirst = "";
+        innerJoinQueryDateSecond = "";
+        innerJoinQueryOpinionFirst = "";
+        innerJoinQueryOpinionSecond = "";
+        innerJoinQueryTopicFirst = "";
+        innerJoinQueryTopicSecond = "";
+        whereQuery = " WHERE ";
     }
 
     private String modifyDrillQuery(boolean isWhere, String whereQuery, ArrayList<String> dimension, String drillTextFieldText, String strCombo, ComboBox combo, int IndexForDimension) {
