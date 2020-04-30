@@ -34,8 +34,9 @@ public class MainSceneController {
     PopularityManager popularityManager = new PopularityManager();
     private boolean isViewGenInitialised = false;
     private ViewGenerator viewGenerator = new ViewGenerator();
-    private HashMap<String, String> viewNameSumOrCountMap = new HashMap<>();
+    private HashMap<String,String> viewNameSumOrCountMap = new HashMap<>();
     private boolean isUpdated = true;
+    private ArrayList<ViewDimension> viewDimensions = new ArrayList<>();
 
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
@@ -92,6 +93,12 @@ public class MainSceneController {
         initializeLocationOnKeyPressedEvent(comboLocation);
         initializeateDateOnKeyPressedEvent(comboDate);
         tableViewLeft.setItems(data);
+
+        //ViewDimensions ORDER IS VERY IMPORTANT
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.TOPIC,comboTopic,txtDrillTopic,txtTopic));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.LOCATION,comboLocation,txtDrillLocation,txtLocation));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.DATE,comboDate,txtDrillDate,txtDate));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.OPINION,comboOpinion,txtDrillOpinion,txtOpinion));
     }
 
     public void buildTable(ResultSet resultSet_Tableview) throws SQLException {
@@ -167,29 +174,25 @@ public class MainSceneController {
         }
         return viewNameSumOrCountMap;
     }
-
-    private String getComboString(ComboBox box) {
-        if (box.getSelectionModel().getSelectedItem().toString().equals("all")) {
-            return "none";
+    private String addMeasures(){return null;}
+    private String getCurrView(){
+        StringBuilder sb = new StringBuilder();
+        for(ViewDimension vd : viewDimensions){
+            sb.append(vd.getComboBoxText());
         }
-        return box.getSelectionModel().getSelectedItem().toString();
+        return sb.toString();
     }
-
-    private String addMeasures() {
-        return null;
-    }
-
-    private String selectQuery(String topic, String location, String date, String opinion) {
-        String viewName = topic + location + date + opinion;
-        String[] array = {topic, location, date, opinion};
+    private String selectQuery(){
+        String viewName = getCurrView();
         StringBuilder sb = new StringBuilder();
         //append select
         sb.append("SELECT ");
-        for (String s : array) {
-            if (s.equals("coordinate")) {
+        for(ViewDimension vd : viewDimensions){
+            if(vd.getComboBoxText().equals("coordinate")){
                 sb.append("lat, long,");
-            } else {
-                sb.append(s).append(",");
+            }else{
+                if(!vd.getComboBoxText().equals("none"))
+                    sb.append(vd.getComboBoxText()).append(",");
             }
         }
         sb.append(getViewNameSumOrCountMap().get(viewName));
@@ -198,48 +201,35 @@ public class MainSceneController {
         sb.append(" FROM ").append(viewName);
         return sb.toString();
     }
-
+    private boolean hasWhereContent(){
+        for(ViewDimension vd : viewDimensions){
+            if(!vd.getWhereText().isEmpty()){
+                return true;
+            }
+        }
+        return false;
+    }
+    private String whereQuery(){
+        //if all where textfields are empty, return empty string
+        if(!hasWhereContent())
+            return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append(" WHERE ");
+        for(ViewDimension vd : viewDimensions){
+            if(!vd.getWhereText().isEmpty())
+                sb.append(vd.getComboBoxText()).append(" = '").append(vd.getWhereText()).append("' AND ");
+        }
+        //remove last AND
+        String s = sb.toString();
+        if(s.substring(s.length()-4).equals("AND ")){
+            s = s.substring(0,s.length()-4);
+        }
+        return s;
+    }
     public void loadView() {
         btnSearch.setDisable(false);
         try {
-            String strComboTopic = getComboString(this.comboTopic);
-            String strComboDate = getComboString(this.comboDate);
-            String strComboLocation = getComboString(this.comboLocation);
-            String strComboOpinion = getComboString(this.comboOpinion);
-
-            String viewQuery = selectQuery(strComboTopic, strComboLocation, strComboDate, strComboOpinion);
-            String viewQueryWhereFirst = selectQuery(strComboTopic, strComboLocation, strComboDate, strComboOpinion) + " WHERE ";
-            String viewQueryWhereSecond = "";
-
-            popularityManager.updatePopularityValue((strComboTopic + strComboLocation + strComboDate + strComboOpinion).trim());
-            boolean isWhere = false;
-            if (txtTopic.getText().trim().isEmpty() && txtDate.getText().trim().isEmpty() && txtLocation.getText().trim().isEmpty() && txtOpinion.getText().trim().isEmpty()) {
-                viewQuery = selectQuery(strComboTopic, strComboLocation, strComboDate, strComboOpinion);
-                isWhere = false;
-            }
-            if (!txtLocation.getText().trim().isEmpty() || !txtLocation.getText().isEmpty()) {
-                viewQueryWhereSecond += strComboLocation + "=" + "'" + txtLocation.getText() + "'" + "";
-                isWhere = true;
-            }
-            if (!txtTopic.getText().trim().isEmpty() || !txtTopic.getText().isEmpty()) {
-                viewQueryWhereSecond += strComboTopic + "=" + "'" + txtTopic.getText() + "'" + "";
-                isWhere = true;
-            }
-            if (!txtOpinion.getText().trim().isEmpty() || !txtOpinion.getText().isEmpty()) {
-                viewQueryWhereSecond += strComboOpinion + "=" + "'" + txtOpinion.getText() + "'" + "";
-                isWhere = true;
-            }
-            if (!txtDate.getText().trim().isEmpty() || !txtDate.getText().isEmpty()) {
-                viewQueryWhereSecond += strComboDate + " = " + " " + txtDate.getText() + "";
-                isWhere = true;
-            }
-            viewQueryWhereFirst += viewQueryWhereSecond;
-            if (isWhere)
-                resultSet = ConnectionManager.selectSQL(viewQueryWhereFirst);
-            else
-                resultSet = ConnectionManager.selectSQL(viewQuery);
-            buildTable(resultSet);
-
+            buildTable(ConnectionManager.selectSQL(selectQuery() + whereQuery()));
         } catch (NullPointerException e) {
             System.out.println("Choose some");
 
