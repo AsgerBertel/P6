@@ -8,6 +8,7 @@ import Sql.ConnectionManager;
 import Sql.QueryManager;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,7 +42,7 @@ public class MainSceneController {
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
     @FXML
-    private TextField txtTopic, txtLocation, txtOpinion, txtDate, txtDrillDate, txtDrillOpinion, txtDrillLocation, txtDrillTopic;
+    private TextField txtTopic, txtLocation, txtOpinion, txtDate, txtDrillDate, txtDrillOpinion, txtDrillLocation, txtDrillTopic, txtTopRows;
     @FXML
     private Button btnUpdate, btnSearch;
     @FXML
@@ -92,6 +93,7 @@ public class MainSceneController {
         initializeOpinionOnKeyPressedEvent(comboOpinion);
         initializeLocationOnKeyPressedEvent(comboLocation);
         initializeateDateOnKeyPressedEvent(comboDate);
+        initializeOnlyNumericTextfield(txtTopRows);
         tableViewLeft.setItems(data);
 
         //ViewDimensions ORDER IS VERY IMPORTANT
@@ -99,6 +101,17 @@ public class MainSceneController {
         viewDimensions.add(new ViewDimension(ViewDimensionEnum.LOCATION,comboLocation,txtDrillLocation,txtLocation));
         viewDimensions.add(new ViewDimension(ViewDimensionEnum.DATE,comboDate,txtDrillDate,txtDate));
         viewDimensions.add(new ViewDimension(ViewDimensionEnum.OPINION,comboOpinion,txtDrillOpinion,txtOpinion));
+    }
+    public void initializeOnlyNumericTextfield(TextField txtTopRows){
+        txtTopRows.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    txtTopRows.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
     }
 
     public void buildTable(ResultSet resultSet_Tableview) throws SQLException {
@@ -229,7 +242,13 @@ public class MainSceneController {
     public void loadView() {
         btnSearch.setDisable(false);
         try {
-            buildTable(ConnectionManager.selectSQL(selectQuery() + whereQuery()));
+            String query = selectQuery() + whereQuery();
+            if(txtTopRows.getText().isEmpty()){
+                buildTable(ConnectionManager.selectSQL(query));
+            } else{
+                buildTable(ConnectionManager.selectSQL(orderByQuery(query)));
+            }
+
         } catch (NullPointerException e) {
             System.out.println("Choose some");
 
@@ -238,6 +257,10 @@ public class MainSceneController {
         } finally {
             btnSearch.setDisable(false);
         }
+    }
+    public String orderByQuery(String query){
+        query = query + " ORDER BY " + getViewNameSumOrCountMap().get(getCurrView()) + " LIMIT " + txtTopRows.getText();
+        return query;
     }
 
     public void drillDown() {
