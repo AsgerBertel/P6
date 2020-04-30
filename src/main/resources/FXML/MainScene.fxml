@@ -39,11 +39,12 @@
                     <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
                     <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
                 </HBox>
+               <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows"/>
+                    <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
 
-                <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
             </VBox>
 
-            <VBox>
+            <VBox styleClass="VBoxDrill">
                 <HBox>
                     <TextField promptText="Drill Topic" fx:id="txtDrillTopic" id="txtTopic" styleClass="searchField"/>
                 </HBox>
