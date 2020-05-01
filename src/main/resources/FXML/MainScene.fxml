@@ -41,41 +41,44 @@
                     <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
                     <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
                 </HBox>
-                <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows"/>
-                <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
+               <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows"/>
+                    <HBox>
+                        <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
+                        <Label text="" fx:id="lblViewSize" id="lblViewSize"/>
+                    </HBox>
             </VBox>
 
             <VBox styleClass="VBoxDrill">
                 <HBox>
                     <TextField promptText="Drill Topic" fx:id="txtDrillTopic" id="txtTopic" styleClass="searchField"/>
-                    <Button text="Roll Up" fx:id="btnRollUpTopic" id="btnRollUpTopic" styleClass="btnRollUp"></Button>
+                    <Button text="Roll Up" fx:id="btnRollUpTopic" id="btnRollUpTopic" styleClass="btnRollUp" onAction="#topicRollUp"/>
                 </HBox>
 
                 <HBox>
                     <TextField promptText="Drill Location" fx:id="txtDrillLocation" id="txtLocation"
                                styleClass="searchField"/>
                     <Button text="Roll Up" fx:id="btnRollUpLocation" id="btnRollUpLocation"
-                            styleClass="btnRollUp"></Button>
+                            styleClass="btnRollUp" onAction="#locationRollUp"/>
                 </HBox>
 
                 <HBox>
                     <TextField promptText="Drill Opinion" fx:id="txtDrillOpinion" id="txtOpinion"
                                styleClass="searchField"/>
                     <Button text="Roll Up" fx:id="btnRollUpOpinion" id="btnRollUpOpinion"
-                            styleClass="btnRollUp"></Button>
+                            styleClass="btnRollUp" onAction="#opinionRollUp"/>
                 </HBox>
                 <HBox>
                     <TextField promptText="Drill Date" fx:id="txtDrillDate" id="txtDate" styleClass="searchField"/>
-                    <Button text="Roll Up" fx:id="btnRollUpDate" id="btnRollUpDate" styleClass="btnRollUp"></Button>
+                    <Button text="Roll Up" fx:id="btnRollUpDate" id="btnRollUpDate" styleClass="btnRollUp" onAction="#dateRollUp"/>
                 </HBox>
                 <Button text="Drill" fx:id="btnDrill" onAction="#drillDown" id="btnSearch"/>
                 <HBox>
-                    <CheckBox fx:id="chkOD" id="chkOD" styleClass="chkMeasures"></CheckBox>
+                    <CheckBox fx:id="chkOD" id="chkOD" styleClass="chkMeasures"/>
                     <Label text="YOLO"></Label>
                 </HBox>
 
-                <CheckBox fx:id="chkFD" id="chkFD" styleClass="chkMeasures"></CheckBox>
-                <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures"></CheckBox>
+                <CheckBox fx:id="chkFD" id="chkFD" styleClass="chkMeasures"/>
+                <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures"/>
 
             </VBox>
         </VBox>
