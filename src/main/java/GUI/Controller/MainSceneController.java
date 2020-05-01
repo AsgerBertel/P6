@@ -452,7 +452,6 @@ public class MainSceneController {
     }
 
     private void initializeateDateOnKeyPressedEvent(ComboBox comboDate) {
-
         //searchbar for topics
         txtDate.setOnKeyReleased(event -> {
             boolean isDay, isMonth, isYear;

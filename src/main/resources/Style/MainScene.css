@@ -46,6 +46,18 @@
     -fx-background-insets: 2px;
 }
 
+
+.btnRollUp {
+    -fx-background-color: white;
+    -fx-padding: 7px;
+    -fx-background-insets: 2px;
+}
+
+.btnRollUp :pressed {
+    -fx-background-color: #E4E7EB;
+    -fx-padding: 7px;
+    -fx-background-insets: 2px;
+}
 #txtTopRows {
     -fx-pref-width: 140;
     -fx-max-width: 140;
