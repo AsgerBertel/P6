@@ -6,7 +6,6 @@ import Lattice.GreedyAlgorithm.GreedyAlgorithmType;
 import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -20,10 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
 import javafx.util.Callback;
-import org.apache.spark.sql.execution.columnar.NULL;
 
-import javax.xml.transform.Result;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -161,7 +157,7 @@ public class MainSceneController {
         currentSearchbar.setText(menuItem);
     }
 
-    private HashMap<String, String> extractViewNameAndAggregate(ResultSet rs) throws SQLException {
+    private HashMap<String, String> extractViewNameAndAggregateMap(ResultSet rs) throws SQLException {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
         while (rs.next()) {
             if (rs.getString(2).contains("AS sum")) {
@@ -177,8 +173,8 @@ public class MainSceneController {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
         if (isUpdated) {
             try {
-                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNamesAndDefinitions)));
-                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNamesAndDefinitions)));
+                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregateMap(ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNamesAndDefinitions)));
+                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregateMap(ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNamesAndDefinitions)));
                 isUpdated = false;
                 viewNameSumOrCountMap = newViewNameSumOrCountMap;
             } catch (SQLException e) {
@@ -187,7 +183,18 @@ public class MainSceneController {
         }
         return viewNameSumOrCountMap;
     }
-    private String addMeasures(){return null;}
+    private String addFrequencyDeviation(){
+        StringBuilder sb = new StringBuilder();
+        //sum or count
+        String aggregate = getViewNameSumOrCountMap().get(getCurrView());
+        sb.append(aggregate).append(", avgval, (sum/avgval)*100) freqD");
+        return sb.toString();
+    }
+
+    private String addMeasures(){
+
+        return null;
+    }
     private String getCurrView(){
         StringBuilder sb = new StringBuilder();
         for(ViewDimension vd : viewDimensions){
@@ -202,10 +209,10 @@ public class MainSceneController {
         sb.append("SELECT ");
         for(ViewDimension vd : viewDimensions){
             if(vd.getComboBoxText().equals("coordinate")){
-                sb.append("lat, long,");
+                sb.append("view.lat, view.long,");
             }else{
                 if(!vd.getComboBoxText().equals("none"))
-                    sb.append(vd.getComboBoxText()).append(",");
+                    sb.append("view.").append(vd.getComboBoxText()).append(",");
             }
         }
         sb.append(getViewNameSumOrCountMap().get(viewName));
