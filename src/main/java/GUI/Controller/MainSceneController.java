@@ -18,7 +18,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
+import org.apache.spark.sql.execution.columnar.NULL;
+import org.postgresql.util.PSQLException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,6 +48,8 @@ public class MainSceneController {
     private Button btnUpdate, btnSearch;
     @FXML
     private TableView tableViewLeft;
+    @FXML
+    private Label lblViewSize;
 
     @FXML
     private VBox leftSide;
@@ -77,10 +82,10 @@ public class MainSceneController {
     String whereQuery = " WHERE ";
 
     public void initialize() {
-        locationDimension.addAll(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country"));
-        dateDimension.addAll(FXCollections.observableArrayList("day", "month", "year"));
-        topicDimension.addAll(FXCollections.observableArrayList( "toptopic"));
-        opinionDimension.addAll(FXCollections.observableArrayList("opinion"));
+        locationDimension.addAll(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "all"));
+        dateDimension.addAll(FXCollections.observableArrayList("day", "month", "year", "all"));
+        topicDimension.addAll(FXCollections.observableArrayList("toptopic", "all"));
+        opinionDimension.addAll(FXCollections.observableArrayList("opinion", "all"));
 
         searchBarContextMenu.setStyle("-fx-pref-width: 200");
         comboLocation.setItems(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "all"));
@@ -99,6 +104,17 @@ public class MainSceneController {
         viewDimensions.add(new ViewDimension(ViewDimensionEnum.LOCATION, comboLocation, txtDrillLocation, txtLocation));
         viewDimensions.add(new ViewDimension(ViewDimensionEnum.DATE, comboDate, txtDrillDate, txtDate));
         viewDimensions.add(new ViewDimension(ViewDimensionEnum.OPINION, comboOpinion, txtDrillOpinion, txtOpinion));
+    }
+    public void clearTextfields(){
+        txtTopic.clear();
+        txtLocation.clear();
+        txtOpinion.clear();
+        txtDate.clear();
+        txtDrillDate.clear();
+        txtDrillOpinion.clear();
+        txtDrillLocation.clear();
+        txtDrillTopic.clear();
+        txtTopRows.clear();
     }
 
     public void initializeOnlyNumericTextfield(TextField txtTopRows) {
@@ -136,7 +152,7 @@ public class MainSceneController {
             }
             data.add(row);
         }
-
+        lblViewSize.setText("View size: "+ data.size());
         tableViewLeft.setItems(data);
     }
 
@@ -277,9 +293,12 @@ public class MainSceneController {
         } catch (NullPointerException e) {
             System.out.println("Choose some");
 
+        } catch (PSQLException e){
+            System.out.println("This view does not exist");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
+            clearTextfields();
             btnSearch.setDisable(false);
         }
     }
@@ -291,10 +310,8 @@ public class MainSceneController {
 
     public void drillDown() {
         try {
-            strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
-            strComboOpinion = comboOpinion.getSelectionModel().getSelectedItem().toString();
-            strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
-            strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
+
+            getComboboxValues();
 
             strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
             if (strComboTopic.equals("all"))
@@ -357,11 +374,15 @@ public class MainSceneController {
 
             resultSet = ConnectionManager.selectSQL(selectQuery + viewName + locationInnerJoin + dateInnerJoin + opinionInnerJoin + topicInnerJoin + whereQuery);
             buildTable(resultSet);
-            txtDrillOpinion.clear();
-            txtDrillTopic.clear();
-            txtDrillDate.clear();
-            txtDrillLocation.clear();
-        } catch (SQLException throwables) {
+            clearTextfields();
+
+        } catch(NullPointerException e){
+            System.out.println("Choose dimensions");
+        }
+        catch (PSQLException e){
+            System.out.println("Invalid input in drill");
+        }
+        catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (IndexOutOfBoundsException e) {
             System.out.println("you cant drill anymore");
@@ -384,7 +405,66 @@ public class MainSceneController {
         whereQuery = " WHERE ";
     }
 
-    private String modifyDrillQuery(boolean isWhere, String whereQuery, ArrayList<String> dimension, String drillTextFieldText, String strCombo, ComboBox combo, int IndexForDimension) throws IndexOutOfBoundsException {
+    public void locationRollUp(){
+        rollUp("location");
+    }
+    public void opinionRollUp(){
+        rollUp("opinion");
+    }
+    public void dateRollUp(){
+        rollUp("date");
+    }
+    public void topicRollUp(){
+        rollUp("topic");
+    }
+
+
+    private void rollUp(String dimension){
+        getComboboxValues();
+        int variable;
+        String viewName ;
+        try {
+            if (dimension.equals("topic")) {
+                alterViewName("topic");
+            } else if (dimension.equals("location")) {
+                alterViewName("location");
+            } else if (dimension.equals("date")) {
+               alterViewName("date");
+            } else if (dimension.equals("opinion")) {
+                alterViewName("opinion");
+            }
+            loadView();
+            clearTextfields();
+        } catch(IndexOutOfBoundsException e){
+            System.out.println("Not rollupable");
+        }
+    }
+    private void getComboboxValues() throws NullPointerException{
+
+        strComboTopic = comboTopic.getSelectionModel().getSelectedItem().toString();
+        strComboOpinion = comboOpinion.getSelectionModel().getSelectedItem().toString();
+        strComboLocation = comboLocation.getSelectionModel().getSelectedItem().toString();
+        strComboDate = comboDate.getSelectionModel().getSelectedItem().toString();
+    }
+    private void alterViewName(String dimension) throws IndexOutOfBoundsException{
+        String viewName;
+        int dimensionIndex;
+        if(dimension.equals("topic")){
+            dimensionIndex = topicDimension.indexOf(strComboTopic);
+            comboTopic.setValue(topicDimension.get(dimensionIndex+1));
+        }else if(dimension.equals("location")){
+            dimensionIndex = locationDimension.indexOf(strComboLocation);
+            comboLocation.setValue(locationDimension.get(dimensionIndex+1));
+        }else if(dimension.equals("date")){
+            dimensionIndex = dateDimension.indexOf(strComboDate);
+            comboDate.setValue(dateDimension.get(dimensionIndex+1));
+        }else {
+            dimensionIndex = opinionDimension.indexOf(strComboOpinion);
+            comboOpinion.setValue(opinionDimension.get(dimensionIndex+1));
+        }
+    }
+
+    private String modifyDrillQuery(boolean isWhere, String whereQuery, ArrayList<String> dimension, String drillTextFieldText, String strCombo, ComboBox combo, int IndexForDimension) {
         index = dimension.indexOf(strCombo);
         if (IndexForDimension == -1)
             IndexForDimension = index;

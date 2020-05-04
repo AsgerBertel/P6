@@ -66,6 +66,11 @@
     -fx-background-insets: 2px;
 }
 
+#lblViewSize{
+    -fx-translate-x: 4;
+    -fx-translate-y: 6;
+}
+
 .searchField:selected {
     -fx-pref-width: 200;
     -fx-max-width: 200;
