@@ -6,6 +6,7 @@ import Lattice.GreedyAlgorithm.GreedyAlgorithmType;
 import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
+import ViewCalculations.View;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -206,7 +207,7 @@ public class MainSceneController {
         StringBuilder sb = new StringBuilder();
         //sum or count
         String aggregate = getViewNameSumOrCountMap().get(getCurrView());
-        sb.append(aggregate).append(",avgval, (sum/avgval)*100) freqdev");
+        sb.append(",avgval, (").append(aggregate).append("/avgval)*100 freqdev");
         return sb.toString();
     }
 
@@ -215,15 +216,193 @@ public class MainSceneController {
     }
 
     private String addMeasuresToSelect(){
+        StringBuilder sb = new StringBuilder();
         //append to selects
+        if(chkFD.isSelected()){
+            sb.append(addSelectFrequencyDeviation());
+        }
+        if(chkOD.isSelected()){
+            sb.append(addSelectOpinionDeviation());
+        }
+        if(sb.length()!=0)
+            return sb.toString();
+        return "";
+    }
+    private String addFrequencyDeviationInnerJoin(){
+        //only requires topic to not be all.
+        StringBuilder sb = new StringBuilder();
+        //add inner join
+        sb.append("inner join ");
+        //select stmnt where we get the avg sum for given topics/opinions.
+        sb.append("(SELECT ");
+        for(ViewDimension vd : this.viewDimensions){
+            //add all dimensions EXCEPT for location (to get average of all locations)
+            if(vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //"avg(sum or count) avgval"
+        sb.append("avg(").append(getViewNameSumOrCountMap().get(getCurrView())).append(") avgval FROM ").append("public.").append(getCurrView());
+        //add group by
+        sb.append(" GROUP BY ");
+        for(ViewDimension vd : this.viewDimensions){
+            //add all dimensions EXCEPT for location (to get average of all locations)
+            if(vd.getViewDimension().equals(ViewDimensionEnum.LOCATION) || vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //remove last comma
+        sb.setLength(sb.length()-2);
+        //
+        //add inner join conditions
+        sb.append(") freqaverage on ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getViewDimension().equals(ViewDimensionEnum.LOCATION) || vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append("view.").append(vd.getComboBoxText()).append(" = ").append("freqaverage.").append(vd.getComboBoxText()).append(" AND ");
+        }
+        //remove last AND
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
 
-        return null;
-    }
-    private String addDeviationInnerJoin(){
-        //Always get both frequency and opinion, choose whether or not to include in the select??
+    private String addDeviationInnerJoins(){
+        StringBuilder sb = new StringBuilder();
+        if(chkFD.isSelected())
+            sb.append(addFrequencyDeviationInnerJoin());
+        if(chkOD.isSelected())
+            //IF OPINION IS ALL THEN WE CAN NOT INCLUDE THIS
+            sb.append(addOpinionDeviationInnerJoin());
         //Only edge case is if opinion is set to all, then we should not include
-        return null;
+        return sb.toString();
     }
+
+    private String addOpinionDeviationInnerJoin() {
+        StringBuilder sb = new StringBuilder();
+        //add local percent of mentions join
+        sb.append(addOpinionDeviationPercentOfMentionsJoin());
+        //add average global percent of mentions join
+        sb.append(addOpinionDeviationAveragePercentOfMentionsJoin());
+        return sb.toString();
+    }
+
+    private String addOpinionDeviationPercentOfMentionsJoin() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" inner join (SELECT ");
+        //add selects
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none"))
+                continue;
+           sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //add aggregate and viewname
+        sb.append("(").append(getViewNameSumOrCountMap().get(getCurrView())).
+                append("/totalsum)*100 percentofmentions FROM public.").append(getCurrView());
+        //add totalsum inner join
+        sb.append(" a inner join ").append(addTotalSumInnerJoin());
+        //add group by and inner join conditions
+        sb.append(" GROUP BY ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //add sum + total sum
+        sb.append("sum, totalsum) percentsum on ");
+        //add inner join conditions
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append(" percentsum.").append(vd.getComboBoxText()).
+                    append(" = ").append("view.").append(vd.getComboBoxText()).
+                    append(" AND ");
+        }
+        //remove last AND
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+
+    private String addOpinionDeviationAveragePercentOfMentionsJoin() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" inner join (SELECT ");
+        //add selects
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //add aggregate and viewname
+        sb.append("avg((").append(getViewNameSumOrCountMap().get(getCurrView())).
+                append("/totalsum)*100) averagepercent FROM public.").append(getCurrView());
+        //add totalsum inner join
+        sb.append(" a inner join ").append(addTotalSumInnerJoin());
+        //add group by and inner join conditions
+        sb.append(" GROUP BY ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //remove last comma
+        sb.setLength(sb.length()-2);
+        //add avgpercent and inner join conditions
+        sb.append(") avgpercent on ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append(" avgpercent.").append(vd.getComboBoxText()).
+                    append(" = ").append("view.").append(vd.getComboBoxText()).
+                    append(" AND ");
+        }
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+    private String addTotalSumInnerJoin(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("( SELECT ");
+        //Select
+        for(ViewDimension vd : this.viewDimensions){
+            //select everything except for opinion
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.OPINION))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //append sum aggregate of sum or count
+        sb.append("sum(").append(getViewNameSumOrCountMap().get(getCurrView())).append(") totalsum");
+        sb.append(" from public.").append(getCurrView());
+        //group by
+        sb.append(" group by ");
+        for(ViewDimension vd : this.viewDimensions){
+            //select everything except for opinion
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.OPINION))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //remove last comma
+        sb.setLength(sb.length()-2);
+        sb.append(") b on ");
+        //add inner join conditions
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.OPINION))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(" = b.").append(vd.getComboBoxText()).append(" AND ");
+        }
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+
     private String getCurrView(){
         StringBuilder sb = new StringBuilder();
         for (ViewDimension vd : viewDimensions) {
@@ -247,10 +426,14 @@ public class MainSceneController {
         }
         sb.append("view.").append(getViewNameSumOrCountMap().get(viewName));
         //IF ANY MEASURES SELECTED, ADD MEASURES
-        //if(hasMeasures)
-        //sb.append(addMeasures());
-        sb.append(" FROM ").append(viewName);
+        if(hasMeasures())
+            sb.append(addMeasuresToSelect());
+        sb.append(" FROM ").append(viewName).append(" view \n");
         return sb.toString();
+    }
+
+    private boolean hasMeasures() {
+        return chkOD.isSelected() || chkFD.isSelected() || chkIPD.isSelected();
     }
 
     private boolean hasWhereContent() {
@@ -284,6 +467,8 @@ public class MainSceneController {
         btnSearch.setDisable(false);
         try {
             String query = selectQuery() + whereQuery();
+            //ADD INNER JOINS HERE
+            query+=addDeviationInnerJoins();
             if (txtTopRows.getText().isEmpty()) {
                 buildTable(ConnectionManager.selectSQL(query));
             } else {
