@@ -70,13 +70,17 @@
                 </HBox>
                 <Button text="Drill" fx:id="btnDrill" onAction="#drillDown" id="btnSearch"/>
                 <HBox>
-                    <CheckBox fx:id="chkOD" id="chkOD" styleClass="chkMeasures"></CheckBox>
-                    <Label text="YOLO"></Label>
+                    <CheckBox fx:id="chkOD" id="chkOD" styleClass="chkMeasures"/>
+                    <Label text="Opinion Deviation"/>
                 </HBox>
-
-                <CheckBox fx:id="chkFD" id="chkFD" styleClass="chkMeasures"></CheckBox>
-                <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures"></CheckBox>
-
+                <HBox>
+                    <CheckBox fx:id="chkFD" id="chkFD" styleClass="chkMeasures"/>
+                    <Label text="Frequency Deviation"/>
+                </HBox>
+                <HBox>
+                    <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures"/>
+                    <Label text="Impressions per Dollar"/>
+                </HBox>
             </VBox>
         </VBox>
     </HBox>
