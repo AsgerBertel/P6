@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainSceneController {
+    @FXML
+    private CheckBox chkFD, chkOD, chkIPD;
     SearchBarContextMenu searchBarContextMenu = new SearchBarContextMenu(this);
     private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
     PopularityManager popularityManager = new PopularityManager();
@@ -184,16 +186,26 @@ public class MainSceneController {
         }
         return viewNameSumOrCountMap;
     }
-    private String addFrequencyDeviation(){
+    private String addSelectFrequencyDeviation(){
         StringBuilder sb = new StringBuilder();
         //sum or count
         String aggregate = getViewNameSumOrCountMap().get(getCurrView());
-        sb.append(aggregate).append(", avgval, (sum/avgval)*100) freqD");
+        sb.append(aggregate).append(",avgval, (sum/avgval)*100) freqdev");
         return sb.toString();
     }
 
-    private String addMeasures(){
+    private String addSelectOpinionDeviation(){
+        return ", (percentofmentions/averagepercent)*100 odev";
+    }
 
+    private String addMeasuresToSelect(){
+        //append to selects
+
+        return null;
+    }
+    private String addDeviationInnerJoin(){
+        //Always get both frequency and opinion, choose whether or not to include in the select??
+        //Only edge case is if opinion is set to all, then we should not include
         return null;
     }
     private String getCurrView(){
@@ -217,8 +229,9 @@ public class MainSceneController {
                     sb.append("view.").append(vd.getComboBoxText()).append(",");
             }
         }
-        sb.append(getViewNameSumOrCountMap().get(viewName));
-        //ADD MEASURES
+        sb.append("view.").append(getViewNameSumOrCountMap().get(viewName));
+        //IF ANY MEASURES SELECTED, ADD MEASURES
+        //if(hasMeasures)
         //sb.append(addMeasures());
         sb.append(" FROM ").append(viewName);
         return sb.toString();
