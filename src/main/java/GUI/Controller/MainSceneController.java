@@ -228,7 +228,7 @@ txtSliceCollum.clear();
     }
 
     private String addSelectOpinionDeviation(){
-        return ", (percentofmentions/averagepercent)*100 odev";
+        return ", percentofmentions";
     }
 
     private String addMeasuresToSelect(){
@@ -297,12 +297,7 @@ txtSliceCollum.clear();
     }
 
     private String addOpinionDeviationInnerJoin() {
-        StringBuilder sb = new StringBuilder();
-        //add local percent of mentions join
-        sb.append(addOpinionDeviationPercentOfMentionsJoin());
-        //add average global percent of mentions join
-        sb.append(addOpinionDeviationAveragePercentOfMentionsJoin());
-        return sb.toString();
+        return addOpinionDeviationPercentOfMentionsJoin();
     }
 
     private String addOpinionDeviationPercentOfMentionsJoin() {
