@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import org.apache.commons.lang.StringUtils;
 import org.apache.spark.sql.execution.columnar.NULL;
 import org.postgresql.util.PSQLException;
 import scala.util.matching.Regex;
@@ -447,22 +448,13 @@ txtSliceCollum.clear();
         return chkOD.isSelected() || chkFD.isSelected() || chkIPD.isSelected();
     }
 
-    private boolean hasWhereContent() {
-        for (ViewDimension vd : viewDimensions) {
-            if (!vd.getWhereText().isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void loadView() {
         btnSearch.setDisable(false);
         try {
             String query = selectQuery();
-            lastQuery = query;
             //ADD INNER JOINS HERE
             query+=addDeviationInnerJoins();
+            lastQuery = query;
             if (txtTopRows.getText().isEmpty()) {
                 buildTable(ConnectionManager.selectSQL(query));
             } else {
@@ -483,6 +475,7 @@ txtSliceCollum.clear();
     }
 
     public String orderByQuery(String query) {
+        if (!txtTopRows.getText().isEmpty())
         query = query + " ORDER BY " + getViewNameSumOrCountMap().get(getCurrView()) + " LIMIT " + txtTopRows.getText();
         return query;
     }
@@ -541,15 +534,15 @@ txtSliceCollum.clear();
             String topicInnerJoin = "";
 
             if (!innerJoinQueryLocationFirst.isEmpty())
-                locationInnerJoin = innerJoinQueryLocationFirst + viewName + innerJoinQueryLocationSecond;
+                locationInnerJoin = innerJoinQueryLocationFirst + " view" + innerJoinQueryLocationSecond;
             if (!innerJoinQueryDateFirst.isEmpty())
-                dateInnerJoin = innerJoinQueryDateFirst + viewName + innerJoinQueryDateSecond;
+                dateInnerJoin = innerJoinQueryDateFirst + " view"+ innerJoinQueryDateSecond;
             if (!innerJoinQueryOpinionFirst.isEmpty())
-                opinionInnerJoin = innerJoinQueryOpinionFirst + viewName + innerJoinQueryOpinionSecond;
+                opinionInnerJoin = innerJoinQueryOpinionFirst + " view" + innerJoinQueryOpinionSecond;
             if (!innerJoinQueryTopicFirst.isEmpty())
-                topicInnerJoin = innerJoinQueryTopicFirst + viewName + innerJoinQueryTopicSecond;
+                topicInnerJoin = innerJoinQueryTopicFirst + " view" + innerJoinQueryTopicSecond;
             System.out.println(select + selectStartQuery() + from + viewName + locationInnerJoin + dateInnerJoin + opinionInnerJoin + topicInnerJoin + whereQuery);
-            lastQuery = select + selectStartQuery() + from + viewName + locationInnerJoin + dateInnerJoin + opinionInnerJoin + topicInnerJoin + whereQuery;
+            lastQuery = select + selectStartQuery() + from + viewName+ " view "+ locationInnerJoin + dateInnerJoin + opinionInnerJoin + topicInnerJoin + whereQuery;
             lastQuery = orderByQuery(lastQuery);
             ResultSet resultSet = null;
             resultSet = ConnectionManager.selectSQL(lastQuery);
@@ -619,13 +612,17 @@ txtSliceCollum.clear();
 
         try {
             String sliceQuery;
+            if (lastQuery.contains("ORDER"))
+                lastQuery = StringUtils.substringBefore(lastQuery, "ORDER");
+
             if (lastQuery.contains("WHERE"))
-                sliceQuery = lastQuery + " AND " + generateMultipleSliceWhereStatements(sliceCollums, sliceValues);
+                sliceQuery = lastQuery + " AND( " + generateMultipleSliceWhereStatements(sliceCollums, sliceValues);
             else
-                sliceQuery = lastQuery + " WHERE " + generateMultipleSliceWhereStatements(sliceCollums, sliceValues);
+                sliceQuery = lastQuery + " WHERE ( " + generateMultipleSliceWhereStatements(sliceCollums, sliceValues);
             popularityManager.updatePopularityValue(getCurrView());
-            System.out.println("Slice:" + sliceQuery);
+            System.out.println("Slice:" + orderByQuery(sliceQuery));
             resultSet = ConnectionManager.selectSQL(orderByQuery(sliceQuery));
+
             buildTable(resultSet);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -638,11 +635,17 @@ txtSliceCollum.clear();
         int n = colums.length;
         String query = "";
         for (int i = 0; i < n; i++) {
-            query += " " + getCurrView() + "." + colums[i] + " = " + "'" + values[i] + "'";
-            if (i != n - 1)
-                query += " AND ";
+            query += " " + "view" + "." + colums[i] + " = " + "'" + values[i] + "'";
+            if (i != n - 1){
+                System.out.println(colums[i]+ colums[i+1]);
+                if (colums[i].equals(colums[i+1]))
+                    query += " OR ";
+                else
+                    query += ") AND (";
+            }
+
         }
-        return query;
+        return query+")";
     }
 
     public void locationRollUp() {
