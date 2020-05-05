@@ -6,6 +6,7 @@ import Lattice.GreedyAlgorithm.GreedyAlgorithmType;
 import OLAP.ViewGenerator;
 import Sql.ConnectionManager;
 import Sql.QueryManager;
+import ViewCalculations.View;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -18,19 +19,24 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
+import org.apache.spark.sql.execution.columnar.NULL;
 import org.postgresql.util.PSQLException;
 import scala.util.matching.Regex;
 
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainSceneController {
+    @FXML
+    private CheckBox chkFD, chkOD, chkIPD;
     SearchBarContextMenu searchBarContextMenu = new SearchBarContextMenu(this);
-    private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+    private ObservableList<ObservableList> data = FXCollections.observableArrayList();
     PopularityManager popularityManager = new PopularityManager();
     private boolean isViewGenInitialised = false;
     private ViewGenerator viewGenerator = new ViewGenerator();
@@ -48,6 +54,7 @@ public class MainSceneController {
     private TableView tableViewLeft;
     @FXML
     private Label lblViewSize;
+
     @FXML
     private VBox leftSide;
     ResultSet resultSet;
@@ -136,6 +143,7 @@ txtSliceCollum.clear();
         data.clear();
         tableViewLeft.getColumns().clear();
         tableViewLeft.getItems().clear();
+        DecimalFormat df = new DecimalFormat("#.#####");
         for (int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++) {
             final int j = i;
             TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i + 1));
@@ -149,9 +157,14 @@ txtSliceCollum.clear();
             System.out.println(col.getText() + "[" + i + "]" + "has been added");
         }
         while (resultSet_Tableview.next()) {
-            ObservableList<String> row = FXCollections.observableArrayList();
+            ObservableList row = FXCollections.observableArrayList();
             for (int i = 1; i <= resultSet_Tableview.getMetaData().getColumnCount(); i++) {
-                row.add(resultSet_Tableview.getString(i));
+                try{
+                    double number = Double.parseDouble(resultSet_Tableview.getString(i));
+                    row.add(df.format(number));
+                } catch (NumberFormatException e){
+                    row.add(resultSet_Tableview.getString(i));
+                }
             }
             data.add(row);
         }
@@ -179,7 +192,7 @@ txtSliceCollum.clear();
         currentSearchbar.setText(menuItem);
     }
 
-    private HashMap<String, String> extractViewNameAndAggregate(ResultSet rs) throws SQLException {
+    private HashMap<String, String> extractViewNameAndAggregateMap(ResultSet rs) throws SQLException {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
         while (rs.next()) {
             if (rs.getString(2).contains("AS sum")) {
@@ -191,12 +204,13 @@ txtSliceCollum.clear();
         return newViewNameSumOrCountMap;
     }
 
+
     private HashMap<String, String> getViewNameSumOrCountMap() {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
         if (isUpdated) {
             try {
-                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNamesAndDefinitions)));
-                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregate(ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNamesAndDefinitions)));
+                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregateMap(ConnectionManager.selectSQL(QueryManager.selectAllMaterializedlViewNamesAndDefinitions)));
+                newViewNameSumOrCountMap.putAll(extractViewNameAndAggregateMap(ConnectionManager.selectSQL(QueryManager.selectAllVirtualViewNamesAndDefinitions)));
                 isUpdated = false;
                 viewNameSumOrCountMap = newViewNameSumOrCountMap;
             } catch (SQLException e) {
@@ -205,12 +219,207 @@ txtSliceCollum.clear();
         }
         return viewNameSumOrCountMap;
     }
-
-    private String addMeasures() {
-        return null;
+    private String addSelectFrequencyDeviation(){
+        StringBuilder sb = new StringBuilder();
+        //sum or count
+        String aggregate = getViewNameSumOrCountMap().get(getCurrView());
+        sb.append(",avgval, (").append(aggregate).append("/avgval)*100 freqdev");
+        return sb.toString();
     }
 
-    private String getCurrView() {
+    private String addSelectOpinionDeviation(){
+        return ", (percentofmentions/averagepercent)*100 odev";
+    }
+
+    private String addMeasuresToSelect(){
+        StringBuilder sb = new StringBuilder();
+        //append to selects
+        if(chkFD.isSelected()){
+            sb.append(addSelectFrequencyDeviation());
+        }
+        if(chkOD.isSelected()){
+            sb.append(addSelectOpinionDeviation());
+        }
+        if(sb.length()!=0)
+            return sb.toString();
+        return "";
+    }
+    private String addFrequencyDeviationInnerJoin(){
+        //only requires topic to not be all.
+        StringBuilder sb = new StringBuilder();
+        //add inner join
+        sb.append("inner join ");
+        //select stmnt where we get the avg sum for given topics/opinions.
+        sb.append("(SELECT ");
+        for(ViewDimension vd : this.viewDimensions){
+            //add all dimensions EXCEPT for location (to get average of all locations)
+            if(vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //"avg(sum or count) avgval"
+        sb.append("avg(").append(getViewNameSumOrCountMap().get(getCurrView())).append(") avgval FROM ").append("public.").append(getCurrView());
+        //add group by
+        sb.append(" GROUP BY ");
+        for(ViewDimension vd : this.viewDimensions){
+            //add all dimensions EXCEPT for location (to get average of all locations)
+            if(vd.getViewDimension().equals(ViewDimensionEnum.LOCATION) || vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //remove last comma
+        sb.setLength(sb.length()-2);
+        //
+        //add inner join conditions
+        sb.append(") freqaverage on ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getViewDimension().equals(ViewDimensionEnum.LOCATION) || vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append("view.").append(vd.getComboBoxText()).append(" = ").append("freqaverage.").append(vd.getComboBoxText()).append(" AND ");
+        }
+        //remove last AND
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+
+    private String addDeviationInnerJoins(){
+        StringBuilder sb = new StringBuilder();
+        if(chkFD.isSelected())
+            sb.append(addFrequencyDeviationInnerJoin());
+        if(chkOD.isSelected())
+            //IF OPINION IS ALL THEN WE CAN NOT INCLUDE THIS
+            sb.append(addOpinionDeviationInnerJoin());
+        //Only edge case is if opinion is set to all, then we should not include
+        return sb.toString();
+    }
+
+    private String addOpinionDeviationInnerJoin() {
+        StringBuilder sb = new StringBuilder();
+        //add local percent of mentions join
+        sb.append(addOpinionDeviationPercentOfMentionsJoin());
+        //add average global percent of mentions join
+        sb.append(addOpinionDeviationAveragePercentOfMentionsJoin());
+        return sb.toString();
+    }
+
+    private String addOpinionDeviationPercentOfMentionsJoin() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" inner join (SELECT ");
+        //add selects
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none"))
+                continue;
+           sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //add aggregate and viewname
+        sb.append("(").append(getViewNameSumOrCountMap().get(getCurrView())).
+                append("/totalsum)*100 percentofmentions FROM public.").append(getCurrView());
+        //add totalsum inner join
+        sb.append(" a inner join ").append(addTotalSumInnerJoin());
+        //add group by and inner join conditions
+        sb.append(" GROUP BY ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //add sum + total sum
+        sb.append("sum, totalsum) percentsum on ");
+        //add inner join conditions
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none"))
+                continue;
+            sb.append(" percentsum.").append(vd.getComboBoxText()).
+                    append(" = ").append("view.").append(vd.getComboBoxText()).
+                    append(" AND ");
+        }
+        //remove last AND
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+
+    private String addOpinionDeviationAveragePercentOfMentionsJoin() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" inner join (SELECT ");
+        //add selects
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //add aggregate and viewname
+        sb.append("avg((").append(getViewNameSumOrCountMap().get(getCurrView())).
+                append("/totalsum)*100) averagepercent FROM public.").append(getCurrView());
+        //add totalsum inner join
+        sb.append(" a inner join ").append(addTotalSumInnerJoin());
+        //add group by and inner join conditions
+        sb.append(" GROUP BY ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(", ");
+        }
+        //remove last comma
+        sb.setLength(sb.length()-2);
+        //add avgpercent and inner join conditions
+        sb.append(") avgpercent on ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.LOCATION))
+                continue;
+            sb.append(" avgpercent.").append(vd.getComboBoxText()).
+                    append(" = ").append("view.").append(vd.getComboBoxText()).
+                    append(" AND ");
+        }
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+    private String addTotalSumInnerJoin(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("( SELECT ");
+        //Select
+        for(ViewDimension vd : this.viewDimensions){
+            //select everything except for opinion
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.OPINION))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //append sum aggregate of sum or count
+        sb.append("sum(").append(getViewNameSumOrCountMap().get(getCurrView())).append(") totalsum");
+        sb.append(" from public.").append(getCurrView());
+        //group by
+        sb.append(" group by ");
+        for(ViewDimension vd : this.viewDimensions){
+            //select everything except for opinion
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.OPINION))
+                continue;
+            sb.append(vd.getComboBoxText()).append(", ");
+        }
+        //remove last comma
+        sb.setLength(sb.length()-2);
+        sb.append(") b on ");
+        //add inner join conditions
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getComboBoxText().equals("none") || vd.getViewDimension().equals(ViewDimensionEnum.OPINION))
+                continue;
+            sb.append("a.").append(vd.getComboBoxText()).append(" = b.").append(vd.getComboBoxText()).append(" AND ");
+        }
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+
+    private String getCurrView(){
         StringBuilder sb = new StringBuilder();
         for (ViewDimension vd : viewDimensions) {
             sb.append(vd.getComboBoxText());
@@ -223,19 +432,24 @@ txtSliceCollum.clear();
         StringBuilder sb = new StringBuilder();
         //append select
         sb.append("SELECT ");
-        for (ViewDimension vd : viewDimensions) {
-            if (vd.getComboBoxText().equals("coordinate")) {
-                sb.append("lat, long,");
-            } else {
-                if (!vd.getComboBoxText().equals("none"))
-                    sb.append(vd.getComboBoxText()).append(",");
+        for(ViewDimension vd : viewDimensions){
+            if(vd.getComboBoxText().equals("coordinate")){
+                sb.append("view.lat, view.long,");
+            }else{
+                if(!vd.getComboBoxText().equals("none"))
+                    sb.append("view.").append(vd.getComboBoxText()).append(",");
             }
         }
-        sb.append(getViewNameSumOrCountMap().get(viewName));
-        //ADD MEASURES
-        //sb.append(addMeasures());
-        sb.append(" FROM ").append(viewName);
+        sb.append("view.").append(getViewNameSumOrCountMap().get(viewName));
+        //IF ANY MEASURES SELECTED, ADD MEASURES
+        if(hasMeasures())
+            sb.append(addMeasuresToSelect());
+        sb.append(" FROM ").append(viewName).append(" view \n");
         return sb.toString();
+    }
+
+    private boolean hasMeasures() {
+        return chkOD.isSelected() || chkFD.isSelected() || chkIPD.isSelected();
     }
 
     private boolean hasWhereContent() {
@@ -252,6 +466,8 @@ txtSliceCollum.clear();
         try {
             String query = selectQuery();
             lastQuery = query;
+            //ADD INNER JOINS HERE
+            query+=addDeviationInnerJoins();
             if (txtTopRows.getText().isEmpty()) {
                 buildTable(ConnectionManager.selectSQL(query));
             } else {
@@ -261,12 +477,11 @@ txtSliceCollum.clear();
         } catch (NullPointerException e) {
             System.out.println("Choose some");
 
-        } catch (PSQLException e) {
+        } catch (PSQLException e){
             System.out.println("This view does not exist");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-
             clearTextfields();
             btnSearch.setDisable(false);
         }
@@ -298,7 +513,9 @@ txtSliceCollum.clear();
             if (strComboOpinion.equals("all"))
                 strComboOpinion = "none";
 
+
             boolean isWhere = false;
+
 
             if (!txtDrillTopic.getText().isEmpty())
                 whereQuery = modifyDrillQuery(isWhere, whereQuery, topicDimension, txtDrillTopic.getText(), strComboTopic, comboTopic, indexTopic);
@@ -436,22 +653,22 @@ txtSliceCollum.clear();
     public void locationRollUp() {
         rollUp("location");
     }
-
-    public void opinionRollUp() {
+    public void opinionRollUp(){
         rollUp("opinion");
     }
-
-    public void dateRollUp() {
+    public void dateRollUp(){
         rollUp("date");
     }
-
-    public void topicRollUp() {
+    public void topicRollUp(){
         rollUp("topic");
     }
 
-    private void rollUp(String dimension) {
+
+    private void rollUp(String dimension){
+        getComboboxValues();
+        int variable;
+        String viewName ;
         try {
-            getComboboxValues();
             if (dimension.equals("topic")) {
                 alterViewName("topic");
             } else if (dimension.equals("location")) {
