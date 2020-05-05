@@ -26,6 +26,7 @@ import org.postgresql.util.PSQLException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -33,7 +34,7 @@ public class MainSceneController {
     @FXML
     private CheckBox chkFD, chkOD, chkIPD;
     SearchBarContextMenu searchBarContextMenu = new SearchBarContextMenu(this);
-    private ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
+    private ObservableList<ObservableList> data = FXCollections.observableArrayList();
     PopularityManager popularityManager = new PopularityManager();
     private boolean isViewGenInitialised = false;
     private ViewGenerator viewGenerator = new ViewGenerator();
@@ -134,6 +135,7 @@ public class MainSceneController {
         data.clear();
         tableViewLeft.getColumns().clear();
         tableViewLeft.getItems().clear();
+        DecimalFormat df = new DecimalFormat("#.#####");
         for (int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++) {
             final int j = i;
             TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i + 1));
@@ -143,13 +145,17 @@ public class MainSceneController {
                 }
             });
             tableViewLeft.getColumns().addAll(col);
-
             System.out.println(col.getText() + "[" + i + "]" + "has been added");
         }
         while (resultSet_Tableview.next()) {
-            ObservableList<String> row = FXCollections.observableArrayList();
+            ObservableList row = FXCollections.observableArrayList();
             for (int i = 1; i <= resultSet_Tableview.getMetaData().getColumnCount(); i++) {
-                row.add(resultSet_Tableview.getString(i));
+                try{
+                    double number = Double.parseDouble(resultSet_Tableview.getString(i));
+                    row.add(df.format(number));
+                } catch (NumberFormatException e){
+                    row.add(resultSet_Tableview.getString(i));
+                }
             }
             data.add(row);
         }
@@ -188,6 +194,7 @@ public class MainSceneController {
         }
         return newViewNameSumOrCountMap;
     }
+
 
     private HashMap<String, String> getViewNameSumOrCountMap() {
         HashMap<String, String> newViewNameSumOrCountMap = new HashMap<>();
