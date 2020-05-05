@@ -23,25 +23,21 @@
             <VBox>
                 <HBox>
                     <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic" styleClass="comboboxDimension"/>
-                    <TextField promptText="Topic Filter" fx:id="txtTopic" id="txtTopic" styleClass="searchField"/>
-                </HBox>
+                   </HBox>
 
                 <HBox>
                     <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation"
                               styleClass="comboboxDimension"/>
-                    <TextField promptText="Location Filter" fx:id="txtLocation" id="txtLocation"
-                               styleClass="searchField"/>
-                </HBox>
+                     </HBox>
                 <HBox>
                     <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion"
                               styleClass="comboboxDimension"/>
-                    <TextField promptText="Opinion Filter" fx:id="txtOpinion" id="txtOpinion" styleClass="searchField"/>
-                </HBox>
+                  </HBox>
                 <HBox>
                     <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
-                    <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
+
                 </HBox>
-                <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows"/>
+                <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows" text="1000"/>
                 <HBox>
                     <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
                     <Label text="" fx:id="lblViewSize" id="lblViewSize"/>

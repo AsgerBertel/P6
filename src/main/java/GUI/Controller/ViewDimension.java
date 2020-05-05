@@ -9,7 +9,7 @@ public class ViewDimension {
     private ComboBox comboBox;
     private TextField drill, where;
 
-    public ViewDimension(ViewDimensionEnum viewDimension, ComboBox comboBox, TextField drill, TextField where) {
+    public ViewDimension(ViewDimensionEnum viewDimension, ComboBox comboBox, TextField drill) {
         this.viewDimension = viewDimension;
         this.comboBox = comboBox;
         this.drill = drill;

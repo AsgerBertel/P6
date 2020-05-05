@@ -41,7 +41,7 @@ public class MainSceneController {
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
     @FXML
-    private TextField txtTopic, txtLocation, txtOpinion, txtDate, txtDrillDate, txtDrillOpinion, txtDrillLocation, txtDrillTopic, txtTopRows, txtSliceValue, txtSliceCollum;
+    private TextField txtDrillDate, txtDrillOpinion, txtDrillLocation, txtDrillTopic, txtTopRows, txtSliceValue, txtSliceCollum;
     @FXML
     private Button btnUpdate, btnSearch;
     @FXML
@@ -94,30 +94,29 @@ public class MainSceneController {
         comboTopic.setItems(FXCollections.observableArrayList("toptopic", "all"));
         comboDate.setItems(FXCollections.observableArrayList("day", "month", "year", "all"));
 
-        initializeTopicOnKeyPressedEvent(comboTopic);
+      /*  initializeTopicOnKeyPressedEvent(comboTopic);
         initializeOpinionOnKeyPressedEvent(comboOpinion);
         initializeLocationOnKeyPressedEvent(comboLocation);
         initializeateDateOnKeyPressedEvent(comboDate);
-        initializeOnlyNumericTextfield(txtTopRows);
+        initializeOnlyNumericTextfield(txtTopRows);*/
+
         tableViewLeft.setItems(data);
 
         //ViewDimensions ORDER IS VERY IMPORTANT
-        viewDimensions.add(new ViewDimension(ViewDimensionEnum.TOPIC, comboTopic, txtDrillTopic, txtTopic));
-        viewDimensions.add(new ViewDimension(ViewDimensionEnum.LOCATION, comboLocation, txtDrillLocation, txtLocation));
-        viewDimensions.add(new ViewDimension(ViewDimensionEnum.DATE, comboDate, txtDrillDate, txtDate));
-        viewDimensions.add(new ViewDimension(ViewDimensionEnum.OPINION, comboOpinion, txtDrillOpinion, txtOpinion));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.TOPIC, comboTopic, txtDrillTopic));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.LOCATION, comboLocation, txtDrillLocation));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.DATE, comboDate, txtDrillDate));
+        viewDimensions.add(new ViewDimension(ViewDimensionEnum.OPINION, comboOpinion, txtDrillOpinion));
     }
 
     public void clearTextfields() {
-        txtTopic.clear();
-        txtLocation.clear();
-        txtOpinion.clear();
-        txtDate.clear();
         txtDrillDate.clear();
         txtDrillOpinion.clear();
         txtDrillLocation.clear();
         txtDrillTopic.clear();
-        txtTopRows.clear();
+txtSliceValue.clear();
+txtSliceCollum.clear();
+
     }
 
 
@@ -248,28 +247,10 @@ public class MainSceneController {
         return false;
     }
 
-    private String whereQuery() {
-        //if all where textfields are empty, return empty string
-        if (!hasWhereContent())
-            return "";
-        StringBuilder sb = new StringBuilder();
-        sb.append(" WHERE ");
-        for (ViewDimension vd : viewDimensions) {
-            if (!vd.getWhereText().isEmpty())
-                sb.append(vd.getComboBoxText()).append(" = '").append(vd.getWhereText()).append("' AND ");
-        }
-        //remove last AND
-        String s = sb.toString();
-        if (s.substring(s.length() - 4).equals("AND ")) {
-            s = s.substring(0, s.length() - 4);
-        }
-        return s;
-    }
-
     public void loadView() {
         btnSearch.setDisable(false);
         try {
-            String query = selectQuery() + whereQuery();
+            String query = selectQuery();
             lastQuery = query;
             if (txtTopRows.getText().isEmpty()) {
                 buildTable(ConnectionManager.selectSQL(query));
@@ -537,134 +518,4 @@ public class MainSceneController {
         return whereQuery;
     }
 
-    private void initializeOpinionOnKeyPressedEvent(ComboBox comboOpinion) {
-        txtOpinion.setOnKeyReleased(event -> {
-            boolean isOpinion;
-            try {
-                if (comboOpinion.getSelectionModel().getSelectedItem().toString().equals("opinion")) {
-                    isOpinion = true;
-                } else {
-                    isOpinion = false;
-                }
-                searchBarContextMenu.getItems().clear();
-                searchBarContextMenu.loadOpinions(txtOpinion.getText(), isOpinion, txtOpinion);
-                searchBarContextMenu.show(txtOpinion, Side.BOTTOM, 0, 0);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                System.out.println("nothing has been chosen");
-            }
-        });
-    }
-
-    private void initializeTopicOnKeyPressedEvent(ComboBox comboTopic) {
-        //searchbar for topics
-        txtTopic.setOnKeyReleased(event -> {
-            boolean isTopTopic, isSubTopic;
-            try {
-                if (comboTopic.getSelectionModel().getSelectedItem().toString().equals("toptopic")) {
-                    isSubTopic = false;
-                    isTopTopic = true;
-                } else if (comboTopic.getSelectionModel().getSelectedItem().toString().equals("subtopic")) {
-                    isSubTopic = true;
-                    isTopTopic = false;
-                } else {
-                    isSubTopic = false;
-                    isTopTopic = false;
-                }
-                searchBarContextMenu.getItems().clear();
-                searchBarContextMenu.loadTopics(txtTopic.getText(), isTopTopic, isSubTopic, txtTopic);
-                searchBarContextMenu.show(txtTopic, Side.BOTTOM, 0, 0);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                System.out.println("nothing has been chosen");
-            }
-        });
-    }
-
-    private void initializeLocationOnKeyPressedEvent(ComboBox comboLocation) {
-
-        //searchbar for topics
-        txtLocation.setOnKeyReleased(event -> {
-            if (!comboLocation.getSelectionModel().getSelectedItem().toString().equals("coordinate")) {
-                boolean isDistrict, isCounty, isCity, isCountry;
-                try {
-                    if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("district")) {
-                        isDistrict = true;
-                        isCounty = false;
-                        isCity = false;
-                        isCountry = false;
-                    } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("county")) {
-                        isDistrict = false;
-                        isCounty = true;
-                        isCity = false;
-                        isCountry = false;
-
-                    } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("city")) {
-                        isDistrict = false;
-                        isCounty = false;
-                        isCity = true;
-                        isCountry = false;
-
-                    } else if (comboLocation.getSelectionModel().getSelectedItem().toString().equals("country")) {
-                        isDistrict = false;
-                        isCounty = false;
-                        isCity = false;
-                        isCountry = true;
-
-                    } else {
-                        isDistrict = false;
-                        isCounty = false;
-                        isCity = false;
-                        isCountry = false;
-                    }
-                    searchBarContextMenu.getItems().clear();
-                    searchBarContextMenu.loadLocation(txtLocation.getText(), isDistrict, isCounty, isCity, isCountry, txtLocation);
-                    searchBarContextMenu.show(txtLocation, Side.BOTTOM, 0, 0);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException e) {
-                    System.out.println("nothing has been chosen");
-                }
-            } else {
-                txtLocation.clear();
-            }
-        });
-    }
-
-    private void initializeateDateOnKeyPressedEvent(ComboBox comboDate) {
-        //searchbar for topics
-        txtDate.setOnKeyReleased(event -> {
-            boolean isDay, isMonth, isYear;
-            try {
-                if (comboDate.getSelectionModel().getSelectedItem().toString().equals("day")) {
-                    isDay = true;
-                    isMonth = false;
-                    isYear = false;
-                } else if (comboDate.getSelectionModel().getSelectedItem().toString().equals("month")) {
-                    isDay = false;
-                    isMonth = true;
-                    isYear = false;
-
-                } else if (comboDate.getSelectionModel().getSelectedItem().toString().equals("year")) {
-                    isDay = false;
-                    isMonth = false;
-                    isYear = true;
-
-                } else {
-                    isDay = false;
-                    isMonth = false;
-                    isYear = false;
-                }
-                searchBarContextMenu.getItems().clear();
-                searchBarContextMenu.loadDate(txtDate.getText(), isDay, isMonth, isYear, txtDate);
-                searchBarContextMenu.show(txtDate, Side.BOTTOM, 0, 0);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                System.out.println("nothing has been chosen");
-            }
-        });
-    }
 }
