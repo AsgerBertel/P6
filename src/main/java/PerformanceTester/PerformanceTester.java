@@ -30,12 +30,33 @@ public class PerformanceTester {
     private GraphManager gm;
     private GreedyAlgorithm ga;
     private GreedyPopularityAlgorithm gpa;
+    private HashMap<String,Long> nodeNameSizeMap = new HashMap<>();
+    private HashMap<String, Node> nodeNameNodeReferenceMap = new HashMap<>();
+
+
+    private void populateNodeSizes() throws SQLException {
+        ResultSet rs = ConnectionManager.selectSQL(QueryManager.selectAllFromViewsize);
+        while(rs.next()){
+            nodeNameSizeMap.put(rs.getString(1).toLowerCase(),rs.getLong(2));
+        }
+    }
+
+    private void populateNodeNameNodeReferenceMap(){
+        for(Node n: gm.nodes.keySet()){
+            nodeNameNodeReferenceMap.put(NodeQueryUtils.getNodeViewName(n),n);
+        }
+    }
 
     public void runAllPerformanceTests(GraphManager gm) throws IOException, SQLException {
         //Runs all tests for all queries and stores them in an xls file
         this.gm = gm;
         this.ga = new GreedyAlgorithm(this.gm);
         this.gpa = new GreedyPopularityAlgorithm(this.gm);
+
+        //INITIALISE SIZE MAP and Node reference map
+        populateNodeSizes();
+        populateNodeNameNodeReferenceMap();
+
 
         LinkedHashMap<Integer, ArrayList<QueryString>> dayQueriesMap = new LinkedHashMap<>();
         for(int i = 0; i < 2; i++){
@@ -119,34 +140,38 @@ public class PerformanceTester {
     }
 
     private double runPerformanceTest(ArrayList<QueryString> queries, HSSFSheet sheet, int day, SummaryStats stats){
-        double totalTime = 0;
+        double totalRowsQueried = 0;
         PopularityManager pm = new PopularityManager();
         for(QueryString s : queries){
             try {
                 //update view popularity
                 pm.updatePopularityValue(s.getViewname());
-                //run query 3 times and get average, to minimize variation. todo set to 5 when doing actual test?
-                double totalTimeSpentOnQuery = 0;
-                for(int i = 0; i < 3; i++){
-                    ResultSet rs = ConnectionManager.selectSQL(s.toString());
-                    rs.next();
-                    JSONArray jsonArray = new JSONArray(rs.getString(1));
-                    totalTimeSpentOnQuery+= jsonArray.getJSONObject(0).getDouble("Execution Time");
+                long rowsQueried = 0;
+
+                if(nodeNameNodeReferenceMap.get(s.getViewname()).isMaterialised()){
+                    rowsQueried = nodeNameSizeMap.get(s.getViewname());
+                }else{
+                    rowsQueried = nodeNameSizeMap.get(NodeQueryUtils.getNodeViewName(nodeNameNodeReferenceMap.get(s.getViewname()).getMaterializedUpperNode()));
                 }
-                double timeSpent = totalTimeSpentOnQuery/3;
-                totalTime+=timeSpent;
+
+                //todo dont query, just yeet the info from maps
+                ResultSet rs = ConnectionManager.selectSQL(s.toString());
+                rs.next();
+                JSONArray jsonArray = new JSONArray(rs.getString(1));
+                rowsQueried+= jsonArray.getJSONObject(0).getDouble("Execution Time");
+                totalRowsQueried+=rowsQueried;
                 Row row = sheet.createRow(sheet.getLastRowNum()+1);
                 Cell query = row.createCell(0);
                 query.setCellValue(s.getViewname());
                 Cell timeSpentOnQuery = row.createCell(1);
-                timeSpentOnQuery.setCellValue(timeSpent);
+                timeSpentOnQuery.setCellValue(rowsQueried);
                 Cell dayCell = row.createCell(2);
                 dayCell.setCellValue(day+1);
-                stats.setLongestQueryViewAndTime(s.getViewname(),timeSpent);
+                stats.setLongestQueryViewAndTime(s.getViewname(),rowsQueried);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return totalTime/queries.size();
+        return totalRowsQueried/queries.size();
     }
 }
