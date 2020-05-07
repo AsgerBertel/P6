@@ -349,8 +349,9 @@ public class MainSceneController {
                 continue;
             sb.append("a.").append(vd.getComboBoxText()).append(", ");
         }
-        //add sum + total sum
-        sb.append("sum, totalsum) percentsum on ");
+        //add sum/count + total sum
+        String aggregate = getViewNameSumOrCountMap().get(getCurrView());
+        sb.append(aggregate).append(", totalsum) percentsum on ");
         //add inner join conditions
         for (ViewDimension vd : this.viewDimensions) {
             if (vd.getComboBoxText().equals("none"))
