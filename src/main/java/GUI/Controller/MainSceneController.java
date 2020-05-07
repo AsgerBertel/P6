@@ -34,6 +34,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -152,7 +153,9 @@ public class MainSceneController {
             }
         });
     }
-
+    public ObservableList getColumnsFromResultset() {
+        return tableViewLeft.getColumns();
+    }
     public void buildTable(ResultSet resultSet_Tableview) throws SQLException {
         data.clear();
         tableViewLeft.getColumns().clear();
@@ -166,6 +169,8 @@ public class MainSceneController {
                 return new SimpleObjectProperty<>(param.getValue().get(j)) {
                 };
             });
+            col.setComparator(makeComparator(resultSetMetaData.getColumnType(i+1)));
+
             tableViewLeft.getColumns().addAll(col);
 
             System.out.println(col.getText() + "[" + i + "]" + "has been added");
@@ -188,14 +193,48 @@ public class MainSceneController {
                         row.add(df.format(resultSet_Tableview.getDouble(i)));
                         break;
                 }
-                //   row.add();
-
-
             }
             data.add(row);
         }
         lblViewSize.setText("View size: " + data.size());
         tableViewLeft.setItems(data);
+    }
+    public Comparator makeComparator(int type){
+
+        switch (type) {
+            case 12:
+                return new Comparator() {
+                    @Override
+                    public int compare(Object o1, Object o2) {
+                        return o1.toString().compareTo(o2.toString());
+                    }
+                };
+            case 4:
+                return new Comparator() {
+                    @Override
+                    public int compare(Object o1, Object o2) {
+                        int o1_numeric, o2_numeric;
+                        o1_numeric = Integer.parseInt(o1.toString());
+                        o2_numeric = Integer.parseInt(o2.toString());
+                        if (o1_numeric < o2_numeric) return 1;
+                        if (o1_numeric > o2_numeric) return -1;
+                        return 0;
+                    }
+                };
+            case 2:
+                return new Comparator() {
+                    @Override
+                    public int compare(Object o1, Object o2) {
+                        double o1_numeric, o2_numeric;
+                        o1_numeric = Double.parseDouble(o1.toString().replace(",", "."));
+                        o2_numeric = Double.parseDouble(o2.toString().replace(",", "."));
+                        if (o1_numeric < o2_numeric) return 1;
+                        if (o1_numeric > o2_numeric) return -1;
+                        return 0;
+                    }
+                };
+        }
+        return null;
     }
 
     public void updateViews() {
