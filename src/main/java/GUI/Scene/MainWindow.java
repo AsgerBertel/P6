@@ -2,6 +2,7 @@ package GUI.Scene;
 
 import java.io.IOException;
 
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +21,8 @@ public class MainWindow extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        int i = 0;
         Parent root =  FXMLLoader.load(getClass().getResource("/FXML/MainScene.fxml"));
         primaryStage.setTitle("P6");
         Scene scene = new Scene(root);
