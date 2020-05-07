@@ -169,7 +169,7 @@ public class QueryManager {
     }
 
     public static String insertIntopopularity(String view, int currentDay) {
-        return "INSERT INTO cube.popularity VALUES ('" + view + "',1," + currentDay + ",true)";
+        return "INSERT INTO cube.popularity (viewname, dailyvalue, day, currentday) VALUES ('" + view + "',1," + currentDay + ",true)";
     }
 
     public static String updatepopularityIfExists(String view) {
