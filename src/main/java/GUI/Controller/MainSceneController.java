@@ -31,7 +31,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainSceneController {
     @FXML
@@ -44,7 +46,10 @@ public class MainSceneController {
     private HashMap<String, String> viewNameSumOrCountMap = new HashMap<>();
     private boolean isUpdated = true;
     private ArrayList<ViewDimension> viewDimensions = new ArrayList<>();
+    private HashMap<ViewDimensionEnum, String> previousDrillJoins = new HashMap<>(), previousDrillWheres = new HashMap<>();
+    private HashMap<ViewDimensionEnum, String> currentDrillJoins = new HashMap<>(), currentDrillWheres = new HashMap<>();
     String lastQuery;
+    private boolean isDrillDown = false, isLastQueryDrillDown = false;
     @FXML
     private ComboBox comboLocation, comboOpinion, comboTopic, comboDate;
     @FXML
@@ -60,6 +65,7 @@ public class MainSceneController {
     private VBox leftSide;
     ResultSet resultSet;
 
+    HashMap<ViewDimensionEnum, List<String>> dimensions = new HashMap<>();
     ArrayList<String> locationDimension = new ArrayList<>();
     ArrayList<String> dateDimension = new ArrayList<>();
     ArrayList<String> topicDimension = new ArrayList<>();
@@ -91,6 +97,11 @@ public class MainSceneController {
     String whereQuery = " WHERE ";
 
     public void initialize() {
+        dimensions.put(ViewDimensionEnum.LOCATION, Arrays.asList("coordinate", "district", "county", "city", "country", "all"));
+        dimensions.put(ViewDimensionEnum.OPINION, Arrays.asList("opinion", "all"));
+        dimensions.put(ViewDimensionEnum.TOPIC, Arrays.asList("toptopic", "all"));
+        dimensions.put(ViewDimensionEnum.DATE, Arrays.asList("day", "month", "year", "all"));
+
         locationDimension.addAll(FXCollections.observableArrayList("coordinate", "district", "county", "city", "country", "all"));
         dateDimension.addAll(FXCollections.observableArrayList("day", "month", "year", "all"));
         topicDimension.addAll(FXCollections.observableArrayList("toptopic", "all"));
@@ -122,9 +133,8 @@ public class MainSceneController {
         txtDrillOpinion.clear();
         txtDrillLocation.clear();
         txtDrillTopic.clear();
-txtSliceValue.clear();
-txtSliceCollum.clear();
-
+        txtSliceValue.clear();
+        txtSliceCollum.clear();
     }
 
 
@@ -150,6 +160,7 @@ txtSliceCollum.clear();
             TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i + 1));
             col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
+
                     return new SimpleStringProperty(param.getValue().get(j).toString());
                 }
             });
@@ -454,6 +465,26 @@ txtSliceCollum.clear();
             String query = selectQuery();
             //ADD INNER JOINS HERE
             query+=addDeviationInnerJoins();
+            if(isDrillDown){
+                query += drillInnerJoin();
+                if(isLastQueryDrillDown){
+                    query += addPreviousDrillDownJoins();
+                }
+                query += drillWhere();
+                if(isLastQueryDrillDown){
+                    query += addPreviousDrillDownWheres();
+                }
+                isDrillDown=false;
+                isLastQueryDrillDown = true;
+                previousDrillJoins = currentDrillJoins;
+                previousDrillWheres = currentDrillWheres;
+                currentDrillJoins = new HashMap<>();
+                currentDrillWheres = new HashMap<>();
+            }else{
+                //this query is not a drill down, so we set flag to false and clear map
+                isLastQueryDrillDown = false;
+                previousDrillJoins = new HashMap<>();
+            }
             lastQuery = query;
             if (txtTopRows.getText().isEmpty()) {
                 buildTable(ConnectionManager.selectSQL(query));
@@ -474,13 +505,109 @@ txtSliceCollum.clear();
         }
     }
 
+    private String addPreviousDrillDownWheres() {
+        StringBuilder sb = new StringBuilder();
+        for(String s : previousDrillWheres.values()){
+            sb.append(" AND ").append(s);
+        }
+        return sb.toString();
+    }
+
+    private String addPreviousDrillDownJoins() {
+        StringBuilder sb = new StringBuilder();
+        for(String s : previousDrillJoins.values()){
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
     public String orderByQuery(String query) {
         if (!txtTopRows.getText().isEmpty())
         query = query + " ORDER BY " + getViewNameSumOrCountMap().get(getCurrView()) + " LIMIT " + txtTopRows.getText();
         return query;
     }
 
+    private String drillWhere(){
+        StringBuilder sb = new StringBuilder();
+        ArrayList<String> wheres = new ArrayList<>();
+        sb.append(" WHERE ");
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getDrillText().isEmpty()) continue;
+            //If getDrillText is not empty, we need to add an inner join on the "previous" element in the dimension hierarchy
+            //get the current index
+            int index = dimensions.get(vd.getViewDimension()).indexOf(vd.getComboBoxText());
+            //if index is two below hierarchy, we're trying to roll down from all, so we ignore. However, if index is 0, we can safely add a where
+            if(index == dimensions.get(vd.getViewDimension()).size()-2) continue;
+            if(previousDrillWheres.containsKey(vd.getViewDimension())){
+                previousDrillWheres.remove(vd.getViewDimension());
+            }
+            String fromLevel = dimensions.get(vd.getViewDimension()).get(index+1);
+            sb.append(fromLevel).append(" = '").append(vd.getDrillText()).append("'");
+            currentDrillWheres.put(vd.getViewDimension(),sb.toString());
+            wheres.add(sb.toString());
+            sb = new StringBuilder();
+        }
+        for(String s : wheres){
+            sb.append(s).append(" AND ");
+        }
+        String s = sb.toString();
+        if (s.substring(s.length() - 4).equals("AND ")) {
+            s = s.substring(0, s.length() - 4);
+        }
+        return s;
+    }
+
+    private String drillInnerJoin(){
+        StringBuilder sb = new StringBuilder();
+        ArrayList<String> joins = new ArrayList<>();
+        for(ViewDimension vd : this.viewDimensions){
+            if(vd.getDrillText().isEmpty()) continue;
+            //If getDrillText is not empty, we need to add an inner join on the "previous" element in the dimension hierarchy
+            //get the current index
+            int index = dimensions.get(vd.getViewDimension()).indexOf(vd.getComboBoxText());
+            //if index is two below hierarchy, we're trying to roll down from all, so we ignore.
+            if(index == dimensions.get(vd.getViewDimension()).size()-2) continue;
+            //check if we just drilled down on the same dimension
+            if(previousDrillJoins.containsKey(vd.getViewDimension())){
+                //remove the key value pair
+                previousDrillJoins.remove(vd.getViewDimension());
+            }
+            //else we add the inner join
+            //declare dimension level that we drilled from
+            String fromLevel = dimensions.get(vd.getViewDimension()).get(index+1);
+            sb.append(" inner join cube.").append(fromLevel).append(" on view.").append(fromLevel)
+                    .append("id = ").append("cube.").append(fromLevel).append(".").append(fromLevel).append("id ");
+            currentDrillJoins.put(vd.getViewDimension(),sb.toString());
+            joins.add(sb.toString());
+            sb = new StringBuilder();
+
+        }
+        for(String s : joins){
+            sb.append(s);
+        }
+
+        return sb.toString();
+    }
+    private void updateComboBoxes(){
+        //this method updates all combo boxes we need to drill down on
+        for(ViewDimension vd : this.viewDimensions){
+            //If drillTextField is not empty, we need to update the combobox. If we roll down from all, ignore as well
+            if(vd.getDrillText().isEmpty() || vd.getComboBoxText().equals("none")){
+                continue;
+            }
+            //get index of curr level
+            int index = dimensions.get(vd.getViewDimension()).indexOf(vd.getComboBoxText());
+            //if index is 0, we skip todo throw an error
+            if(index==0)
+                continue;
+            vd.getComboBox().setValue(dimensions.get(vd.getViewDimension()).get(index-1));
+        }
+    }
     public void drillDown() {
+        updateComboBoxes();
+        isDrillDown = true;
+        loadView();
+        /*
         try {
 
             getComboboxValues();
@@ -560,6 +687,7 @@ txtSliceCollum.clear();
             System.out.println("you cant drill anymore");
         }
         resetGlobalVariables();
+         */
     }
 
     private String selectStartQuery() {
