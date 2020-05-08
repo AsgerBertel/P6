@@ -87,14 +87,15 @@ public class GreedyAlgorithm {
     }
 
     public double getBenefit(Set<Node> nodes, Node currentNode) {
-        BigInteger benefit = BigInteger.valueOf(0);
+        double benefit = 0;
         for(Node n: BFS_GetSubGraph(nodes, currentNode)){
             if(!(n.getActualCost().compareTo(currentNode.getViewSize()) < 0 )) {
-                benefit = benefit.add(n.getActualCost().subtract(currentNode.getViewSize()));
+                benefit += (n.getActualCost().doubleValue() - currentNode.getViewSize().doubleValue()) * n.getScale();
+                //benefit = benefit.add(n.getActualCost().subtract(currentNode.getViewSize()));
             }
         }
 
-        return benefit.doubleValue() * currentNode.getScale();
+        return benefit * currentNode.getScale();
     }
 
     private void calculateInitialValue(Node topNode, Set<Node> keyset) throws SQLException {

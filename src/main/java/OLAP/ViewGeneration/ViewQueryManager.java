@@ -195,8 +195,13 @@ public class ViewQueryManager {
 
     private static String aggregateFunction(Node n) {
         if(!n.getMaterializedUpperNode().equals(root) && !n.isMaterialised()){
+            if(!n.getMaterializedUpperNode().getMaterializedUpperNode().equals(root))
+                return "sum(f.sum)";
             return "sum(f.count)";
-        }else{
+        }else         if(!n.getMaterializedUpperNode().equals(root) && n.isMaterialised()){
+            return"sum(f.count)";
+        }
+        else{
             for(Level l : n.getDimensions().values()){
                 if(l.getName().equals("toptopic")){
                     return"count(cubefrequency.cube.toptopic.toptopic)";

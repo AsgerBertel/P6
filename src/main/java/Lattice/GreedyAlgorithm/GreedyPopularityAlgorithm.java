@@ -48,8 +48,6 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         double maxVal = sortedNodePopularityMap.get(sortedNodePopularityMap.keySet().toArray()[sortedNodePopularityMap.size() - 1]);
         for (Node n : sortedNodePopularityMap.keySet()) {
             int currentPopularityValue = sortedNodePopularityMap.get(n);
-            if (currentPopularityValue == 30)
-                System.out.println("i like trains");
             if (currentPopularityValue == 0) {
                 n.setScale(scale);
                 previousPopularityVal = currentPopularityValue;

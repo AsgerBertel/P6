@@ -23,27 +23,73 @@
             <VBox>
                 <HBox>
                     <ComboBox promptText="Topic" fx:id="comboTopic" id="comboTopic" styleClass="comboboxDimension"/>
-                    <TextField promptText="Topic Filter" fx:id="txtTopic" id="txtTopic" styleClass="searchField"/>
-                </HBox>
+                   </HBox>
 
                 <HBox>
-                    <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation" styleClass="comboboxDimension"/>
-                    <TextField promptText="Location Filter" fx:id="txtLocation" id="txtLocation"
-                               styleClass="searchField"/>
-                </HBox>
+                    <ComboBox promptText="Location" fx:id="comboLocation" id="comboLocation"
+                              styleClass="comboboxDimension"/>
+                     </HBox>
                 <HBox>
-                    <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion" styleClass="comboboxDimension"/>
-                    <TextField promptText="Opinion Filter" fx:id="txtOpinion" id="txtOpinion" styleClass="searchField"/>
-                </HBox>
+                    <ComboBox promptText="Opinion" fx:id="comboOpinion" id="comboOpinion"
+                              styleClass="comboboxDimension"/>
+                  </HBox>
                 <HBox>
                     <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
-                    <TextField promptText="Date Filter" fx:id="txtDate" id="txtDate" styleClass="searchField"/>
-                </HBox>
 
-                <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
+                </HBox>
+                <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows" text="1000"/>
+                <HBox>
+                    <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
+                    <Label text="" fx:id="lblViewSize" id="lblViewSize"/>
+                </HBox>
             </VBox>
 
+            <VBox styleClass="VBoxDrill">
+                <HBox>
+                    <TextField promptText="Drill Topic" fx:id="txtDrillTopic" id="txtTopic" styleClass="searchField"/>
+                    <Button text="Roll Up" fx:id="btnRollUpTopic" id="btnRollUpTopic" styleClass="btnRollUp"
+                            onAction="#topicRollUp"/>
+                </HBox>
 
+                <HBox>
+                    <TextField promptText="Drill Location" fx:id="txtDrillLocation" id="txtLocation"
+                               styleClass="searchField"/>
+                    <Button text="Roll Up" fx:id="btnRollUpLocation" id="btnRollUpLocation"
+                            styleClass="btnRollUp" onAction="#locationRollUp"/>
+                </HBox>
+
+                <HBox>
+                    <TextField promptText="Drill Opinion" fx:id="txtDrillOpinion" id="txtOpinion"
+                               styleClass="searchField"/>
+                    <Button text="Roll Up" fx:id="btnRollUpOpinion" id="btnRollUpOpinion"
+                            styleClass="btnRollUp" onAction="#opinionRollUp"/>
+                </HBox>
+                <HBox>
+                    <TextField promptText="Drill Date" fx:id="txtDrillDate" id="txtDate" styleClass="searchField"/>
+                    <Button text="Roll Up" fx:id="btnRollUpDate" id="btnRollUpDate" styleClass="btnRollUp"
+                            onAction="#dateRollUp"/>
+                </HBox>
+                <Button text="Drill" fx:id="btnDrill" onAction="#drillDown" id="btnSearch"/>
+
+                <TextField fx:id="txtSliceCollum" styleClass="searchField" promptText="Slice Collum"/>
+
+                <HBox>
+                    <TextField fx:id="txtSliceValue" styleClass="searchField" promptText="Slice Value"/>
+                    <Button fx:id="btnSlice" styleClass="btnRollUp" text="Slice" onAction="#slice"/>
+                </HBox>
+                <HBox>
+                    <CheckBox fx:id="chkOD" id="chkOD" styleClass="chkMeasures"/>
+                    <Label text="Opinion Deviation"/>
+                </HBox>
+                <HBox>
+                    <CheckBox fx:id="chkFD" id="chkFD" styleClass="chkMeasures"/>
+                    <Label text="Frequency Deviation"/>
+                </HBox>
+                <HBox>
+                    <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures"/>
+                    <Label text="Impressions per Dollar"/>
+                </HBox>
+            </VBox>
         </VBox>
     </HBox>
 </VBox>

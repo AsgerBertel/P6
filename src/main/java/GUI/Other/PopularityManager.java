@@ -28,6 +28,7 @@ public class PopularityManager {
                     String dbViewName = resultSet.getString(1);
                     if (viewName.equals(dbViewName)) {
                         viewExists = true;
+                        break;
                     } else {
                         viewExists = false;
 
@@ -36,8 +37,11 @@ public class PopularityManager {
                 }
                 if (!viewExists) {
                     ConnectionManager.updateSql(QueryManager.insertIntopopularity(viewName, currentDay));
+                    System.out.println("Insert:"+QueryManager.insertIntopopularity(viewName, currentDay));
                 } else {
                     ConnectionManager.updateSql(QueryManager.updatepopularityIfExists(viewName));
+                    System.out.println("Update:"+QueryManager.updatepopularityIfExists(viewName));
+
                 }
             } else {
                 resultSet = ConnectionManager.selectSQL(QueryManager.selectDayFromPopulation);
