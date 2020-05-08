@@ -20,8 +20,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.json.JSONArray;
-import scala.collection.parallel.ParIterableLike;
 
 public class PerformanceTester {
 
@@ -30,20 +28,20 @@ public class PerformanceTester {
     private GraphManager gm;
     private GreedyAlgorithm ga;
     private GreedyPopularityAlgorithm gpa;
-    private HashMap<String,Long> nodeNameSizeMap = new HashMap<>();
+    private HashMap<String, Long> nodeNameSizeMap = new HashMap<>();
     private HashMap<String, Node> nodeNameNodeReferenceMap = new HashMap<>();
 
 
     private void populateNodeSizes() throws SQLException {
         ResultSet rs = ConnectionManager.selectSQL(QueryManager.selectAllFromViewsize);
-        while(rs.next()){
-            nodeNameSizeMap.put(rs.getString(1).toLowerCase(),rs.getLong(2));
+        while (rs.next()) {
+            nodeNameSizeMap.put(rs.getString(1).toLowerCase(), rs.getLong(2));
         }
     }
 
-    private void populateNodeNameNodeReferenceMap(){
-        for(Node n: gm.nodes.keySet()){
-            nodeNameNodeReferenceMap.put(NodeQueryUtils.getNodeViewName(n),n);
+    private void populateNodeNameNodeReferenceMap() {
+        for (Node n : gm.nodes.keySet()) {
+            nodeNameNodeReferenceMap.put(NodeQueryUtils.getNodeViewName(n), n);
         }
     }
 
@@ -58,10 +56,7 @@ public class PerformanceTester {
         populateNodeNameNodeReferenceMap();
 
 
-        LinkedHashMap<Integer, ArrayList<QueryString>> dayQueriesMap = new LinkedHashMap<>();
-        for(int i = 0; i < 2; i++){
-            dayQueriesMap.put(i,PerformanceTestQueryGenerator.weightedRandomQueries(getAllViewNamesExceptForNNNN(this.gm.nodes.keySet()),20,this.random));
-        }
+        LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap = PerformanceTestQueryGenerator.sameMonth();
 
         //Run base and write results
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -72,32 +67,33 @@ public class PerformanceTester {
         SummaryStats popSum = new SummaryStats("POPULARITY");
         //run base greedy
         //delet everything
-        ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
-        runBase(dayQueriesMap,baseDataSheet,baseSum);
+       ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
+        runBase(dayQueriesMap, baseDataSheet, baseSum);
         //delete all views and empty the popularity table
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         ConnectionManager.updateSql(QueryManager.deleteContentsTablePopularity);
         //Run popularity
-        runPopularity(dayQueriesMap,popularityDataSheet,popSum);
+        runPopularity(dayQueriesMap, popularityDataSheet, popSum);
         //Before every day, run greedy and generate views
         //before first run, drop the contents of the popularity table manually?
-        writeToExcel(workbook,baseSum,popSum);
+        writeToExcel(workbook, baseSum, popSum);
 
     }
+
     private void writeToExcel(HSSFWorkbook workbook, SummaryStats base, SummaryStats pop) throws IOException {
         File results = new File("C:/Users/Mads/Desktop/PerformanceTest/Results.xls");
         HSSFSheet baseSummarySheet = workbook.createSheet("baseSUM");
         HSSFSheet popularitySummarySheet = workbook.createSheet("popularitySUM");
-        populateSumSheet(base,baseSummarySheet);
-        populateSumSheet(pop,popularitySummarySheet);
+        populateSumSheet(base, baseSummarySheet);
+        populateSumSheet(pop, popularitySummarySheet);
         FileOutputStream os = new FileOutputStream(results);
         workbook.write(os);
     }
 
-    private void populateSumSheet(SummaryStats stats, HSSFSheet sheet){
+    private void populateSumSheet(SummaryStats stats, HSSFSheet sheet) {
         int rownum = 0;
-        LinkedHashMap<String,String> summary = stats.getStatSummary();
-        for(String s : summary.keySet()){
+        LinkedHashMap<String, String> summary = stats.getStatSummary();
+        for (String s : summary.keySet()) {
             Row row = sheet.createRow(++rownum);
             Cell cell1, cell2;
             cell1 = row.createCell(1);
@@ -107,19 +103,23 @@ public class PerformanceTester {
         }
     }
 
-    private void runBase(LinkedHashMap<Integer, ArrayList<QueryString>> dayQueriesMap, HSSFSheet data,SummaryStats baseSum) throws SQLException {
+    private void runBase(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet data, SummaryStats baseSum) throws SQLException {
         //materialize view and add time
-        baseSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.ga,this.gm));
-        for(int i : dayQueriesMap.keySet()){
-            double avg = runPerformanceTest(dayQueriesMap.get(i),data, i, baseSum);
-            baseSum.updateValues(dayQueriesMap.get(i).size(),i+1,avg);
+        baseSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.ga, this.gm));
+        for (int i : dayQueriesMap.keySet()) {
+            double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, baseSum);
+            System.out.println("Base finished d: " + (i+1));
+            baseSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
+            ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
         }
     }
-    private void runPopularity(LinkedHashMap<Integer, ArrayList<QueryString>> dayQueriesMap, HSSFSheet data,SummaryStats popSum) throws SQLException {
-        for(int i : dayQueriesMap.keySet()){
-            popSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.gpa,this.gm));
-            double avg = runPerformanceTest(dayQueriesMap.get(i),data, i, popSum);
-            popSum.updateValues(dayQueriesMap.get(i).size(),i+1,avg);
+
+    private void runPopularity(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet data, SummaryStats popSum) throws SQLException {
+        for (int i : dayQueriesMap.keySet()) {
+            popSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.gpa, this.gm));
+            double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, popSum);
+            System.out.println("Pop finished d: " + (i+1));
+            popSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
             ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
         }
     }
@@ -127,51 +127,49 @@ public class PerformanceTester {
     private double runGreedyAlgorithmAndGenerateViews(GreedyAlgorithm ga, GraphManager gm) throws SQLException {
         ViewGenerator vg = new ViewGenerator();
         ga.materializeNodes(5);
-        return vg.generateViews(gm.nodes,gm.getTopNode());
+        return vg.generateViews(gm.nodes, gm.getTopNode());
     }
-    private ArrayList<String> getAllViewNamesExceptForNNNN(Set<Node> nodes){
+
+    private ArrayList<String> getAllViewNamesExceptForNNNN(Set<Node> nodes) {
         ArrayList<String> viewNames = new ArrayList<>();
-        for(Node n : nodes){
-            if(!NodeQueryUtils.getNodeViewName(n).equals("nonenonenonenone")){
+        for (Node n : nodes) {
+            if (!NodeQueryUtils.getNodeViewName(n).equals("nonenonenonenone")) {
                 viewNames.add(NodeQueryUtils.getNodeViewName(n));
             }
         }
         return viewNames;
     }
 
-    private double runPerformanceTest(ArrayList<QueryString> queries, HSSFSheet sheet, int day, SummaryStats stats){
+    private double runPerformanceTest(ArrayList<String> queries, HSSFSheet sheet, int day, SummaryStats stats) throws SQLException {
         double totalRowsQueried = 0;
+        HashMap<QueriedView, QueriedView> queriedViews = new HashMap<>();
         PopularityManager pm = new PopularityManager();
-        for(QueryString s : queries){
-            try {
-                //update view popularity
-                pm.updatePopularityValue(s.getViewname());
-                long rowsQueried = 0;
-
-                if(nodeNameNodeReferenceMap.get(s.getViewname()).isMaterialised()){
-                    rowsQueried = nodeNameSizeMap.get(s.getViewname());
-                }else{
-                    rowsQueried = nodeNameSizeMap.get(NodeQueryUtils.getNodeViewName(nodeNameNodeReferenceMap.get(s.getViewname()).getMaterializedUpperNode()));
-                }
-
-                //todo dont query, just yeet the info from maps
-                ResultSet rs = ConnectionManager.selectSQL(s.toString());
-                rs.next();
-                JSONArray jsonArray = new JSONArray(rs.getString(1));
-                rowsQueried+= jsonArray.getJSONObject(0).getDouble("Execution Time");
-                totalRowsQueried+=rowsQueried;
-                Row row = sheet.createRow(sheet.getLastRowNum()+1);
-                Cell query = row.createCell(0);
-                query.setCellValue(s.getViewname());
-                Cell timeSpentOnQuery = row.createCell(1);
-                timeSpentOnQuery.setCellValue(rowsQueried);
-                Cell dayCell = row.createCell(2);
-                dayCell.setCellValue(day+1);
-                stats.setLongestQueryViewAndTime(s.getViewname(),rowsQueried);
-            } catch (SQLException e) {
-                e.printStackTrace();
+        for (String s : queries) {
+            QueriedView curr = new QueriedView(s);
+            if (queriedViews.containsKey(curr)) {
+                queriedViews.get(curr).setAmount_of_queries(1);
+            } else {
+                queriedViews.put(curr, curr);
+                curr.setAmount_of_queries(1);
             }
+            long rowsQueried = 0;
+            if (nodeNameNodeReferenceMap.get(s).isMaterialised()) {
+                rowsQueried = nodeNameSizeMap.get(s);
+            } else {
+                rowsQueried = nodeNameSizeMap.get(NodeQueryUtils.getNodeViewName(nodeNameNodeReferenceMap.get(s).getMaterializedUpperNode()));
+            }
+            totalRowsQueried += rowsQueried;
+            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+            Cell query = row.createCell(0);
+            query.setCellValue(s);
+            Cell timeSpentOnQuery = row.createCell(1);
+            timeSpentOnQuery.setCellValue(rowsQueried);
+            Cell dayCell = row.createCell(2);
+            dayCell.setCellValue(day + 1);
+            stats.setLongestQueryViewAndTime(s, rowsQueried);
         }
-        return totalRowsQueried/queries.size();
+        //update all views we've used
+        pm.updatePopularityValues(queriedViews.keySet());
+        return totalRowsQueried / queries.size();
     }
 }

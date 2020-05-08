@@ -164,6 +164,11 @@ public class QueryManager {
         return "INSERT INTO cube.popularity VALUES ('" + view + "',1,1,true)";
     }
 
+    public static String insertPopularityIfNoRowsExistWithValue(String view, int dailyvalue, int day){
+        return "INSERT INTO cube.popularity VALUES ('" + view + "',"+dailyvalue+","+ day +",true)";
+    }
+
+
     public static String insertNewDayIntoPopularity(String view, int day) {
         return "INSERT INTO cube.popularity VALUES ('" + view + "',1," + day + ",true)";
     }
@@ -174,5 +179,9 @@ public class QueryManager {
 
     public static String updatepopularityIfExists(String view) {
         return "UPDATE cube.popularity SET dailyvalue = dailyvalue+1 WHERE currentday = true AND viewname = '" + view + "'";
+    }
+
+    public static String updatePopularityIfExistsWithValue(String view, int new_val){
+        return "UPDATE cube.popularity SET dailyvalue = "+new_val+" WHERE currentday = true AND viewname = '" + view + "'";
     }
 }

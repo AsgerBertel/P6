@@ -17,7 +17,11 @@ public class ConnectionManager {
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             return rs;
+        } catch (SQLException e){
+            e.printStackTrace();
         }
+        System.exit(420);
+        return null;
     }
 
     public static int updateSqlWithGeneratedKey(String query, String primaryKeyName) {
