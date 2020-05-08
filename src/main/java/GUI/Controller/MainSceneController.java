@@ -28,6 +28,7 @@ import org.apache.spark.sql.execution.columnar.NULL;
 import org.postgresql.util.PSQLException;
 import scala.util.matching.Regex;
 
+import java.math.BigInteger;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -181,16 +182,19 @@ public class MainSceneController {
 
                 switch (resultSetMetaData.getColumnType(i)) {
                     case 12:
-                        System.out.println("varchar");
                         row.add(resultSet_Tableview.getString(i));
                         break;
                     case 4:
-                        System.out.println("int");
                         row.add(resultSet_Tableview.getInt(i));
                         break;
                     case 2:
-                        System.out.println("numeric");
                         row.add(df.format(resultSet_Tableview.getDouble(i)));
+                        break;
+                    case -5:
+                        row.add(resultSet_Tableview.getLong(i));
+                        break;
+                    default:
+                        System.out.println("YIKES");
                         break;
                 }
             }
