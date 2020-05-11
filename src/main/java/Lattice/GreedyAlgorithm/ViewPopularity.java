@@ -7,8 +7,12 @@ public class ViewPopularity {
     private int amountOfTimesUsed = 0;
     private int overAllValue;
     private int currentDailyValue;
+    private int globalAccumulatedValue;
+    private int dailyAccumulatedValue;
 
-    public ViewPopularity(String name) {
+    public ViewPopularity(String name, int dailyAccumulatedValue, int globalAccumulatedValue) {
+        this.dailyAccumulatedValue = dailyAccumulatedValue;
+        this.globalAccumulatedValue = globalAccumulatedValue;
         this.name = name;
     }
 
@@ -39,8 +43,17 @@ public class ViewPopularity {
         this.currentDailyValue = currentDailyValue;
     }
 
+    public void setGlobalAccumulatedValue(int globalAccumulatedValue) {
+        this.globalAccumulatedValue = globalAccumulatedValue;
+    }
+
+    public void setDailyAccumulatedValue(int dailyAccumulatedValue) {
+        this.dailyAccumulatedValue = dailyAccumulatedValue;
+    }
+
+
     public int calculatePopularityValue() {
-        return currentDailyValue + getGlobalAverageValue();
+        return ((currentDailyValue/dailyAccumulatedValue) + (getGlobalAverageValue()/globalAccumulatedValue))/2;
     }
 
     @Override
