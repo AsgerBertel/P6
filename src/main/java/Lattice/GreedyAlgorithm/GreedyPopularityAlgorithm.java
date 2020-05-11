@@ -63,13 +63,26 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         scale = 1;
     }
 
+    private int getAccumulatedGlobalPopularityValue() throws SQLException{
+        ResultSet resultSet= ConnectionManager.selectSQL(QueryManager.getAccumulatedGlobalValue);
+        resultSet.next();
+        return resultSet.getInt(1);
+    }
+    private int getAccumulatedDailyPopularityValue() throws SQLException{
+        ResultSet resultSet= ConnectionManager.selectSQL(QueryManager.getAccumulatedDailyValue);
+        resultSet.next();
+        return resultSet.getInt(1);
+    }
+
 
     private LinkedHashMap<String, Integer> fillNodePopularityMap() throws SQLException {
         LinkedHashMap<String, Integer> viewPopularityMap = new LinkedHashMap<>();
         ResultSet resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
         ArrayList<ViewPopularity> listOfViews = new ArrayList<>();
+        int dailyAccumulated = getAccumulatedDailyPopularityValue();
+        int globalAccumulated = getAccumulatedGlobalPopularityValue();
         while (resultSet.next()) {
-            ViewPopularity view = new ViewPopularity(resultSet.getString(1));
+            ViewPopularity view = new ViewPopularity(resultSet.getString(1), dailyAccumulated, globalAccumulated);
             if (listOfViews.contains(view)) {
                 view = listOfViews.get(listOfViews.indexOf(view));
                 view.incrementAmountOfTimesUsed();

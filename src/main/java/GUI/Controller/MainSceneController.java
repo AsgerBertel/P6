@@ -157,6 +157,8 @@ public class MainSceneController {
     public ObservableList getColumnsFromResultset() {
         return tableViewLeft.getColumns();
     }
+
+
     public void buildTable(ResultSet resultSet_Tableview) throws SQLException {
         data.clear();
         tableViewLeft.getColumns().clear();
