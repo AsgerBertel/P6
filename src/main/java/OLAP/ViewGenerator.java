@@ -60,6 +60,8 @@ public class ViewGenerator {
 
     private void deleteViews(LinkedHashMap<Node,Node> nodes){
         //Get resultset of all existing virtual views and material views.
+        ConnectionManager.updateSql(QueryManager.dropSchemaPublic); //Todo REMOVE AND FIX METHOD
+        /*
         ArrayList<String> materialisedNodeNames = new ArrayList<>();
         //put all mat node names into a list
         for(Node n: nodes.keySet()){
@@ -82,6 +84,7 @@ public class ViewGenerator {
         } catch (SQLException e) {
             System.exit(420);
         }
+         */
 
     }
     public double generateViews(LinkedHashMap<Node,Node> nodes, Node root) throws SQLException {
@@ -92,19 +95,41 @@ public class ViewGenerator {
         ArrayList<String> matViews = getMaterialisedViewNames();
         double totalTimeSpent = 0;
         System.out.println("matview names");
+        ArrayList<Node> toBeMaterialisedNodes = new ArrayList<>();
+        ArrayList<Node> materialisedNodes = new ArrayList<>();
         for(Node n : nodes.keySet()){
-            if(matViews.contains(NodeQueryUtils.getNodeViewName(n).toLowerCase())){
+            if(n.isMaterialised())
+                toBeMaterialisedNodes.add(n);
+        }
+        int numberOfMaterialisations = 0;
+        while(numberOfMaterialisations != toBeMaterialisedNodes.size()){
+            for(Node n: toBeMaterialisedNodes){
+                if(n.isMaterialised() && (n.getMaterializedUpperNode().equals(root) || materialisedNodes.contains(n.getMaterializedUpperNode()))){
+                    if(materialisedNodes.contains(n)) continue;
+                    System.out.println(NodeQueryUtils.getNodeViewName(n));
+                    ResultSet rs = ConnectionManager.selectSQL("EXPLAIN (FORMAT JSON, ANALYSE) "+ vqm.createView(n));
+                    rs.next();
+                    JSONArray jsonArray = new JSONArray(rs.getString(1));
+                    totalTimeSpent += jsonArray.getJSONObject(0).getDouble("Execution Time");
+                    numberOfMaterialisations++;
+                    materialisedNodes.add(n);
+                }
+            }
+        }
+        /*for(Node n : nodes.keySet()){
+            /*if(matViews.contains(NodeQueryUtils.getNodeViewName(n).toLowerCase())){
                 System.out.println(NodeQueryUtils.getNodeViewName(n));
                 continue;
             }
-            if(n.isMaterialised()){
+             //todo uncomment when delete method is fixed
+            if(n.isMaterialised() && !materialisedFactNodes.contains(n)){
                 System.out.println(NodeQueryUtils.getNodeViewName(n));
                 ResultSet rs = ConnectionManager.selectSQL("EXPLAIN (FORMAT JSON, ANALYSE) "+ vqm.createView(n));
                 rs.next();
                 JSONArray jsonArray = new JSONArray(rs.getString(1));
                 totalTimeSpent += jsonArray.getJSONObject(0).getDouble("Execution Time");
             }
-        }
+        }*/
         int i = 0;
         for(Node n : nodes.keySet()){
             //IF NONE NONE NONE NONE skip

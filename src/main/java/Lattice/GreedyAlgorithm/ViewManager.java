@@ -9,8 +9,8 @@ import java.util.Set;
 public class ViewManager {
 
 
-    public static LinkedHashMap<Node, Integer> getNodeReferencesFromViews(LinkedHashMap<String, Integer> views, Set<Node> nodes){
-        LinkedHashMap<Node, Integer> viewPopularityMap = new LinkedHashMap<>();
+    public static LinkedHashMap<Node, Double> getNodeReferencesFromViews(LinkedHashMap<String, Double> views, Set<Node> nodes){
+        LinkedHashMap<Node, Double> viewPopularityMap = new LinkedHashMap<>();
         LinkedHashMap<String, Node> viewNameNodeMap = getViewNameNodeMap(nodes);
         for(String s: views.keySet()){
             viewPopularityMap.put(viewNameNodeMap.get(s), views.get(s));

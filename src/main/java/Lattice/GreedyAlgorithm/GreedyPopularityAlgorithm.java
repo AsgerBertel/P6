@@ -28,8 +28,8 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
     }
 
     private void updateBenefitScale() throws SQLException {
-        LinkedHashMap<Node, Integer> sortedNodePopularityMap = new LinkedHashMap<>();
-        LinkedHashMap<Node, Integer> unsortedNodePopularityMap = ViewManager.getNodeReferencesFromViews(this.fillNodePopularityMap(), this.gm.nodes.keySet());
+        LinkedHashMap<Node, Double> sortedNodePopularityMap = new LinkedHashMap<>();
+        LinkedHashMap<Node, Double> unsortedNodePopularityMap = ViewManager.getNodeReferencesFromViews(this.fillNodePopularityMap(), this.gm.nodes.keySet());
         unsortedNodePopularityMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sortedNodePopularityMap.put(entry.getKey(), entry.getValue()));
@@ -43,11 +43,11 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
          */
     }
 
-    private void assignScalingToNodes(LinkedHashMap<Node, Integer> sortedNodePopularityMap) {
+    private void assignScalingToNodes(LinkedHashMap<Node, Double> sortedNodePopularityMap) {
         double previousPopularityVal = 0;
         double maxVal = sortedNodePopularityMap.get(sortedNodePopularityMap.keySet().toArray()[sortedNodePopularityMap.size() - 1]);
         for (Node n : sortedNodePopularityMap.keySet()) {
-            int currentPopularityValue = sortedNodePopularityMap.get(n);
+            double currentPopularityValue = sortedNodePopularityMap.get(n);
             if (currentPopularityValue == 0) {
                 n.setScale(scale);
                 previousPopularityVal = currentPopularityValue;
@@ -68,36 +68,49 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         resultSet.next();
         return resultSet.getInt(1);
     }
-    private int getAccumulatedDailyPopularityValue() throws SQLException{
-        ResultSet resultSet= ConnectionManager.selectSQL(QueryManager.getAccumulatedDailyValue);
+    private int getAccumulatedDailyPopularityValue(int maxDay) throws SQLException{
+        ResultSet resultSet= ConnectionManager.selectSQL(QueryManager.getAccumulatedDailyValue(maxDay));
         resultSet.next();
         return resultSet.getInt(1);
     }
 
+    private int getCurrentDay() throws SQLException {
+        ResultSet rs = ConnectionManager.selectSQL("SELECT day, currentday FROM cube.popularity");
+        int maxDay = 0;
+        while(rs.next()){
+            if(rs.getBoolean(2)){
+                return rs.getInt(1);
+            }
+            if(rs.getInt(1) > maxDay)
+                maxDay = rs.getInt(1);
+        }
+        return maxDay;
+    }
 
-    private LinkedHashMap<String, Integer> fillNodePopularityMap() throws SQLException {
-        LinkedHashMap<String, Integer> viewPopularityMap = new LinkedHashMap<>();
+
+    private LinkedHashMap<String, Double> fillNodePopularityMap() throws SQLException {
+        LinkedHashMap<String, Double> viewPopularityMap = new LinkedHashMap<>();
         ResultSet resultSet = ConnectionManager.selectSQL(QueryManager.selectAllFromPopularity);
         ArrayList<ViewPopularity> listOfViews = new ArrayList<>();
-        int dailyAccumulated = getAccumulatedDailyPopularityValue();
+        int curr_day = getCurrentDay();
+        int dailyAccumulated = getAccumulatedDailyPopularityValue(curr_day);
         int globalAccumulated = getAccumulatedGlobalPopularityValue();
         while (resultSet.next()) {
             ViewPopularity view = new ViewPopularity(resultSet.getString(1), dailyAccumulated, globalAccumulated);
             if (listOfViews.contains(view)) {
                 view = listOfViews.get(listOfViews.indexOf(view));
                 view.incrementAmountOfTimesUsed();
-                if (resultSet.getBoolean(4))
+                if (resultSet.getInt(3)==curr_day){
                     view.setCurrentDailyValue(resultSet.getInt(2));
-                else
-                    view.setOverAllValue(resultSet.getInt(2));
+                }
+                view.setOverAllValue(resultSet.getInt(2));
 
             } else {
                 view.incrementAmountOfTimesUsed();
-                if (resultSet.getBoolean(4))
+                if (resultSet.getInt(3)==curr_day){
                     view.setCurrentDailyValue(resultSet.getInt(2));
-                else
-                    view.setOverAllValue(resultSet.getInt(2));
-
+                }
+                view.setOverAllValue(resultSet.getInt(2));
                 listOfViews.add(view);
             }
         }
@@ -106,7 +119,7 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         }
         for (Node n : this.gm.nodes.keySet()) {
             if (!viewPopularityMap.containsKey(NodeQueryUtils.getNodeViewName(n))) {
-                viewPopularityMap.put(NodeQueryUtils.getNodeViewName(n),0);
+                viewPopularityMap.put(NodeQueryUtils.getNodeViewName(n),0.0);
             }
         }
         ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);

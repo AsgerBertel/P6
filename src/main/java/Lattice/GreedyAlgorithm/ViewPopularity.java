@@ -52,8 +52,8 @@ public class ViewPopularity {
     }
 
 
-    public int calculatePopularityValue() {
-        return ((currentDailyValue/dailyAccumulatedValue) + (getGlobalAverageValue()/globalAccumulatedValue))/2;
+    public double calculatePopularityValue() {
+        return ((double)currentDailyValue/dailyAccumulatedValue + (double)getGlobalAverageValue()/globalAccumulatedValue)/2;
     }
 
     @Override

@@ -30,6 +30,7 @@ public class PerformanceTester {
     private GreedyPopularityAlgorithm gpa;
     private HashMap<String, Long> nodeNameSizeMap = new HashMap<>();
     private HashMap<String, Node> nodeNameNodeReferenceMap = new HashMap<>();
+    private LinkedHashSet<Node> curr_matviews = new LinkedHashSet<>();
 
 
     private void populateNodeSizes() throws SQLException {
@@ -67,8 +68,8 @@ public class PerformanceTester {
         SummaryStats popSum = new SummaryStats("POPULARITY");
         //run base greedy
         //delet everything
-       ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
-        runBase(dayQueriesMap, baseDataSheet, baseSum);
+        //ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
+        //runBase(dayQueriesMap, baseDataSheet, baseSum);
         //delete all views and empty the popularity table
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         ConnectionManager.updateSql(QueryManager.deleteContentsTablePopularity);
@@ -105,28 +106,48 @@ public class PerformanceTester {
 
     private void runBase(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet data, SummaryStats baseSum) throws SQLException {
         //materialize view and add time
+        int days = 0;
         baseSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.ga, this.gm));
         for (int i : dayQueriesMap.keySet()) {
+            /*if(days == 3){
+                break;
+            }*/
             double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, baseSum);
             System.out.println("Base finished d: " + (i+1));
             baseSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
+            baseSum.addMatViewDay(i+1, getCurrentMaterialisedViewList());
             ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
+            days++;
         }
     }
 
     private void runPopularity(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet data, SummaryStats popSum) throws SQLException {
+        int days = 0;
         for (int i : dayQueriesMap.keySet()) {
+            /*if(days == 3){
+                break;
+            }*/
             popSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.gpa, this.gm));
             double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, popSum);
             System.out.println("Pop finished d: " + (i+1));
             popSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
+            popSum.addMatViewDay(i+1, getCurrentMaterialisedViewList());
             ConnectionManager.updateSql(QueryManager.updateCurrentDayInPopularity);
+            days++;
         }
+    }
+
+    private ArrayList<String> getCurrentMaterialisedViewList(){
+        ArrayList<String> matViews = new ArrayList<>();
+        for(Node n : curr_matviews){
+            matViews.add(NodeQueryUtils.getNodeViewName(n));
+        }
+        return matViews;
     }
 
     private double runGreedyAlgorithmAndGenerateViews(GreedyAlgorithm ga, GraphManager gm) throws SQLException {
         ViewGenerator vg = new ViewGenerator();
-        ga.materializeNodes(5);
+        curr_matviews = ga.materializeNodes(5);
         return vg.generateViews(gm.nodes, gm.getTopNode());
     }
 

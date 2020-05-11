@@ -194,11 +194,15 @@ public class ViewQueryManager {
     }
 
     private static String aggregateFunction(Node n) {
+        if(NodeQueryUtils.getNodeViewName(n).equals("toptopiccountymonthopinion"))
+            System.out.println();
         if(!n.getMaterializedUpperNode().equals(root) && !n.isMaterialised()){
             if(!n.getMaterializedUpperNode().getMaterializedUpperNode().equals(root))
                 return "sum(f.sum)";
             return "sum(f.count)";
-        }else         if(!n.getMaterializedUpperNode().equals(root) && n.isMaterialised()){
+        }else if(!n.getMaterializedUpperNode().equals(root) && n.isMaterialised()){
+            if(!n.getMaterializedUpperNode().getMaterializedUpperNode().equals(root))
+                return "sum(f.sum)";
             return"sum(f.count)";
         }
         else{

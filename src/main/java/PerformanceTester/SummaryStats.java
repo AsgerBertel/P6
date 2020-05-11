@@ -1,9 +1,11 @@
 package PerformanceTester;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class SummaryStats {
     LinkedHashMap<Integer, Double> avgQuerySizeDayMap = new LinkedHashMap<>();
+    private LinkedHashMap<Integer, ArrayList<String>> materialisedViews = new LinkedHashMap<>();
     String greedyAlgType, LargestQueryView;
     long largestQuerySize = 0, timeSpentMaterializing = 0;
     int numOfQueriesExecuted = 0;
@@ -44,6 +46,12 @@ public class SummaryStats {
         this.addAvgQueryTimeDay(day,dayAvg);
     }
 
+    public void addMatViewDay(int day, ArrayList<String> views){
+        if(this.materialisedViews.containsKey(day))
+            throw new RuntimeException("Day " + day + " is already added");
+        this.materialisedViews.put(day,views);
+    }
+
     public LinkedHashMap<String,String> getStatSummary(){
         LinkedHashMap<String,String> statSummaryMap = new LinkedHashMap<>();
         //Alg type
@@ -53,15 +61,30 @@ public class SummaryStats {
         //Number of queries executed
         statSummaryMap.put("NumberOfQueriesExecuted",String.valueOf(this.numOfQueriesExecuted));
         //Avg query time total
-        statSummaryMap.put("AvgQueryTimeTotal",String.valueOf(this.getAvgQueryTime()));
+        statSummaryMap.put("AvgQueryRowsTotal",String.valueOf(this.getAvgQueryTime()));
         //Longest query time + view
         statSummaryMap.put("LargestQuerySize",String.valueOf(this.largestQuerySize));
         statSummaryMap.put("LargestQueryView",String.valueOf(this.LargestQueryView));
         //Avg query time per day
         for(int i : this.avgQuerySizeDayMap.keySet()){
-            statSummaryMap.put("AvgQueryTimeDay" + i,String.valueOf(this.avgQuerySizeDayMap.get(i)));
+            statSummaryMap.put("AvgQueryRowsDay" + i,String.valueOf(this.avgQuerySizeDayMap.get(i)));
+        }
+        for(int i : this.materialisedViews.keySet()){
+            statSummaryMap.put("MaterialisedDay" + i,getMatViewsOnIthDay(i));
         }
         return statSummaryMap;
+    }
+
+    private String getMatViewsOnIthDay(int day){
+        StringBuilder sb = new StringBuilder();
+        for(String s : this.materialisedViews.get(day)){
+            sb.append(s).append(",");
+        }
+        String s = sb.toString();
+        if(s.substring(s.length()-1).equals(",")){
+            s = s.substring(0,s.length()-1);
+        }
+        return s;
 
     }
 

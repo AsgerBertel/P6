@@ -14,7 +14,7 @@ public class PerformanceTestQueryGenerator {
     final static int FULL_RANDOM_CHANCE = 40;
     final static ArrayList<String> taskOneViews = new ArrayList<>(Arrays.asList(
             "toptopicdistrictmonthopinion",
-            "toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion",
+            //"toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion",
             "toptopiccountynoneopinion", "toptopiccountynoneopinion", "toptopiccountynoneopinion",
             "toptopicdistrictnoneopinion", "toptopicdistrictnoneopinion", "toptopicdistrictnoneopinion"
     ));
