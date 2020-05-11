@@ -68,8 +68,8 @@ public class PerformanceTester {
         SummaryStats popSum = new SummaryStats("POPULARITY");
         //run base greedy
         //delet everything
-        //ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
-        //runBase(dayQueriesMap, baseDataSheet, baseSum);
+        ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
+        runBase(dayQueriesMap, baseDataSheet, baseSum);
         //delete all views and empty the popularity table
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
         ConnectionManager.updateSql(QueryManager.deleteContentsTablePopularity);
