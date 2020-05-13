@@ -82,7 +82,7 @@ public class PerformanceTester {
     }
 
     private void writeToExcel(HSSFWorkbook workbook, SummaryStats base, SummaryStats pop) throws IOException {
-        File results = new File("C:/Users/Mads/Desktop/PerformanceTest/Results.xls");
+        File results = new File("C:/Users/Mads/Desktop/PerformanceTest/SAMERALES.xls");
         HSSFSheet baseSummarySheet = workbook.createSheet("baseSUM");
         HSSFSheet popularitySummarySheet = workbook.createSheet("popularitySUM");
         populateSumSheet(base, baseSummarySheet);

@@ -54,8 +54,9 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
             } else if (currentPopularityValue == previousPopularityVal) {
                 n.setScale(scale);
             } else {
+                double test = currentPopularityValue / maxVal;
                 double relativeDifference = (currentPopularityValue / maxVal) - (previousPopularityVal / maxVal);
-                scale = (1 + relativeDifference) * scale;
+                scale = (1 + test) * scale;
                 n.setScale(scale);
                 previousPopularityVal = currentPopularityValue;
             }

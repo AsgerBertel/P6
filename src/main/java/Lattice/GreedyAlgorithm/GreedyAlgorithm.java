@@ -16,6 +16,7 @@ import java.util.*;
 
 public class GreedyAlgorithm {
     //When we find our own benefit calculation model, this should probably be a double value
+    private int amountOfIterations;
     public LinkedHashMap<Node, Double> benefitValueTree = new LinkedHashMap<>();
     LinkedHashSet<Node> materializedNodes = new LinkedHashSet<>();
     GraphManager gm;
@@ -38,6 +39,7 @@ public class GreedyAlgorithm {
     }
 
     public LinkedHashSet<Node> materializeNodes(int amountOfNodesToMaterialize) throws SQLException {
+        amountOfIterations = amountOfNodesToMaterialize;
         initializeGraph();
         for(int i = 0; i < amountOfNodesToMaterialize; i++){
             //printBenefitTree();
@@ -51,16 +53,30 @@ public class GreedyAlgorithm {
     private void selectHighestBenefit(){
         Node bestNode = null;
         double bestNodeVal = 0;
+        boolean isNotBase = isNotBase();
         for(Node n: benefitValueTree.keySet()){
+            if(isNotBase){
+                if(n.getScale()== 1.0) continue;
+            }
             if((bestNode == null || benefitValueTree.get(n) > bestNodeVal) && !materializedNodes.contains(n)){
                 bestNode = n;
                 bestNodeVal = benefitValueTree.get(n);
             }
         }
         materializedNodes.add(bestNode);
+        System.out.println("Selected " + NodeQueryUtils.getNodeViewName(bestNode));
         bestNode.setMaterialised(true);
         updateActualCost(bestNode);
 
+    }
+
+    private boolean isNotBase(){
+        int counter = 0;
+        for(Node n : benefitValueTree.keySet()){
+            if(n.getScale()!=1.0) counter++;
+        }
+        if(counter >= amountOfIterations) return true;
+        return false;
     }
 
     private void updateActualCost(Node n){
@@ -143,7 +159,8 @@ public class GreedyAlgorithm {
     private void printBenefitTree(){
         System.out.println("Benefit:");
         for(Node n: benefitValueTree.keySet()){
-            System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + benefitValueTree.get(n)+ " scale:"+n.getScale());
+            if(n.getScale() > 1.0 || NodeQueryUtils.getNodeViewName(n).equals("nonecoordinateyearopinion"))
+                System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + benefitValueTree.get(n)+ " scale:"+n.getScale());
         }
     }
 }
