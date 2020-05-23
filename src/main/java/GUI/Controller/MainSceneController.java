@@ -163,7 +163,10 @@ public class MainSceneController {
         DecimalFormat df = new DecimalFormat("#.#####");
         ResultSetMetaData resultSetMetaData = resultSet_Tableview.getMetaData();
         for (int i = 0; i < resultSet_Tableview.getMetaData().getColumnCount(); i++) {
+            System.out.println("amount of collums"+resultSet_Tableview.getMetaData().getColumnCount());
             final int j = i;
+
+            System.out.println(j);
             TableColumn col = new TableColumn<>(resultSet_Tableview.getMetaData().getColumnName(i + 1));
             col.setCellValueFactory((Callback<TableColumn.CellDataFeatures<ObservableList, Object>, ObservableValue<Object>>) param -> {
                 return new SimpleObjectProperty<>(param.getValue().get(j)) {
@@ -181,15 +184,15 @@ public class MainSceneController {
 
                 switch (resultSetMetaData.getColumnType(i)) {
                     case 12:
-                        System.out.println("varchar");
+
                         row.add(resultSet_Tableview.getString(i));
                         break;
                     case 4:
-                        System.out.println("int");
+
                         row.add(resultSet_Tableview.getInt(i));
                         break;
                     case 2:
-                        System.out.println("numeric");
+
                         row.add(df.format(resultSet_Tableview.getDouble(i)));
                         break;
                 }
@@ -544,6 +547,7 @@ public class MainSceneController {
             }
             lastQuery = query;
             if (txtTopRows.getText().isEmpty()) {
+                System.out.println(ConnectionManager.selectSQL(query));
                 buildTable(ConnectionManager.selectSQL(query));
             } else {
                 buildTable(ConnectionManager.selectSQL(orderByQuery(query)));
