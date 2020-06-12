@@ -28,22 +28,37 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
     }
 
     private void updateBenefitScale() throws SQLException {
-        LinkedHashMap<Node, Double> sortedNodePopularityMap = new LinkedHashMap<>();
-        LinkedHashMap<Node, Double> unsortedNodePopularityMap = ViewManager.getNodeReferencesFromViews(this.fillNodePopularityMap(), this.gm.nodes.keySet());
-        unsortedNodePopularityMap.entrySet().stream()
+        LinkedHashMap<Node, Double> sortedNodePopularityMap = ViewManager.getNodeReferencesFromViews(this.fillNodePopularityMap(), this.gm.nodes.keySet());
+        /*unsortedNodePopularityMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sortedNodePopularityMap.put(entry.getKey(), entry.getValue()));
-
+        */
         assignScalingToNodes(sortedNodePopularityMap);
-
-        /**
-         * Lav en sorteret liste af nodes baseret på popularitet - Lavest --> Højest
-         * Assign scaling til hver node. Baseret på hvor stor forskel der er på current node og next nodes popularitet
-         *
-         */
     }
 
-    private void assignScalingToNodes(LinkedHashMap<Node, Double> sortedNodePopularityMap) {
+
+    private void assignScalingToNodes(LinkedHashMap<Node,Double> nodePopularityMap){
+        double avgPop = calculateAveragePopularity(nodePopularityMap.values());
+        for(Node n : nodePopularityMap.keySet()){
+            if(nodePopularityMap.get(n) == 0)
+                n.setScale(1.0);
+            else{
+                double scale = 1 * (1+ (nodePopularityMap.get(n)/avgPop));
+                n.setScale(scale);
+            }
+        }
+    }
+
+    private double calculateAveragePopularity(Collection<Double> values){
+        int count = 0;
+        double val = 0;
+        for(Double d : values){
+            val += d;
+            count++;
+        }
+        return val/count;
+    }
+    private void assignScalingToNodesOLD(LinkedHashMap<Node, Double> sortedNodePopularityMap) {
         double previousPopularityVal = 0;
         double maxVal = sortedNodePopularityMap.get(sortedNodePopularityMap.keySet().toArray()[sortedNodePopularityMap.size() - 1]);
         for (Node n : sortedNodePopularityMap.keySet()) {

@@ -53,11 +53,11 @@ public class GreedyAlgorithm {
     private void selectHighestBenefit(){
         Node bestNode = null;
         double bestNodeVal = 0;
-        boolean isNotBase = isNotBase();
+        //boolean isNotBase = isNotBase();
         for(Node n: benefitValueTree.keySet()){
-            if(isNotBase){
+            /*if(isNotBase){
                 if(n.getScale()== 1.0) continue;
-            }
+            }*/
             if((bestNode == null || benefitValueTree.get(n) > bestNodeVal) && !materializedNodes.contains(n)){
                 bestNode = n;
                 bestNodeVal = benefitValueTree.get(n);
@@ -110,8 +110,8 @@ public class GreedyAlgorithm {
                 //benefit = benefit.add(n.getActualCost().subtract(currentNode.getViewSize()));
             }
         }
-
-        return benefit * currentNode.getScale();
+        return benefit;
+        //return benefit * currentNode.getScale();
     }
 
     private void calculateInitialValue(Node topNode, Set<Node> keyset) throws SQLException {
