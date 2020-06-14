@@ -8,7 +8,7 @@ public class SummaryStats {
     private LinkedHashMap<Integer, ArrayList<String>> materialisedViews = new LinkedHashMap<>();
     String greedyAlgType, LargestQueryView;
     long largestQuerySize = 0, timeSpentMaterializing = 0;
-    int numOfQueriesExecuted = 0;
+    int numOfQueriesExecuted = 0, numberOfMaterialisedViews = 0;
 
     public SummaryStats(String greedyAlgType) {
         this.greedyAlgType = greedyAlgType;
@@ -58,6 +58,8 @@ public class SummaryStats {
         statSummaryMap.put("GreedyAlgType",this.greedyAlgType);
         //time spent materializing
         statSummaryMap.put("TimeSpentMaterializing", String.valueOf(this.timeSpentMaterializing));
+        //Number of Mat views
+        statSummaryMap.put("Number of Materialised Views", String.valueOf(this.numberOfMaterialisedViews));
         //Number of queries executed
         statSummaryMap.put("NumberOfQueriesExecuted",String.valueOf(this.numOfQueriesExecuted));
         //Avg query time total
@@ -89,4 +91,7 @@ public class SummaryStats {
     }
 
 
+    public void setNumberOfMaterialisedViews(int number_of_materialised_views) {
+        this.numberOfMaterialisedViews = number_of_materialised_views;
+    }
 }

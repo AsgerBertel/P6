@@ -11,6 +11,14 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException {
+        for(int i = 7; i < 11; i++){
+            System.out.println("\nRUN WITH " + i + " MAT VIEWS \n");
+            run(i);
+        }
+
+    }
+
+    public static void run(int i) throws IOException, SQLException {
         Dimension d1, d2, d3, d4;
         Level d1prod, d1cat, d1none;
         Level d2loc, d2dis, d2county, d2cit, d2country, d2none;
@@ -43,7 +51,7 @@ public class Main {
         GraphManager gm = new GraphManager(root);
         //Generate tree and nodes
         gm.generateTree(root);
-        PerformanceTester pt = new PerformanceTester();
+        PerformanceTester pt = new PerformanceTester(i);
         pt.runAllPerformanceTests(gm);
     }
 }

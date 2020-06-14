@@ -103,7 +103,9 @@ public class ViewGenerator {
         }
         int numberOfMaterialisations = 0;
         while(numberOfMaterialisations != toBeMaterialisedNodes.size()){
+            if(numberOfMaterialisations == 95) break;
             for(Node n: toBeMaterialisedNodes){
+                if(NodeQueryUtils.getNodeViewName(n).equals("nonenonenonenone")) continue;
                 if(n.isMaterialised() && (n.getMaterializedUpperNode().equals(root) || materialisedNodes.contains(n.getMaterializedUpperNode()))){
                     if(materialisedNodes.contains(n)) continue;
                     System.out.println(NodeQueryUtils.getNodeViewName(n));
@@ -193,7 +195,7 @@ public class ViewGenerator {
     }
     public void updateViews() throws SQLException {
         ga.resetNodes();
-        ga.materializeNodes(4);
+        ga.materializeNodes(5);
         generateViews(gm.nodes,root);
     }
 }

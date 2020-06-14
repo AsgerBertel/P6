@@ -45,7 +45,6 @@ public class GreedyAlgorithm {
             //printBenefitTree();
             selectHighestBenefit();
             updateCurrentBenefit();
-
         }
         return materializedNodes;
     }
@@ -53,11 +52,11 @@ public class GreedyAlgorithm {
     private void selectHighestBenefit(){
         Node bestNode = null;
         double bestNodeVal = 0;
-        //boolean isNotBase = isNotBase();
+        boolean isNotBase = isNotBase();
         for(Node n: benefitValueTree.keySet()){
-            /*if(isNotBase){
+            if(isNotBase){
                 if(n.getScale()== 1.0) continue;
-            }*/
+            }
             if((bestNode == null || benefitValueTree.get(n) > bestNodeVal) && !materializedNodes.contains(n)){
                 bestNode = n;
                 bestNodeVal = benefitValueTree.get(n);
@@ -159,7 +158,7 @@ public class GreedyAlgorithm {
     private void printBenefitTree(){
         System.out.println("Benefit:");
         for(Node n: benefitValueTree.keySet()){
-            if(n.getScale() > 1.0 || NodeQueryUtils.getNodeViewName(n).equals("nonecoordinateyearopinion"))
+            if(n.getScale() > 1.0 || NodeQueryUtils.getNodeViewName(n).equals("nonedistrictdayopinion") ||NodeQueryUtils.getNodeViewName(n).equals("toptopiccountyyearopinion") )
                 System.out.println(NodeQueryUtils.getNodeViewName(n) + " : " + benefitValueTree.get(n)+ " scale:"+n.getScale());
         }
     }

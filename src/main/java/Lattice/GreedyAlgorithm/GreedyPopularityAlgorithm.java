@@ -53,6 +53,8 @@ public class GreedyPopularityAlgorithm extends GreedyAlgorithm {
         int count = 0;
         double val = 0;
         for(Double d : values){
+            if(d == 0)
+                continue;
             val += d;
             count++;
         }

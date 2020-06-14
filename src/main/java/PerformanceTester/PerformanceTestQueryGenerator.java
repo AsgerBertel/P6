@@ -12,9 +12,68 @@ public class PerformanceTestQueryGenerator {
 
     //this class generates an arraylist of queries
     final static int FULL_RANDOM_CHANCE = 40;
+
+    final static ArrayList<String> yeet = new ArrayList<>(Arrays.asList(
+            "nonecoordinatenonenone", "nonecoordinatenonenone", "nonecoordinatenonenone",
+            "toptopicnonenoneopinion", "toptopicnonenoneopinion", "toptopicnonenoneopinion"
+    ));
+    final static ArrayList<String> yeet2 = new ArrayList<>(Arrays.asList(
+            "toptopiccountymonthopinion", "toptopiccountymonthopinion", "toptopiccountymonthopinion",
+            "toptopiccountydayopinion", "toptopiccountydayopinion", "toptopiccountydayopinion"
+    ));
+    final static ArrayList<String> yeet3 = new ArrayList<>(Arrays.asList(
+            "toptopicnonenonenone", "toptopicnonenonenone", "toptopicnonenonenone",
+            "toptopiccoordinatedayopinion", "toptopiccoordinatedayopinion", "toptopiccoordinatedayopinion"
+    ));
+    final static ArrayList<String> yeet4 = new ArrayList<>(Arrays.asList(
+            "nonecountydayopinion", "nonecountydayopinion", "nonecountydayopinion",
+            "toptopiccitynonenone", "toptopiccitynonenone", "toptopiccitynonenone"
+    ));
+    final static ArrayList<String> yeet5 = new ArrayList<>(Arrays.asList(
+            "nonenonedayopinion", "nonenonedayopinion", "nonenonedayopinion",
+            "nonenonemonthopinion", "nonenonemonthopinion", "nonenonemonthopinion"
+    ));
+    final static ArrayList<String> yeet6 = new ArrayList<>(Arrays.asList(
+            "nonenoneyearopinion", "nonenoneyearopinion", "nonenoneyearopinion",
+            "toptopicdistrictnonenone", "toptopicdistrictnonenone", "toptopicdistrictnonenone"
+    ));
+    final static ArrayList<String> yeet7 = new ArrayList<>(Arrays.asList(
+            "nonedistrictmonthnone", "nonedistrictmonthnone", "nonedistrictmonthnone",
+            "toptopiccountynonenone", "toptopiccountynonenone", "toptopiccountynonenone"
+    ));
+    final static ArrayList<String> yeet8 = new ArrayList<>(Arrays.asList(
+            "toptopicnonenoneopinion", "toptopicnonenoneopinion", "toptopicnonenoneopinion",
+            "nonedistrictdaynone", "nonedistrictdaynone", "nonedistrictdaynone"
+    ));
+    final static ArrayList<String> yeet9 = new ArrayList<>(Arrays.asList(
+            "nonedistrictnoneopinion", "nonedistrictnoneopinion", "nonedistrictnoneopinion",
+            "nonecityyearopinion", "nonecityyearopinion", "nonecityyearopinion"
+    ));
+    final static ArrayList<String> yeet10 = new ArrayList<>(Arrays.asList(
+            "toptopiccoordinatenonenone", "toptopiccoordinatenonenone", "toptopiccoordinatenonenone",
+            "toptopiccountyyearopinion", "toptopiccountyyearopinion", "toptopiccountyyearopinion"
+    ));
+
+
+    private static ArrayList<String> randomYeeteronis(Random random){
+        ArrayList<String> queries = new ArrayList<>();
+        ArrayList<ArrayList<String>> yeetlist = new ArrayList<>(Arrays.asList(yeet, yeet2, yeet3, yeet4, yeet5,yeet6,yeet7,yeet8,yeet9,yeet10));
+        for(int i = 0; i < 15; i++){
+            queries.addAll(yeetlist.get(random.nextInt(yeetlist.size())));
+        }
+        return queries;
+    }
+    public static LinkedHashMap<Integer, ArrayList<String>> neoGeneralChanges(Random random, int days){
+        LinkedHashMap<Integer,ArrayList<String>> queries = new LinkedHashMap<>();
+        for(int i = 0; i < days; i++){
+            queries.put(i,randomYeeteronis(random));
+        }
+        return queries;
+    }
+
     final static ArrayList<String> taskOneViews = new ArrayList<>(Arrays.asList(
             "toptopicdistrictmonthopinion",
-            //"toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion",
+            "toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion", "toptopiccitynoneopinion",
             "toptopiccountynoneopinion", "toptopiccountynoneopinion", "toptopiccountynoneopinion",
             "toptopicdistrictnoneopinion", "toptopicdistrictnoneopinion", "toptopicdistrictnoneopinion"
     ));
@@ -34,6 +93,126 @@ public class PerformanceTestQueryGenerator {
     final static ArrayList<String> taskFiveViews = new ArrayList<>(Arrays.asList(
             "toptopiccountynoneopinion","toptopiccountynoneopinion","toptopiccountynoneopinion","toptopiccountynoneopinion"
     ));
+    final static ArrayList<String> dailyTOP = new ArrayList<>(Arrays.asList(
+            "toptopiccountydayopinion","toptopiccountydayopinion","toptopiccountydayopinion",
+            "toptopicdistrictdayopinion","toptopicdistrictdayopinion","toptopicdistrictdayopinion"
+    ));
+    final static ArrayList<String> monthlyTOP = new ArrayList<>(Arrays.asList(
+            "toptopiccountymonthopinion","toptopiccountymonthopinion","toptopiccountymonthopinion",
+            "toptopicdistrictmonthopinion","toptopicdistrictmonthopinion","toptopicdistrictmonthopinion"
+    ));
+    final static ArrayList<String> dailyMentions = new ArrayList<>(Arrays.asList(
+            "nonecountydaynone","nonecountydaynone","nonecountydaynone",
+            "nonedistrictdaynone","nonedistrictdaynone","nonedistrictdaynone"
+    ));
+    final static ArrayList<String> monthlyMentions = new ArrayList<>(Arrays.asList(
+            "nonecountymonthnone","nonecountymonthnone","nonecountymonthnone",
+            "nonedistrictmonthnone","nonedistrictmonthnone","nonedistrictmonthnone"
+    ));
+
+    final static ArrayList<String> suddenpt2 = new ArrayList<>(Arrays.asList(
+            "toptopicdistrictyearopinion","toptopicdistrictyearopinion","toptopicdistrictyearopinion",
+            "toptopiccountyyearopinion","toptopiccountyyearopinion","toptopiccountyyearopinion"
+    ));
+
+    final static ArrayList<String> finalday1 = new ArrayList<>(Arrays.asList(
+            "toptopicdistrictdayopinion","toptopicdistrictdayopinion","toptopicdistrictdayopinion",
+            "toptopiccountydayopinion","toptopiccountydayopinion","toptopiccountydayopinion",
+            "toptopiccountymonthopinion","toptopiccountymonthopinion","toptopiccountymonthopinion"
+    ));
+    final static ArrayList<String> finalday2 = new ArrayList<>(Arrays.asList(
+            "toptopicdistrictmonthopinion","toptopicdistrictmonthopinion","toptopicdistrictmonthopinion",
+            "toptopiccountymonthopinion","toptopiccountymonthopinion","toptopiccountymonthopinion"
+    ));
+    final static ArrayList<String> finalday3 = new ArrayList<>(Arrays.asList(
+            "nonedistrictdayopinion","nonedistrictdayopinion","nonedistrictdayopinion",
+            "nonecountydayopinion","nonecountydayopinion","nonecountydayopinion",
+            "toptopicdistrictmonthopinion","toptopicdistrictmonthopinion","toptopicdistrictmonthopinion"
+    ));
+
+    public static LinkedHashMap<Integer, ArrayList<String>> finaltesteronies(){
+        LinkedHashMap<Integer,ArrayList<String>> querymap = new LinkedHashMap<>();
+        for(int i = 0; i < 30; i++){
+            querymap.put(i,finalTesteroniQueries(i));
+        }
+        return querymap;
+    }
+
+    public static ArrayList<String> finalTesteroniQueries(int day){
+        ArrayList<String> queries = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            if(day < 5){
+                queries.addAll(finalday1);
+            }
+            else if(day < 10){
+                queries.addAll(finalday2);
+            }
+            else if(day < 15){
+                queries.addAll(finalday3);
+            }
+            else if(day < 20){
+                queries.addAll(finalday1);
+            }
+            else if(day < 25){
+                queries.addAll(finalday2);
+            }
+            else queries.addAll(finalday3);
+        }
+        return queries;
+    }
+
+    public static ArrayList<String> suddenpt1(){
+        ArrayList<String> queries = new ArrayList<>();
+        for(int i = 0; i < 12; i++){
+            queries.addAll(taskThreeViews);
+        }
+        return queries;
+    }
+    public static ArrayList<String> suddenpt2List(){
+        ArrayList<String> queries = new ArrayList<>();
+        for(int i = 0; i < 8; i++){
+            queries.addAll(suddenpt2);
+        }
+        return queries;
+    }
+    public static LinkedHashMap<Integer, ArrayList<String>> suddenDeath(){
+        LinkedHashMap<Integer,ArrayList<String>> querymap = new LinkedHashMap<>();
+        for(int i = 0; i < 30; i++){
+            if(i < 15 ) querymap.put(i,suddenpt1());
+            else querymap.put(i, suddenpt2List());
+        }
+        return querymap;
+    }
+    public static ArrayList<String> daily(){
+        ArrayList<String> queries = new ArrayList<>();
+        for(int i = 0; i < 14; i++){
+            if(i < 7) queries.addAll(dailyTOP);
+            else queries.addAll(dailyMentions);
+        }
+        return queries;
+    }
+    public static ArrayList<String> monthly(){
+        ArrayList<String> queries = new ArrayList<>();
+        for(int i = 0; i < 14; i++){
+            if(i < 7) queries.addAll(monthlyTOP);
+            else queries.addAll(monthlyMentions);
+        }
+        return queries;
+    }
+
+    public static LinkedHashMap<Integer, ArrayList<String>> normPattern(){
+        LinkedHashMap<Integer,ArrayList<String>> queries = new LinkedHashMap<>();
+        for(int i = 0; i < 30; i++){
+            if(i%7 == 0){
+                ArrayList<String> temp = new ArrayList<>();
+                temp.addAll(daily());
+                temp.addAll(monthly());
+                queries.put(i,temp);
+            } else queries.put(i,daily());
+        }
+        return queries;
+    }
+
 
     public static ArrayList<String> fullRandomQueries(ArrayList<String> possibleViews, int amount, Random r){
         ArrayList<String> queries = new ArrayList<>();
@@ -80,6 +259,7 @@ public class PerformanceTestQueryGenerator {
         }
         return queries;
     }
+
     public static LinkedHashMap<Integer, ArrayList<String>> suddenChanges(){
         LinkedHashMap<Integer,ArrayList<String>> queries = new LinkedHashMap<>();
         for(int i = 0; i < 30; i++){

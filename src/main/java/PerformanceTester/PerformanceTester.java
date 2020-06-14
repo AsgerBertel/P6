@@ -22,7 +22,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 public class PerformanceTester {
-
+    int NUMBER_OF_MATERIALISED_VIEWS;
     final static int RANDOM_SEED = 1234;
     Random random = new Random(RANDOM_SEED);
     private GraphManager gm;
@@ -31,6 +31,11 @@ public class PerformanceTester {
     private HashMap<String, Long> nodeNameSizeMap = new HashMap<>();
     private HashMap<String, Node> nodeNameNodeReferenceMap = new HashMap<>();
     private LinkedHashSet<Node> curr_matviews = new LinkedHashSet<>();
+
+    public PerformanceTester(int i){
+        this.NUMBER_OF_MATERIALISED_VIEWS = i;
+    }
+
 
 
     private void populateNodeSizes() throws SQLException {
@@ -57,15 +62,19 @@ public class PerformanceTester {
         populateNodeNameNodeReferenceMap();
 
 
-        LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap = PerformanceTestQueryGenerator.sameMonth();
+        LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap = PerformanceTestQueryGenerator.finaltesteronies();
 
         //Run base and write results
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         HSSFSheet baseDataSheet = workbook.createSheet("baseDATA");
         HSSFSheet popularityDataSheet = workbook.createSheet("popularityDATA");
+        HSSFSheet allVirtualDataSheet = workbook.createSheet("allVirtualDATA");
+        HSSFSheet allMatDataSheet = workbook.createSheet("allMatDATA");
         SummaryStats baseSum = new SummaryStats("BASE");
         SummaryStats popSum = new SummaryStats("POPULARITY");
+        SummaryStats virtSum = new SummaryStats("ONLY VIRTUAL");
+        SummaryStats matSum = new SummaryStats("ALL MATERIALISED");
         //run base greedy
         //delet everything
         ConnectionManager.updateSql(QueryManager.dropSchemaPublic);
@@ -77,18 +86,58 @@ public class PerformanceTester {
         runPopularity(dayQueriesMap, popularityDataSheet, popSum);
         //Before every day, run greedy and generate views
         //before first run, drop the contents of the popularity table manually?
-        writeToExcel(workbook, baseSum, popSum);
+        runAllMatViews(dayQueriesMap,allMatDataSheet,matSum);
+        runNoMatViews(dayQueriesMap,allVirtualDataSheet,virtSum);
+        writeToExcel(workbook, baseSum, popSum, matSum, virtSum);
 
     }
 
-    private void writeToExcel(HSSFWorkbook workbook, SummaryStats base, SummaryStats pop) throws IOException {
-        File results = new File("C:/Users/Mads/Desktop/PerformanceTest/SAMERALES.xls");
+    private void runNoMatViews(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet allVirtualDataSheet, SummaryStats virtSum) throws SQLException {
+        virtSum.setTimeSpentMaterializing(0);
+        virtSum.setNumberOfMaterialisedViews(0);
+        //Set all views to have root as their uppermaterialised node
+        for(Node n: gm.nodes.keySet()){
+            n.setMaterialised(false);
+            n.setMaterializedUpperNode(gm.getTopNode());
+        }
+        for (int i : dayQueriesMap.keySet()) {
+            double avg = runPerformanceTest(dayQueriesMap.get(i), allVirtualDataSheet, i, virtSum,false);
+            System.out.println("all virt finished d: " + (i+1));
+            virtSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
+            virtSum.addMatViewDay(i+1, getCurrentMaterialisedViewList());
+        }
+
+    }
+    private void runAllMatViews(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet allMatDataSheet, SummaryStats matSum) throws SQLException {
+        matSum.setTimeSpentMaterializing(1420120.4500000002);
+        matSum.setNumberOfMaterialisedViews(this.NUMBER_OF_MATERIALISED_VIEWS);
+        //Set all nodes to have themselves as upper materialised node
+        for(Node n: gm.nodes.keySet()){
+            n.setMaterialised(true);
+            n.setMaterializedUpperNode(n);
+        }
+        for(int i : dayQueriesMap.keySet()){
+            double avg = runPerformanceTest(dayQueriesMap.get(i),allMatDataSheet,i,matSum,false);
+            System.out.println("all mat finished d: " + (i+1));
+            matSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
+            matSum.addMatViewDay(i+1, getCurrentMaterialisedViewList());
+        }
+
+    }
+
+    private void writeToExcel(HSSFWorkbook workbook, SummaryStats base, SummaryStats pop, SummaryStats mat, SummaryStats virt) throws IOException {
+        File results = new File("C:/Users/mk96/Desktop/performancetest/finalfinal/finalTestWith" + this.NUMBER_OF_MATERIALISED_VIEWS + "MatViews.xls");
         HSSFSheet baseSummarySheet = workbook.createSheet("baseSUM");
         HSSFSheet popularitySummarySheet = workbook.createSheet("popularitySUM");
+        HSSFSheet virtSumSheet = workbook.createSheet("virtSum");
+        HSSFSheet matSumSheet = workbook.createSheet("allMatSum");
         populateSumSheet(base, baseSummarySheet);
         populateSumSheet(pop, popularitySummarySheet);
+        populateSumSheet(mat, matSumSheet);
+        populateSumSheet(virt, virtSumSheet);
         FileOutputStream os = new FileOutputStream(results);
         workbook.write(os);
+        os.close();
     }
 
     private void populateSumSheet(SummaryStats stats, HSSFSheet sheet) {
@@ -108,11 +157,12 @@ public class PerformanceTester {
         //materialize view and add time
         int days = 0;
         baseSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.ga, this.gm));
+        baseSum.setNumberOfMaterialisedViews(this.NUMBER_OF_MATERIALISED_VIEWS);
         for (int i : dayQueriesMap.keySet()) {
             /*if(days == 3){
                 break;
             }*/
-            double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, baseSum);
+            double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, baseSum,false);
             System.out.println("Base finished d: " + (i+1));
             baseSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
             baseSum.addMatViewDay(i+1, getCurrentMaterialisedViewList());
@@ -123,12 +173,13 @@ public class PerformanceTester {
 
     private void runPopularity(LinkedHashMap<Integer, ArrayList<String>> dayQueriesMap, HSSFSheet data, SummaryStats popSum) throws SQLException {
         int days = 0;
+        popSum.setNumberOfMaterialisedViews(this.NUMBER_OF_MATERIALISED_VIEWS);
         for (int i : dayQueriesMap.keySet()) {
             /*if(days == 3){
                 break;
             }*/
             popSum.setTimeSpentMaterializing(runGreedyAlgorithmAndGenerateViews(this.gpa, this.gm));
-            double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, popSum);
+            double avg = runPerformanceTest(dayQueriesMap.get(i), data, i, popSum,true);
             System.out.println("Pop finished d: " + (i+1));
             popSum.updateValues(dayQueriesMap.get(i).size(), i + 1, avg);
             popSum.addMatViewDay(i+1, getCurrentMaterialisedViewList());
@@ -147,7 +198,7 @@ public class PerformanceTester {
 
     private double runGreedyAlgorithmAndGenerateViews(GreedyAlgorithm ga, GraphManager gm) throws SQLException {
         ViewGenerator vg = new ViewGenerator();
-        curr_matviews = ga.materializeNodes(5);
+        curr_matviews = ga.materializeNodes(this.NUMBER_OF_MATERIALISED_VIEWS);
         return vg.generateViews(gm.nodes, gm.getTopNode());
     }
 
@@ -161,7 +212,7 @@ public class PerformanceTester {
         return viewNames;
     }
 
-    private double runPerformanceTest(ArrayList<String> queries, HSSFSheet sheet, int day, SummaryStats stats) throws SQLException {
+    private double runPerformanceTest(ArrayList<String> queries, HSSFSheet sheet, int day, SummaryStats stats, boolean shouldUpdatePop) throws SQLException {
         double totalRowsQueried = 0;
         HashMap<QueriedView, QueriedView> queriedViews = new HashMap<>();
         PopularityManager pm = new PopularityManager();
@@ -190,7 +241,8 @@ public class PerformanceTester {
             stats.setLongestQueryViewAndTime(s, rowsQueried);
         }
         //update all views we've used
-        pm.updatePopularityValues(queriedViews.keySet());
+        if(shouldUpdatePop)
+            pm.updatePopularityValues(queriedViews.keySet());
         return totalRowsQueried / queries.size();
     }
 }
