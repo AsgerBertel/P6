@@ -37,7 +37,7 @@
                     <ComboBox promptText="Date" fx:id="comboDate" id="comboDate" styleClass="comboboxDimension"/>
 
                 </HBox>
-                <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows" text="1000"/>
+                <TextField promptText="Amount of top rows" fx:id="txtTopRows" id="txtTopRows" text="" disable="true"/>
                 <HBox>
                     <Button text="Search" fx:id="btnSearch" onAction="#loadView" id="btnSearch"/>
                     <Label text="" fx:id="lblViewSize" id="lblViewSize"/>
@@ -86,8 +86,8 @@
                     <Label text="Frequency Deviation"/>
                 </HBox>
                 <HBox>
-                    <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures"/>
-                    <Label text="Impressions per Dollar"/>
+                    <CheckBox fx:id="chkIPD" id="chkIPD" styleClass="chkMeasures" visible="false"/>
+                    <Label text="Impressions per Dollar"  visible="false"/>
                 </HBox>
             </VBox>
         </VBox>
