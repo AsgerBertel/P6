@@ -75,7 +75,7 @@
 
                 <HBox>
                     <TextField fx:id="txtSliceValue" styleClass="searchField" promptText="Slice Value"/>
-                    <Button fx:id="btnSlice" styleClass="btnRollUp" text="Slice" onAction="#slice"/>
+                    <Button fx:id="btnSlice" styleClass="btnRollUp" text="Search" onAction="#slice"/>
                 </HBox>
                 <HBox>
                     <CheckBox fx:id="chkOD" id="chkOD" styleClass="chkMeasures"/>
